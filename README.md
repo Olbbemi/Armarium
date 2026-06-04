@@ -18,7 +18,7 @@ Hortus (정원 — 상위 우산)
 커스텀 스킬을 한 곳에서 버전관리하고, 플러그인으로 설치해 **어느 프로젝트에서나** 쓰기 위한 저장소.
 
 - 프로젝트별 `.claude/skills/` 에 흩어두면 다른 프로젝트에서 못 쓴다 -> 플러그인으로 묶어 해결.
-- **공개 마켓플레이스에 게시하지 않는다.** `marketplace.json` 은 repo 안 파일일 뿐이고, 로컬 경로로 등록한다. (git repo 자체가 public 이어도 그건 일반 repo 노출이지 마켓플레이스 공개가 아니다.)
+- **공개 마켓플레이스에 게시하지 않는다.** `marketplace.json` 은 repo 안 파일일 뿐이고, 사용자가 이 repo 를 직접 마켓플레이스로 add 해야 쓸 수 있다. (git repo 가 public 이어도 그건 일반 repo 노출이지 공개 마켓플레이스 등재가 아니다.)
 - 플러그인이라 스킬뿐 아니라 **에이전트·규약(CLAUDE.md)·훅까지 묶어** 배포되어, 다른 프로젝트에서도 의존성 없이 자기완결로 동작한다.
 
 ---
@@ -31,9 +31,14 @@ Armarium/
 │   ├── marketplace.json   # 이 repo 를 마켓플레이스로 선언 (name: hortus)
 │   └── plugin.json        # 플러그인 정의 (name: armarium)
 ├── CLAUDE.md              # 커스텀 태그 등 규약 (자기완결)
-├── agents/                # 스킬이 호출하는 서브에이전트 정의
-│   └── knowledge-writer.md
-└── skills/                # 스킬 본체 (각 디렉토리 = 스킬 1개)
+├── agents/                # 스킬이 호출하는 서브에이전트 정의 (플러그인 루트)
+│   ├── knowledge-writer.md
+│   └── skill-verify-*.md
+└── skills/                # 스킬 본체 (각 디렉토리 = 스킬 1개, 각자 README.md 포함)
+    ├── code-design/
+    ├── code-analyze/
+    ├── skill-writing/
+    ├── skill-verify/
     ├── knowledge-capture/
     └── knowledge-promote/
 ```
@@ -46,42 +51,68 @@ Armarium/
 
 ## 설치
 
-`/plugin` 은 슬래시 명령이라 세션에서 직접 입력한다.
+`/plugin` 은 슬래시 명령이라 세션에서 직접 입력한다. 평생 1회면 된다.
 
 ```
-/plugin marketplace add /home/olbbemi/Project/Armarium
+/plugin marketplace add Olbbemi/Armarium
 /plugin install armarium@hortus
+/reload-plugins
 ```
 
-- 경로는 **로컬 경로**로 등록한다. 작성 중에는 편집이 바로 반영되어 편하다.
-- 다른 머신에서는 이 repo 를 clone 한 뒤 그 경로를 add 하거나, git URL 로 add 한다.
-- 설치 후 스킬은 `armarium:knowledge-capture` 식으로 노출된다. 등록이 바로 안 보이면 새 세션을 시작한다.
+- GitHub `owner/repo` 로 add 하면 Claude Code 가 자동으로 clone·캐시한다 (`~/.claude/plugins/`). 직접 clone 할 필요 없다.
+- **user scope** 설치라 1회만 하면 어느 프로젝트에서 켜든 `armarium:<스킬>` 으로 노출된다.
+- 등록이 바로 안 보이면 `/reload-plugins` 또는 새 세션.
 
 ---
 
 ## 수록 스킬
 
-| 스킬 | 역할 |
-|------|------|
-| `knowledge-capture` | 논의 중 전제 지식 부재를 감지해 wip 초안으로 누적. `knowledge-writer` 에이전트에 작성 위임 |
-| `knowledge-promote` | wip 초안을 정제해 확정지식으로 승급 |
+각 스킬의 상세는 해당 디렉토리의 README 참조.
 
-두 스킬은 지식 저장소(**Herbarium**)의 `wip/` 와 `knowledge/` 를 읽고 쓴다. 기본 경로는 `/home/olbbemi/Project/Herbarium` 이며, 스킬 본문에 박혀 있다.
+| 스킬 | 요약 | 호출 |
+|------|------|------|
+| [`code-design`](skills/code-design/README.md) | 설계→구현→문서화 9단계 개발 파이프라인 지도. 현재 단계 판단·전환 규칙 | `/code-design`, "어디서부터 시작?" |
+| [`code-analyze`](skills/code-analyze/README.md) | 코드를 구조·품질·변경 영향도·로직 요약 네 측면으로 분석 | `/code-analyze` (명시 호출) |
+| [`skill-writing`](skills/skill-writing/README.md) | armarium 스킬 작성 규격 가이드 (구조·태그·프론트매터·에이전트) | `/skill-writing`, "스킬 만들어줘" |
+| [`skill-verify`](skills/skill-verify/README.md) | 스킬이 `skill-writing` 규격·동작대로인지 7항목 검증 후 보고서 | `/skill-verify`, "스킬 검증해줘" |
+| [`knowledge-capture`](skills/knowledge-capture/README.md) | 논의 중 전제 지식 부재를 감지해 wip 초안으로 누적 | `/knowledge-capture` (명시 활성) |
+| [`knowledge-promote`](skills/knowledge-promote/README.md) | wip 초안을 정제해 확정지식으로 승급 | `/knowledge-promote` |
 
-> 나머지 커스텀 스킬(code-design, skill-writing, skill-verify, code-analyze 등)은 순차 이관 예정.
+`knowledge-capture` / `knowledge-promote` 는 지식 저장소(**Herbarium**)의 `wip/` 와 `knowledge/` 를 읽고 쓴다. 기본 경로는 `/home/olbbemi/Project/Herbarium` 이며 스킬 본문에 박혀 있다.
 
 ---
 
 ## 새 스킬 추가
 
 1. `skills/<새스킬>/SKILL.md` 작성 (frontmatter `name`, `description` 필수).
-2. 서브에이전트가 필요하면 `agents/<에이전트>.md` 에 정의.
-3. 내부 경로는 플러그인 루트 상대(`skills/...`, `agents/...`)로 작성.
-4. 로컬 경로 설치 상태면 편집 즉시 반영, 안 되면 `/plugin marketplace update` 후 새 세션.
+2. 같은 디렉토리에 `README.md` 작성 후 위 "수록 스킬" 표에 링크 추가.
+3. 서브에이전트가 필요하면 `agents/<에이전트>.md` 에 정의.
+4. 내부 경로는 플러그인 루트 상대(`skills/...`, `agents/...`)로 작성.
+5. 커밋·푸시 후 아래 "업데이트" 흐름으로 반영.
+
+---
+
+## 버전 규칙
+
+`.claude-plugin/plugin.json` 의 `version` 은 SemVer(`major.minor.patch`)를 따른다. **plugin payload**(`skills/`, `agents/`, `CLAUDE.md` 등 배포물)가 바뀔 때만 올리며, `.claude/`(dev 설정·push 훅)·`.planning/` 같은 비배포 파일은 버전과 무관하다.
+
+| 등급 | 기준 | 예 |
+|------|------|----|
+| MAJOR `X.0.0` | 호환을 깨는 변경 | 스킬/슬래시 명령 이름 변경·삭제, 호출·경로 규약 변경, 동작 방식 근본 변경 |
+| MINOR `0.X.0` | 하위호환 기능 추가 | 새 스킬·에이전트 추가, 기존 스킬에 기능·옵션·검증 항목 추가, 트리거 확장 |
+| PATCH `0.0.X` | 하위호환 수정 | 버그 수정, README·문구·오타, 내부 리팩터링, 동작 의미 불변 미세 조정 |
+
+- **0.x 단계:** 스킬 셋과 호출 규약이 안정될 때까지는 1.0 전이며, 이 동안엔 큰 변경도 0.x 안에서 MINOR로 흡수해도 된다. 안정되면 `1.0.0` 으로 올린다.
+- 버전을 안 올리고 push 하면 `/plugin marketplace update` 가 변경을 받아오지 않는다. push 직전 확인 훅이 이를 잡아준다.
 
 ---
 
 ## 업데이트
 
-- **이 머신(로컬 경로 설치)**: 파일 편집 -> 바로 반영 (필요 시 새 세션).
-- **다른 머신(git 설치)**: `git pull` 후 `/plugin marketplace update`.
+소스 저장소(`/home/olbbemi/Project/Armarium`)를 고쳐 GitHub 에 올리고 설치처(캐시)를 갱신하는 흐름이다. 설치된 플러그인은 `~/.claude/plugins/cache/...` 의 읽기전용 사본이라 직접 고치지 않는다.
+
+1. 소스 저장소에서 수정 -> commit -> push
+2. 의미 있는 변경이면 `.claude-plugin/plugin.json` 의 `version` 을 올린다 (안 올리면 update 가 변경을 받아오지 않는다).
+3. `/plugin marketplace update hortus` -> `/reload-plugins`
+
+> push 시 `version` 미변경을 잡아주는 확인 훅이 `.claude/settings.json` 에 있다 (armarium 저장소에서 작업할 때만 동작).

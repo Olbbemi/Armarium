@@ -12,7 +12,7 @@
 대상 스킬 디렉토리 안에 다음 중 하나라도 있으면 복합 스킬로 본다.
 
 - SKILL.md, overview.md 외의 추가 디렉토리가 있다
-- SKILL.md, overview.md 외의 추가 마크다운 파일이 있다 (단 `verify-result.md` 같은 산출물 파일은 제외)
+- SKILL.md, overview.md 외의 추가 마크다운 파일이 있다 (단 `README.md`, `verify-result.md` 같은 문서·산출물 파일은 제외)
 
 해당하지 않으면 단순 스킬로 본다.
 
