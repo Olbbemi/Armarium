@@ -20,22 +20,17 @@
 ## 구조
 
 - `overview.md` — 진입점. 실행 순서 정의
-- `code-analyze.sh` — 실행 모드와 에이전트 경로를 결정하는 bash 디스패처
-- `agents/structure.md`, `agents/quality.md`, `agents/impact.md`, `agents/summary.md` — 각 분석 에이전트
+- 플러그인 루트 `agents/code-analyze-{structure,quality,impact,summary}.md` — 각 분석 에이전트. 플러그인이 자동 발견해 Task 의 `subagent_type` 으로 호출된다
 
 ## 동작 흐름
 
-1. **디스패처 호출** — `bash "${CLAUDE_PLUGIN_ROOT}/skills/code-analyze/code-analyze.sh" [<analysis>...]`. 인자는 `structure`/`quality`/`impact`/`summary` 중 하나 이상, 또는 없음
-2. **출력 해석** — 디스패처가 `KEY=VALUE` 로 모드를 반환
-   - `MODE=ASK` — 선택이 비어 있음 → 사용자에게 분석 종류를 물어 1단계 재실행
-   - `MODE=INLINE` — 단일 분석 → 해당 에이전트 파일을 Read 해 인라인 실행
-   - `MODE=PARALLEL` — 2개 이상 → 각 에이전트를 Task 도구로 병렬 호출
-3. **분석 선택 판단** — 종류 미지정 시 Claude가 대화 맥락으로 자동 선택, 모호하면 인자 없이 호출해 `MODE=ASK` 를 받아 사용자에게 선택지 제시
-4. **병렬 실행** — PARALLEL 모드면 모든 에이전트를 동시 실행
-5. **결과 취합** — 완료 후 `## 구조`, `## 품질` 등 섹션 헤더로 구분해 통합 제시
+1. **분석 종류 결정** — 사용자가 `structure`/`quality`/`impact`/`summary` 중 명시하면 그대로, 미지정이면 맥락으로 자동 선택, 모호하면 사용자에게 질문
+2. **대상 경로 결정** — 대화 맥락에서 결정, 불명확하면 사용자에게 질문
+3. **에이전트 호출** — 선택된 분석마다 `code-analyze-<종류>` 에이전트를 Task 로 호출. 2개 이상이면 한 응답 안에 병렬
+4. **결과 취합** — 완료 후 `## 구조`, `## 품질` 등 섹션 헤더로 구분해 통합 제시
 
 ## 입력 / 출력
 
-- **분석 종류** — 디스패처 인자 (없으면 맥락 판단 또는 ASK)
-- **분석 대상 경로** — 디스패처 인자로 받지 않는다. Claude가 대화 맥락에서 결정하며, 불명확하면 사용자에게 묻는다. 결정된 경로를 각 에이전트 입력으로 전달
+- **분석 종류** — 호출 시 지정 (없으면 맥락 판단 또는 질문)
+- **분석 대상 경로** — Claude가 대화 맥락에서 결정하며, 불명확하면 사용자에게 묻는다. 결정된 경로를 각 에이전트 입력으로 전달
 - **출력** — 분석별 마크다운 리포트
