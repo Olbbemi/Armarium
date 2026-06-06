@@ -82,11 +82,7 @@
 
 | 파일 | 역할 | 진입 조건 |
 |------|------|----------|
-| `skills/code-design/03-implementation/create.md` | 새 프로젝트 신규 구현 흐름 | 흐름 A 선택 시 |
-| `skills/code-design/03-implementation/modify.md` | 기존 코드 변경 구현 흐름 | 흐름 B 선택 시 |
-| `skills/code-design/03-implementation/languages/cpp.md` | C++ 언어 reference | C++ 사용 시 |
-| `skills/code-design/03-implementation/languages/python.md` | Python 언어 reference | Python 사용 시 |
-| `skills/code-design/03-implementation/languages/rust.md` | Rust 언어 reference | Rust 사용 시 |
+| `skills/code-design/03-implementation/languages/cpp.md` | C++ 고유 가드레일 | C++ 사용 시 |
 
 ---
 

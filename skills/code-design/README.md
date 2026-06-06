@@ -17,7 +17,7 @@
 - 단계별 진입 파일
   - `01-requirements.md` — 요구사항 분석
   - `02-design.md` — 설계 (`02-design/new_project.md`, `02-design/extend_or_refactor.md` 분기)
-  - `03-implementation.md` — 구현 (`03-implementation/create.md`, `modify.md`, `languages/*.md` 분기)
+  - `03-implementation.md` — 구현. 분기 구조가 아니라 경량 "최소 제약" 가드레일(G1~G12) 묶음 (언어 고유 가드레일은 `03-implementation/languages/cpp.md`)
   - `04-static-analysis` ~ `09-documentation` — TBD(미작성)
 
 ## 9단계와 정상 흐름

@@ -7,7 +7,7 @@
     {
       "name": "armarium",
       "source": "./",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "description": "개인 커스텀 스킬 묶음 (Hortus 패밀리)"
     }
   ]

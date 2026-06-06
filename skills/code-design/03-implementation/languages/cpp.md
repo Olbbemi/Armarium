@@ -1,94 +1,18 @@
-> **이름:** `cpp.md`
-> **역할:** 3단계 구현에서 C++ 사용 시 참조하는 reference. 빌드 시스템 / 테스트 프레임워크 / 의존성 관리 명령과 C++ 관용 패턴을 모은다. 흐름 variant 파일의 사전 조사 / 작업 흐름에서 언어별 명령이 필요할 때 로드된다.
+> 역할: 3단계 구현에서 C++ 사용 시, 메인 가드레일(G1~G12)에 더해 적용하는 C++ 고유의 선.
+>        "어떻게 쓰는지"(빌드/테스트 명령, 문법)는 일반 상식·공식 문서·프로젝트 파일에 맡긴다.
+>        라벨은 메인 G 와 구분되게 `CPP-G#` 를 쓴다.
 
-# C++ 언어 reference
+# C++ 고유 가드레일
 
----
-
-## 표준 도구 (기본값)
-
-| 영역 | 기본 | 대안 |
-|------|------|------|
-| 빌드 시스템 | CMake (3.20+) | Bazel |
-| 패키지 / 의존성 | vcpkg | Conan, FetchContent |
-| 테스트 프레임워크 | GoogleTest (gtest) | Catch2 |
-| 포맷팅 | clang-format | - |
-| 정적 분석 | clang-tidy | cppcheck |
-| 표준 | C++20 | C++17 (필요 시) |
-
-대안을 선택할 사유가 있으면 사용자에게 질문 (공통 원칙 1).
-
----
-
-## 디렉토리 레이아웃
-
-```
-프로젝트 루트/
-├── CMakeLists.txt
-├── vcpkg.json              # vcpkg 사용 시
-├── include/                # public 헤더
-│   └── {project}/
-├── src/                    # 구현
-│   └── {module}.cpp
-└── tests/                  # 테스트
-    └── test_{module}.cpp
-```
-
----
-
-## 명령 매핑
-
-### 초기화 (새 프로젝트 - 흐름 A)
-
-```bash
-# CMakeLists.txt 작성 후
-cmake -B build -DCMAKE_BUILD_TYPE=Debug
-```
-
-### 의존성 추가 (vcpkg)
-
-```bash
-vcpkg add port {package_name}    # vcpkg.json 갱신
-cmake -B build                    # 재구성
-```
-
-### 빌드
-
-```bash
-cmake --build build
-```
-
-### 테스트 실행
-
-```bash
-ctest --test-dir build --output-on-failure
-```
-
-### 포맷팅 / 린트
-
-```bash
-clang-format -i src/**/*.cpp include/**/*.hpp
-clang-tidy src/**/*.cpp
-```
-
----
-
-## TDD 사이클 명령 매핑
-
-| 사이클 단계 | 명령 |
-|-----------|------|
-| 테스트 작성 후 실패 확인 (Red) | `ctest --test-dir build -R {test_name}` |
-| 구현 후 통과 확인 (Green) | `ctest --test-dir build -R {test_name}` |
-| 전체 테스트 재실행 (Refactor) | `ctest --test-dir build --output-on-failure` |
-
----
-
-## 관용 패턴 / 주의 사항
-
-- **헤더 / 소스 분리:** public 인터페이스는 `include/` 의 `.hpp`, 구현은 `src/` 의 `.cpp`
-- **헤더 가드:** `#pragma once` 권장 (또는 include guard 매크로)
-- **RAII:** 자원 관리는 스마트 포인터 / RAII 객체로. raw `new` / `delete` 금지
-- **표준 명시:** `CMakeLists.txt` 에 `set(CMAKE_CXX_STANDARD 20)` 명시
-- **컴파일러 경고:** `-Wall -Wextra -Wpedantic` 활성화 권장
-- **테스트 빌드 분리:** 테스트는 별도 타겟. production 빌드에 포함 X
-- **lock 파일:** `vcpkg.json` 의 baseline / overrides 로 버전 고정. 커밋 권장
+- **CPP-G1. 자원은 RAII/스마트포인터로 관리한다 (raw `new`/`delete` 금지).**
+  예외 경로에서도 누수가 안 생기고, 소유권이 타입에 드러난다.
+- **CPP-G2. public 인터페이스는 헤더(`.hpp`), 구현은 소스(`.cpp`)로 분리하고 헤더 가드(`#pragma once`)를 둔다.**
+  ODR 위반·중복 정의·헤더 비대화를 막는다.
+- **CPP-G3. C++ 표준 버전을 빌드에 명시한다 (예: `set(CMAKE_CXX_STANDARD 20)`).**
+  컴파일러 디폴트에 맡기면 환경마다 동작·가용 기능이 갈린다.
+- **CPP-G4. 컴파일러 경고를 최대로 켜고(`-Wall -Wextra -Wpedantic`) 무경고를 유지한다.**
+  C++ 경고는 잠재 UB·실수의 1차 신호다. (검증완료선 "무경고"의 C++ 구체화.)
+- **CPP-G5. 값/이동/참조·복사 시맨틱을 의식한다.**
+  불필요한 복사, 댕글링 참조, 이동 후 사용(use-after-move)을 막는다.
+- **CPP-G6. 테스트는 production과 별도 타깃으로 빌드한다.**
+  테스트 코드가 배포 바이너리에 섞이지 않게 한다.
