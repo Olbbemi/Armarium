@@ -22,6 +22,7 @@
     facet/       facet 파일들 + index (Claude 층)
     html/        인터랙티브 HTML (사람, Mermaid)
     markdown/    as-built 마크다운 문서 (사람, 위키/명세)
+    .tmp/        렌더 중간 산출물(예: flow.diagram.md). 렌더 후 삭제
 ```
 
 생성만 한다. 커밋 / 이동(특히 HTML 을 GitHub Pages 디렉토리로) / 푸시는 사용자가 결과를 보고 직접 한다.
@@ -46,16 +47,24 @@
 |------|----------|------|----------|
 | 1 아키텍처/의존 | `code-analyze-architecture` | 모듈/디렉토리 레이아웃, 의존성 방향, 진입점 | 다이어그램 가능 |
 | 2 타입/관계 | `code-analyze-types` | 구조체/클래스/인터페이스 + 멤버 + 상속/구현 | 다이어그램 가능 |
-| 3 플로우 | `code-analyze-flow` | 주요 시나리오의 호출/데이터 흐름 | 다이어그램 가능 |
+| 3 플로우 | `code-analyze-flow` | 주요 시나리오의 호출/데이터 흐름 | 산문(facet) + 시퀀스(임시) 분리 |
 | 4 외부의존 | `code-analyze-externals` | 사용 라이브러리/패키지 + 사용 위치 | 텍스트 |
 | 5 로직요약 | `code-analyze-summary` | 모듈별 동작을 사람 말로 서술 | 텍스트 |
+
+플로우(facet 3)만 예외다. 시퀀스 다이어그램은 Claude 층에 무거우므로 facet 에는 산문만 영구 저장하고, 시퀀스 다이어그램은 임시 파일(`analyze/.tmp/flow.diagram.md`)로 빼서 렌더에만 쓰고 렌더 후 삭제한다. 구조형 다이어그램(아키텍처/타입/외부)은 Claude 에게도 유용하므로 facet 에 그대로 영구 보존한다.
 
 ### 렌더 에이전트
 
 | 에이전트 | 역할 | 입력 | 출력 |
 |----------|------|------|------|
-| `code-analyze-render-html` | facet 집합 -> 단일 인터랙티브 HTML (Mermaid) | `analyze/facet/` | `analyze/html/` |
-| `code-analyze-render-markdown` | facet 집합 -> as-built 마크다운 문서 | `analyze/facet/` | `analyze/markdown/` |
+| `code-analyze-render-html` | facet + 임시 시퀀스 -> 단일 인터랙티브 HTML (Mermaid) | `analyze/facet/` + `analyze/.tmp/flow.diagram.md` | `analyze/html/` |
+| `code-analyze-render-markdown` | facet + 임시 시퀀스 -> as-built 마크다운 문서 | `analyze/facet/` + `analyze/.tmp/flow.diagram.md` | `analyze/markdown/` |
+
+### 검증 에이전트
+
+| 에이전트 | 역할 | 입력 | 출력 |
+|----------|------|------|------|
+| `code-analyze-verify` | 렌더 HTML 의 mermaid 문법/렌더 깨짐 검증 | `analyze/html/index.html` | 리포트 본문 반환 |
 
 impact(변경 영향도)는 별도 에이전트/산출물로 두지 않는다. 생성된 facet 지도를 읽어 on-demand 로 추론한다 -- 변경 대상의 직접/간접 호출자, 공개 노출 지점(API/CLI/export), 관련 테스트를 architecture/flow facet 에서 짚어 영향 범위를 파악한다.
 
@@ -66,11 +75,13 @@ impact(변경 영향도)는 별도 에이전트/산출물로 두지 않는다. �
 ### 사전 준비
 
 1. 분석 대상 경로를 정한다(대화 맥락에서 결정, 모호하면 사용자에게 질문). 결정된 경로를 모든 에이전트 입력으로 전달한다.
-2. 메인이 Bash 로 `<프로젝트 루트>/analyze/{facet,html,markdown}/` 를 생성한다(`mkdir -p`).
+2. 메인이 Bash 로 `<프로젝트 루트>/analyze/{facet,html,markdown,.tmp}/` 를 생성한다(`mkdir -p`).
 
 ### Phase 1 -- 분석 (병렬)
 
 분석 에이전트(facet 1-5)를 한 응답에서 Task 로 **병렬 호출**한다. 각 에이전트는 facet 결과 본문을 반환하고, 메인이 받아 `analyze/facet/<facet>.md` 로 저장한다.
+
+플로우(facet 3)는 산문과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 구분자 위(산문)를 `analyze/facet/flow.md` 로, 아래(시퀀스 다이어그램)를 `analyze/.tmp/flow.diagram.md` 로 나눠 저장한다.
 
 <PENETRATE>
 facet 분석 에이전트들은 한 응답 안에서 병렬로 호출한다.
@@ -86,11 +97,21 @@ facet 분석 에이전트들은 한 응답 안에서 병렬로 호출한다.
 
 ### Phase 3 -- 렌더 (병렬)
 
-facet 집합 + 인덱스가 준비되면 렌더 에이전트 2개를 Task 로 **병렬 호출**한다. 각 에이전트는 렌더 결과 본문을 반환하고, 메인이 `analyze/html/`, `analyze/markdown/` 에 저장한다.
+facet 집합 + 인덱스 + 임시 시퀀스 파일이 준비되면 렌더 에이전트 2개를 Task 로 **병렬 호출**한다. 입력으로 `analyze/facet/` 와 `analyze/.tmp/flow.diagram.md` 경로를 함께 전달한다. 각 에이전트는 렌더 결과 본문을 반환하고, 메인이 `analyze/html/`, `analyze/markdown/` 에 저장한다.
+
+저장이 끝나면 메인이 `analyze/.tmp/` 를 삭제한다. 임시 시퀀스 파일은 렌더 산출물에 이미 복사돼 들어갔으므로 더 보관하지 않는다.
+
+<RICOCHET>
+임시 시퀀스 파일을 영구 보존하거나 최종 산출물에서 링크로 참조하지 않는다. 렌더 후 삭제한다.
+</RICOCHET>
+
+### Phase 4 -- 검증 (메인 -> 에이전트)
+
+렌더가 끝나면 메인이 `code-analyze-verify` 를 Task 로 호출한다. 입력은 저장된 HTML 경로(`analyze/html/index.html`). 검증 리포트를 받아, 깨진 다이어그램이 있으면 사용자에게 보고한다. 검증 도구가 없어 스킵된 경우에도 그 사실을 안내한다.
 
 ### 결과 안내
 
-생성된 파일 목록과 경로를 안내한다. HTML 을 Pages 로 옮기거나 커밋하려면 사용자가 직접 한다고 알린다.
+생성된 파일 목록과 경로, 검증 결과 요약을 안내한다. HTML 을 Pages 로 옮기거나 커밋하려면 사용자가 직접 한다고 알린다.
 
 ---
 
