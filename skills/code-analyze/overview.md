@@ -66,6 +66,14 @@
 |----------|------|------|------|
 | `code-analyze-verify` | 렌더 HTML 의 mermaid 문법/렌더 깨짐 검증 | `analyze/html/index.html` | 리포트 본문 반환 |
 
+### 조건부 분석 에이전트
+
+| 에이전트 | 역할 | 입력 | 출력 |
+|----------|------|------|------|
+| `code-analyze-callgraph-cpp` | C++ 함수 호출 그래프(clang/LLVM) 추출 | 분석 대상 경로 + compile_commands.json | facet 텍스트 + DOT(임시) 분리 반환 |
+
+함수 단위의 빽빽한 호출 관계는 mermaid 가 약하므로 Graphviz 로 보강한다. **C++ 이고 `compile_commands.json` 이 있을 때만** 동작하며(정확도 우선), 사전조건이 없으면 이 단계를 통째로 스킵하고 나머지 산출물은 그대로 만든다. 호출 그래프 이미지는 사람용이라 facet 에는 텍스트 요약만 들어가고, DOT/SVG 는 임시 렌더 레인을 탄다(시퀀스와 동일 패턴).
+
 impact(변경 영향도)는 별도 에이전트/산출물로 두지 않는다. 생성된 facet 지도를 읽어 on-demand 로 추론한다 -- 변경 대상의 직접/간접 호출자, 공개 노출 지점(API/CLI/export), 관련 테스트를 architecture/flow facet 에서 짚어 영향 범위를 파악한다.
 
 ---
@@ -91,15 +99,25 @@ facet 분석 에이전트들은 한 응답 안에서 병렬로 호출한다.
 에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다. 본문을 반환하고 메인이 저장한다.
 </RICOCHET>
 
+### Phase 1 보강 -- C++ 함수 호출 그래프 (조건부)
+
+대상이 C++ 이고 `compile_commands.json` 이 있으면 메인이 `code-analyze-callgraph-cpp` 를 Task 로 호출한다. 반환 본문을 `%%CALLGRAPH-DOT%%` 로 나눠, 텍스트 요약은 `analyze/facet/callgraph-cpp.md` 로(영구, Claude 용), DOT 들은 `analyze/.tmp/` 로 저장한다. 사전조건이 없거나 에이전트가 스킵을 반환하면 이 단계를 건너뛴다.
+
+<RICOCHET>
+호출 그래프 DOT/SVG 를 facet 에 저장하지 않는다. facet 에는 텍스트 요약(`callgraph-cpp.md`)만 저장한다.
+</RICOCHET>
+
 ### Phase 2 -- 인덱스 합성 (메인)
 
 메인이 저장된 facet 파일들을 보고 얇은 **인덱스**(`analyze/facet/index.md`)를 만든다. 인덱스는 진입점/목차 + 어느 facet 에 무엇이 있는지의 오리엔트만 담는다(facet 내용을 재서술하지 않는다).
 
 ### Phase 3 -- 렌더 (병렬)
 
-facet 집합 + 인덱스 + 임시 시퀀스 파일이 준비되면 렌더 에이전트 2개를 Task 로 **병렬 호출**한다. 입력으로 `analyze/facet/` 와 `analyze/.tmp/flow.diagram.md` 경로를 함께 전달한다. 각 에이전트는 렌더 결과 본문을 반환하고, 메인이 `analyze/html/`, `analyze/markdown/` 에 저장한다.
+렌더 전, `analyze/.tmp/` 에 호출 그래프 DOT 이 있으면 메인이 Bash 로 `dot -Tsvg` 를 돌려 같은 위치에 SVG 로 렌더한다(graphviz 미설치면 스킵하고 안내). render-html 은 mermaid 가 아닌 이 SVG 를 그대로 인라인한다.
 
-저장이 끝나면 메인이 `analyze/.tmp/` 를 삭제한다. 임시 시퀀스 파일은 렌더 산출물에 이미 복사돼 들어갔으므로 더 보관하지 않는다.
+facet 집합 + 인덱스 + 임시 시퀀스/호출그래프 파일이 준비되면 렌더 에이전트 2개를 Task 로 **병렬 호출**한다. 입력으로 `analyze/facet/` 와 `analyze/.tmp/`(flow.diagram.md, 호출그래프 SVG) 경로를 함께 전달한다. 각 에이전트는 렌더 결과 본문을 반환하고, 메인이 `analyze/html/`, `analyze/markdown/` 에 저장한다.
+
+저장이 끝나면 메인이 `analyze/.tmp/` 를 삭제한다. 임시 시퀀스/DOT/SVG 는 렌더 산출물에 이미 복사돼 들어갔으므로 더 보관하지 않는다.
 
 <RICOCHET>
 임시 시퀀스 파일을 영구 보존하거나 최종 산출물에서 링크로 참조하지 않는다. 렌더 후 삭제한다.
@@ -107,7 +125,7 @@ facet 집합 + 인덱스 + 임시 시퀀스 파일이 준비되면 렌더 에이
 
 ### Phase 4 -- 검증 (메인 -> 에이전트)
 
-렌더가 끝나면 메인이 `code-analyze-verify` 를 Task 로 호출한다. 입력은 저장된 HTML 경로(`analyze/html/index.html`). 검증 리포트를 받아, 깨진 다이어그램이 있으면 사용자에게 보고한다. 검증 도구가 없어 스킵된 경우에도 그 사실을 안내한다.
+렌더가 끝나면 메인이 `code-analyze-verify` 를 Task 로 호출한다. 입력은 저장된 HTML 경로(`analyze/html/index.html`). 검증 리포트를 받아, 깨진 다이어그램(mermaid)이나 비어 있는 호출 그래프 SVG 가 있으면 사용자에게 보고한다. 검증 도구가 없어 스킵된 경우에도 그 사실을 안내한다.
 
 ### 결과 안내
 

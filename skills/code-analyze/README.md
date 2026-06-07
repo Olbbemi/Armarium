@@ -40,17 +40,19 @@
 ## 구조
 
 - `overview.md` — 진입점. 실행 순서 정의
-- 플러그인 루트 `agents/` 의 에이전트 8개. 플러그인이 자동 발견해 Task 의 `subagent_type`(bare 이름)으로 호출된다
+- 플러그인 루트 `agents/` 의 에이전트 9개. 플러그인이 자동 발견해 Task 의 `subagent_type`(bare 이름)으로 호출된다
   - 분석 5: `code-analyze-{architecture,types,flow,externals,summary}`
   - 렌더 2: `code-analyze-{render-html,render-markdown}`
   - 검증 1: `code-analyze-verify`
+  - 조건부 분석 1: `code-analyze-callgraph-cpp` (C++ + compile_commands.json 있을 때만)
 
 ## 동작 흐름
 
 1. **대상 경로 결정** — 대화 맥락에서 결정, 모호하면 사용자에게 질문. 결정된 경로를 모든 에이전트 입력으로 전달
 2. **Phase 1 분석(병렬)** — 분석 에이전트 5개를 한 응답에서 Task 로 병렬 호출. 각 에이전트는 결과 본문을 반환하고 메인이 `analyze/facet/<facet>.md` 로 저장. 플로우는 산문(`facet/flow.md`)과 시퀀스(`.tmp/flow.diagram.md`)를 나눠 저장
+2.5. **Phase 1 보강(조건부, C++)** — C++ + `compile_commands.json` 이 있으면 `code-analyze-callgraph-cpp` 호출. 텍스트 요약은 `facet/callgraph-cpp.md`, DOT 은 `.tmp/` 로 저장. 사전조건 없으면 스킵
 3. **Phase 2 인덱스 합성(메인)** — 저장된 facet 들을 보고 얇은 진입점/목차 `analyze/facet/index.md` 작성
-4. **Phase 3 렌더(병렬)** — 렌더 에이전트 2개를 병렬 호출(입력에 `.tmp/flow.diagram.md` 포함), 메인이 `analyze/html/`·`analyze/markdown/` 에 저장 후 `.tmp/` 삭제
+4. **Phase 3 렌더(병렬)** — (호출그래프 DOT 이 있으면 메인이 먼저 `dot -Tsvg` 로 SVG 렌더) 렌더 에이전트 2개를 병렬 호출(입력에 `.tmp/` 의 시퀀스·호출그래프 SVG 포함), 메인이 `analyze/html/`·`analyze/markdown/` 에 저장 후 `.tmp/` 삭제
 5. **Phase 4 검증** — `code-analyze-verify` 로 HTML 의 mermaid 문법/렌더 깨짐 확인. 깨짐·스킵을 사용자에게 보고
 6. **결과 안내** — 생성 파일 목록·경로·검증 요약 안내. 게시는 사용자 몫임을 알림
 

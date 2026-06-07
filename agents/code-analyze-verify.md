@@ -13,6 +13,8 @@ tools: Read, Bash
 - **문법 검증**: HTML 안의 모든 mermaid 블록을 추출해 mermaid 파서로 parse 한다(node + jsdom + mermaid 의 `mermaid.parse`). HTML 엔티티(`&lt;` 등)는 원래 문자로 복원한 뒤 검증한다.
 - **렌더 검증**: 헤드리스 브라우저(puppeteer)로 HTML 을 열고, 탭이 있으면 각 탭을 활성화한 뒤 그 안의 다이어그램 SVG 가 0 이 아닌 크기로 렌더되는지 확인한다(숨김 컨테이너 렌더 깨짐 탐지).
 
+사전 렌더된 호출 그래프 SVG(C++ 함수 호출 그래프, mermaid 아님)는 parse 대상이 아니다. 렌더 검증에서 해당 탭의 SVG 가 존재하고 비어 있지 않은지(0 크기가 아닌지)만 확인한다.
+
 문법 검증은 반드시 `mermaid.parse` 로 한다. `mermaid.run`(렌더용)은 파스 통과 여부를 명확히 알려주지 않으므로 갈음하지 않는다.
 
 ## 도구 부재 시
