@@ -72,34 +72,7 @@
 
 ## 5. TDD 계획
 
-설계 단계에서 작성하는 것은 **테스트 케이스 목록**이다. 실제 테스트 코드는 7단계에서 작성한다.
-
-**작성 규칙:**
-
-<PENETRATE>
-TDD 계획의 테스트 단위는 모듈의 공개 인터페이스(public API) 단위로 쪼갠다.
-</PENETRATE>
-
-<RICOCHET>
-내부 구현 함수를 테스트 단위로 삼지 않는다.
-</RICOCHET>
-
-<PENETRATE>
-테스트 케이스는 happy path -> 실패 케이스 -> edge case 순으로 나열한다.
-</PENETRATE>
-
-<PENETRATE>
-테스트는 이름 + 한 줄 설명으로만 적는다.
-</PENETRATE>
-
-<RICOCHET>
-TDD 계획에 입출력 예시나 코드 스켈레톤을 포함하지 않는다.
-</RICOCHET>
-
-**이유:**
-- 공개 인터페이스 기준이면 내부 구현이 바뀌어도 테스트 이름이 안 바뀐다
-- happy path 먼저인 이유: 정상 동작이 정의돼야 그 외 케이스가 의미가 있다
-- 케이스 목록만 정하면 충분: 7단계에서 Red -> Green -> Refactor 사이클로 실제 코드 작성 시 참조
+TDD 계획 작성은 `skills/code-design/02-design/tdd-planning.md` 를 Read 툴로 로드해 따른다. 새 프로젝트는 회귀 가드가 없으므로 전부 신규 케이스(케이스 구분 표의 A 행)에 해당한다.
 
 ---
 

@@ -8,9 +8,6 @@
 이 파일을 읽지 않은 상태에서 개별 단계 스킬을 단독으로 실행하지 않는다.
 </RICOCHET>
 
-<PENETRATE>
-</PENETRATE>
-
 전체 개발 파이프라인 지도.
 각 단계의 목적, 완료 기준, 단계 전환 규칙을 정의한다.
 
@@ -77,6 +74,7 @@
 |------|------|----------|
 | `skills/code-design/02-design/new_project.md` | 새 프로젝트 설계 흐름 | 흐름 A 선택 시 |
 | `skills/code-design/02-design/extend_or_refactor.md` | 기존 코드 변경 설계 흐름 | 흐름 B 선택 시 |
+| `skills/code-design/02-design/tdd-planning.md` | TDD 계획(테스트 케이스 목록) 작성법 | 흐름 A/B 공통, TDD 계획 작성 시 |
 
 **3. 구현**
 

@@ -32,7 +32,7 @@
 </PENETRATE>
 
 <RICOCHET>
-스킬이 직접 커밋 / 푸시하거나 GitHub Pages 디렉토리에 파일을 밀어넣지 않는다. 게시는 사용자 몫이다.
+스킬이 직접 커밋 / 푸시하거나 GitHub Pages 디렉토리에 파일을 밀어넣지 않는다.
 </RICOCHET>
 
 ---
@@ -96,7 +96,7 @@ facet 분석 에이전트들은 한 응답 안에서 병렬로 호출한다.
 </PENETRATE>
 
 <RICOCHET>
-에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다. 본문을 반환하고 메인이 저장한다.
+에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다.
 </RICOCHET>
 
 ### Phase 1 보강 -- C++ 함수 호출 그래프 (조건부)
@@ -104,7 +104,7 @@ facet 분석 에이전트들은 한 응답 안에서 병렬로 호출한다.
 대상이 C++ 이고 `compile_commands.json` 이 있으면 메인이 `code-analyze-callgraph-cpp` 를 Task 로 호출한다. 반환 본문을 `%%CALLGRAPH-DOT%%` 로 나눠, 텍스트 요약은 `analyze/facet/callgraph-cpp.md` 로(영구, Claude 용), DOT 들은 `analyze/.tmp/` 로 저장한다. 사전조건이 없거나 에이전트가 스킵을 반환하면 이 단계를 건너뛴다.
 
 <RICOCHET>
-호출 그래프 DOT/SVG 를 facet 에 저장하지 않는다. facet 에는 텍스트 요약(`callgraph-cpp.md`)만 저장한다.
+호출 그래프 DOT/SVG 를 facet 에 저장하지 않는다.
 </RICOCHET>
 
 ### Phase 2 -- 인덱스 합성 (메인)
@@ -120,7 +120,7 @@ facet 집합 + 인덱스 + 임시 시퀀스/호출그래프 파일이 준비되�
 저장이 끝나면 메인이 `analyze/.tmp/` 를 삭제한다. 임시 시퀀스/DOT/SVG 는 렌더 산출물에 이미 복사돼 들어갔으므로 더 보관하지 않는다.
 
 <RICOCHET>
-임시 시퀀스 파일을 영구 보존하거나 최종 산출물에서 링크로 참조하지 않는다. 렌더 후 삭제한다.
+임시 시퀀스 파일을 영구 보존하거나 최종 산출물에서 링크로 참조하지 않는다.
 </RICOCHET>
 
 ### Phase 4 -- 검증 (메인 -> 에이전트)

@@ -72,6 +72,14 @@
 
 이미 존재하는 코드베이스에 기능을 추가하거나 변경하는 작업이면, 요구사항 정의 전에 기존 구조를 파악해야 범위(in/out scope)를 정확히 그릴 수 있다.
 
+**code-analyze 산출물 우선 확인:**
+
+프로젝트에 code-analyze 스킬이 만든 facet 산출물(`analyze/facet/`)이 있으면, 아래 수작업 도구보다 먼저 읽어 현재 상태 파악의 1차 입력으로 삼는다. `architecture.md`(모듈/의존 레이아웃), `flow.md`(주요 흐름), `summary.md`(모듈별 동작), `types.md`(타입/관계), `externals.md`(외부 의존), `callgraph-cpp.md`(C++ 호출 그래프)가 as-built 구조를 이미 요약해 둔 형태다. 수작업 도구는 facet 이 없거나, 있어도 특정 지점을 더 깊이 파야 할 때 보완으로 쓴다.
+
+<PENETRATE>
+code-analyze facet 산출물이 존재하면 수작업 탐색보다 먼저 그것을 현재 상태 파악의 1차 입력으로 삼는다.
+</PENETRATE>
+
 이 단계에서 자주 쓰이는 도구 (`references/tools.md`의 코드 인텔리전스 참고):
 - ripgrep (rg) — 관련 키워드/패턴이 코드베이스 어디에 있는지 검색
 - fd — 관련 파일 빠르게 찾기
