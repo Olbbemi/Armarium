@@ -4,9 +4,12 @@
 #      "버전을 올릴지 / 그대로 진행할지" 확인을 요청한다.
 #  (2) .claude-plugin/marketplace.json 의 같은 플러그인 version 이 plugin.json
 #      version 과 다르면(한쪽만 올린 경우) 확인을 요청한다.
+#  (3) README.md 상단의 "현재 버전" 표기가 plugin.json version 과 다르면
+#      (README 갱신 누락) 확인을 요청한다.
 #
-# version 을 안 올리거나 두 파일이 어긋난 채 push 하면 /plugin marketplace
-# update 시 변경이 반영되지 않으므로, 그 사고를 push 직전에 차단한다.
+# version 을 안 올리거나 세 곳이 어긋난 채 push 하면 /plugin marketplace
+# update 시 변경이 반영되지 않거나 README 표기가 실제와 달라지므로, 그 사고를
+# push 직전에 차단한다.
 set -uo pipefail
 
 input=$(cat)
@@ -41,6 +44,16 @@ name=$(git -C "$repo" show HEAD:.claude-plugin/plugin.json 2>/dev/null | jq -r '
 mkt=$(git -C "$repo" show HEAD:.claude-plugin/marketplace.json 2>/dev/null | jq -r --arg n "$name" '.plugins[]? | select(.name==$n) | .version // ""')
 if [ -n "$mkt" ] && [ "$mkt" != "$cur" ]; then
   reason="plugin.json version('${cur}') 과 marketplace.json 의 '${name}' version('${mkt}') 이 다릅니다. 두 파일 version 을 같은 값으로 맞춘 뒤 push 하세요. 이대로 푸시하면 카탈로그 버전이 어긋나 update 가 제대로 반영되지 않습니다."
+  jq -nc --arg r "$reason" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r}}'
+  exit 0
+fi
+
+# (3) README.md 상단 "현재 버전" 표기가 plugin.json 과 다르면 확인 요청
+#     README 는 사람용 문서라 훅 사각지대였음 → 여기서 parity 로 잡는다.
+#     README 에 버전 표기가 없으면(구버전) 비강제 통과.
+rdme=$(git -C "$repo" show HEAD:README.md 2>/dev/null | grep -m1 -oE '현재 버전: `[0-9]+\.[0-9]+\.[0-9]+`' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+if [ -n "$rdme" ] && [ "$rdme" != "$cur" ]; then
+  reason="plugin.json version('${cur}') 과 README.md 상단 표기('${rdme}') 가 다릅니다. README 상단 '현재 버전' 줄을 '${cur}' 로 맞춘 뒤 push 하세요. README 갱신을 빠뜨리면 표기가 실제 배포 버전과 어긋납니다."
   jq -nc --arg r "$reason" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r}}'
   exit 0
 fi
