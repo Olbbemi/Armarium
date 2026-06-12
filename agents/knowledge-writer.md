@@ -17,11 +17,13 @@ tools: Read, Glob, WebSearch, WebFetch
 | 필드 | 의미 |
 |------|------|
 | `topic` | 주제 식별자 (kebab-case). wip 파일명 기반 |
-| `triggered_by` | 발동된 기준 코드 (A~E). 복수 가능 |
+| `triggered_by` | 발동된 기준 코드 (A~E 또는 `user-request`). 복수 가능 |
 | `trigger_summary` | 한 줄 사유 (1~2 문장) |
 | `user_known` | 사용자가 안다고 명시한 인접 지식 |
 | `discussion_context` | 임계가 발생한 큰 논의 맥락 |
 | `snippets` | 대화 발췌 |
+| `kind` | 지식 종류. `concept`(기본) 또는 `code`. `code` 면 아래 코드 지식 골격으로 작성 |
+| `language` | 대상 언어 (`kind: code` 일 때만). `python` / `rust` / `cpp` |
 
 ---
 
@@ -51,6 +53,28 @@ tools: Read, Glob, WebSearch, WebFetch
 | 캡처 맥락 | 이 wip가 나온 프로젝트와 그 프로젝트 특유의 전제(언어/규모/아키텍처)·결정사항. 승급 시 일반화/삭제 대상 |
 
 세부 포맷(헤더 레벨, 구분선 등)은 실사용 누적 후 조정한다.
+
+### 코드 지식 wip 골격 (kind: code)
+
+입력 `kind` 가 `code` 면(언어 문법/기능 주제) 위 골격 대신 아래로 작성한다. `language` 로 작성 언어를 받는다. 권장 골격이며 해당 없는 섹션은 비워둔다.
+
+wip 의 맨 첫 줄에 메타 주석을 둔다: `<!-- wip-meta: kind=code | language=<language> | since=<도입 버전, 모르면 생략> -->`.
+승급 단계가 이 줄을 읽어 코드 지식인지 판별하고 frontmatter 의 language·since 출발값으로 삼는다.
+concept wip 에는 이 줄을 두지 않는다.
+
+| 섹션 | 의미 |
+|------|------|
+| 한 줄 정의 | 이 문법/기능이 무엇을 하나 |
+| 문법 형태 | 시그니처·구문 |
+| 최소 예제 | 돌아가는 짧은 코드 (`language` 로 작성) |
+| 이전 방식과의 차이 | before/after. 선행 방식이 없으면 생략 |
+| 주의점 | 실제 있는 것만. 갈래 -- 수명·소유권 / 동작·안전성 / 성능 / 문법·파싱 / 호환·지원 |
+| 버전·지원 | 컴파일러·런타임별 지원 현황·부분 구현 |
+| 참고 자료 | 공식 문서·표준 |
+| 미해결 질문 | 확신 못 한 부분 |
+| 캡처 맥락 | 승급 시 일반화/삭제 대상 |
+
+`since`(도입된 표준·언어 버전) 후보를 알아내면 버전·지원이나 캡처 맥락에 적어 둔다. 승급 때 frontmatter `since` 로 올라간다.
 
 ---
 
