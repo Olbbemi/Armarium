@@ -17,7 +17,7 @@
 
 ## 동작 흐름
 
-1. 활성 (슬래시 명령)
+1. 활성 (슬래시 명령) — 활성 직후 저장 경로를 사용자에게 입력받고 git origin remote 로 Herbarium 여부 검증
 2. 매 발화마다 두 트리거 동시 감시
    - **자동 감지** — 점수표 합계 3점 이상
    - **명시 지시** — 사용자의 직접 저장 요청 ("이거 knowledge로 남겨줘" 등)
@@ -40,7 +40,7 @@
 
 ## 입력 / 출력
 
-- **저장 위치** — `/home/olbbemi/Project/Herbarium/wip/<topic>.md`
+- **저장 위치** — 활성 시 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<topic>.md`. 입력 경로는 origin remote 가 `git@github.com:Olbbemi/Herbarium.git` 인 Herbarium 저장소 하위여야 하며, 아니면 다시 입력받는다
 - **writer 입력 포맷** — `topic` / `triggered_by` / `trigger_summary` / `user_known` / `discussion_context` / `snippets` (라벨+콜론 구조화 텍스트, JSON 아님)
 
 ## 주의

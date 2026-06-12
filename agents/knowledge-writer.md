@@ -12,10 +12,11 @@ tools: Read, Glob, WebSearch, WebFetch
 
 ## 입력 포맷
 
-메인 LLM 이 Task 도구의 prompt 파라미터에 라벨+콜론 구조화 텍스트로 전달한다. 6 필드.
+메인 LLM 이 Task 도구의 prompt 파라미터에 라벨+콜론 구조화 텍스트로 전달한다.
 
 | 필드 | 의미 |
 |------|------|
+| `save_path` | 메인이 활성 시 확정한 wip 저장 디렉토리 절대경로. writer 는 이 경로 기준으로 충돌 검사·파일명을 정한다 |
 | `topic` | 주제 식별자 (kebab-case). wip 파일명 기반 |
 | `triggered_by` | 발동된 기준 코드 (A~E 또는 `user-request`). 복수 가능 |
 | `trigger_summary` | 한 줄 사유 (1~2 문장) |
@@ -98,7 +99,7 @@ concept wip 에는 이 줄을 두지 않는다.
 
 ## 파일명 규칙
 
-권장 파일명의 기본형은 `<topic>.md` 이고, 메인이 저장할 기준 경로는 전역 지식 루트의 `/home/olbbemi/Project/Herbarium/wip/` 다.
+권장 파일명의 기본형은 `<topic>.md` 이고, 메인이 저장할 기준 경로는 입력으로 받은 `save_path` 디렉토리다.
 writer 는 이 디렉토리 기준으로 파일명만 정해 반환하고, 실제 저장은 하지 않는다.
 
 <PENETRATE>
@@ -113,7 +114,7 @@ writer 가 Write/Edit 으로 wip 파일을 직접 저장하지 않는다.
 
 ## 동일 topic 충돌 처리
 
-Glob 으로 `/home/olbbemi/Project/Herbarium/wip/<topic>*.md` 패턴의 기존 파일을 검사한 뒤 다음 규칙에 따라 권장 파일명을 결정한다.
+Glob 으로 `<save_path>/<topic>*.md` 패턴의 기존 파일을 검사한 뒤 다음 규칙에 따라 권장 파일명을 결정한다.
 
 | 기존 파일 상태 | 권장 파일명 |
 |--------------|----------|
@@ -147,10 +148,10 @@ writer 는 파일을 저장하지 않으므로, 본문 전체를 메인에 반�
 
 반환 메시지 구조:
 
-- 1번째 줄: `저장 요망. 권장 파일명: <filename>.md` (`/home/olbbemi/Project/Herbarium/wip/` 기준)
+- 1번째 줄: `저장 요망. 권장 파일명: <filename>.md` (입력 `save_path` 기준)
 - 2번째 줄부터: wip 파일 본문 전체 (markdown). 군더더기 설명·요약 없이 본문만.
 
-메인은 이 본문의 `&`/`<`/`>` HTML 엔티티를 원복해 `/home/olbbemi/Project/Herbarium/wip/<filename>.md` 로 저장한다.
+메인은 이 본문의 `&`/`<`/`>` HTML 엔티티를 원복해 `<save_path>/<filename>.md` 로 저장한다.
 
 <PENETRATE>
 writer 는 본문 전체를 반환하고, 파일 저장은 메인 에이전트가 수행한다.

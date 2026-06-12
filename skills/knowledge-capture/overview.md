@@ -19,6 +19,49 @@ LLM 자가판단으로 스킬을 활성하거나 점수 계산을 시작하지 �
 
 ---
 
+## 저장 경로 설정
+
+활성 직후, wip 파일을 저장할 디렉토리 경로를 사용자에게 입력받는다.
+경로를 코드에 고정하지 않으며, 매 활성마다 새로 입력받는다.
+
+입력 경로는 Herbarium 저장소 하위여야 한다. 디렉토리명은 동명 저장소가 있을 수 있어 신뢰할 수 없으므로, 검증은 git origin remote 조회로 한다.
+
+### 검증 절차
+
+1. 입력 경로에서 origin remote 를 조회한다. 입력 경로가 아직 없으면 존재하는 가장 가까운 상위 디렉토리에서 조회한다.
+   `git -C <입력경로> remote get-url origin`
+2. 결과가 아래 기대 remote URL 과 정확히 일치하면 채택한다.
+3. 일치하지 않거나 조회에 실패하면 사유를 한 줄로 알리고 경로를 다시 입력받는다. 일치할 때까지 반복한다.
+4. 채택한 경로가 아직 없으면 `mkdir -p` 로 생성한다.
+
+#### 기대 remote URL
+
+이 값이 저장 경로 검증의 단일 기준이다.
+
+```
+git@github.com:Olbbemi/Herbarium.git
+```
+
+채택한 저장 경로는 점수표와 마찬가지로 메인 LLM 컨텍스트에만 유지하며(세션 휘발), 별도 파일 · 인덱스에 저장하지 않는다.
+
+<PENETRATE>
+활성 직후 wip 저장 디렉토리 경로를 사용자에게 입력받는다.
+</PENETRATE>
+
+<PENETRATE>
+입력 경로의 git origin remote 가 기대 remote URL 과 정확히 일치할 때만 저장 경로로 채택한다.
+</PENETRATE>
+
+<RICOCHET>
+origin remote 가 기대 remote URL 과 일치하지 않는 경로를 저장 경로로 채택하지 않는다.
+</RICOCHET>
+
+<RICOCHET>
+wip 저장 경로를 코드에 고정 리터럴로 박지 않는다.
+</RICOCHET>
+
+---
+
 ## 하위 스킬
 
 | 스킬 | 파일 | 역할 |
@@ -29,7 +72,7 @@ LLM 자가판단으로 스킬을 활성하거나 점수 계산을 시작하지 �
 
 ## 실행 순서
 
-1. 활성 (슬래시 명령)
+1. 활성 (슬래시 명령). 활성 직후 저장 경로를 설정한다 (`저장 경로 설정` 섹션)
 2. 매 발화마다 두 트리거 동시 감시
    - 자동 감지: 점수표 임계(3점) 도달
    - 명시 지시: 사용자의 직접 저장 요청
@@ -167,7 +210,7 @@ wip 단계에서 위임 여부 · 묶음 · 분리 여부를 사용자에게 묻
 | `subagent_type` | `knowledge-writer` |
 | `run_in_background` | `true` (백그라운드) |
 | writer 출력 | wip 파일 전체 본문을 최종 메시지로 반환 (Write 안 함) |
-| 저장 | 메인 에이전트가 통지를 받아 `/home/olbbemi/Project/Herbarium/wip/<topic>.md` (또는 suffix) 로 직접 저장 |
+| 저장 | 메인 에이전트가 통지를 받아 활성 시 설정한 저장 경로 하위 `<저장경로>/<topic>.md` (또는 suffix) 로 직접 저장 |
 
 <PENETRATE>
 `knowledge-writer` 호출은 백그라운드(`run_in_background: true`)로 한다. 메인은 완료 통지 도착까지 사용자 논의를 계속한다.
@@ -191,6 +234,7 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 
 | 필드 | 의미 | 비고 |
 |------|------|------|
+| `save_path` | 활성 시 확정한 wip 저장 디렉토리 절대경로 | `저장 경로 설정` 에서 채택한 경로. writer 가 충돌 검사·파일명 결정 기준으로 사용 |
 | `topic` | 주제 식별자 (kebab-case) | wip 파일명 기반 |
 | `triggered_by` | 발동된 기준 코드 (A~E 또는 `user-request`) | 복수 가능 |
 | `trigger_summary` | 한 줄 사유 | 1~2 문장 |
@@ -203,6 +247,7 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 #### 입력 예시 (zmq 라이브러리 — 한 항목 묶음)
 
 ```
+save_path: /home/olbbemi/Project/Herbarium/wip
 topic: zmq
 triggered_by: A, B
 trigger_summary:
