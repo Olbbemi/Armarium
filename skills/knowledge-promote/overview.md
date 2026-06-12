@@ -3,10 +3,7 @@
 `knowledge-capture` 가 쌓은 wip 초안을 확정지식으로 가공해 전역 지식 저장소에 올리는 스킬.
 캡처(wip 누적)와 별개의 독립 스킬이며, 사용자가 직접 호출할 때만 동작한다.
 
-경로:
-
-- wip 인박스: `/home/olbbemi/Project/Herbarium/wip/`
-- 확정지식: `/home/olbbemi/Project/Herbarium/knowledge/`
+wip 인박스와 확정지식 디렉토리는 모두 Herbarium 저장소 하위에 있다. Herbarium 의 실제 경로는 고정이 아니므로, 활성 직후 사용자에게 저장소 루트를 입력받아 git origin remote 로 검증하고 wip/ 와 knowledge/ 를 그 하위로 도출한다 (아래 "경로 설정" 참조).
 
 ---
 
@@ -20,7 +17,52 @@
 
 ---
 
+## 경로 설정
+
+활성 직후, Herbarium 저장소 루트 경로를 사용자에게 입력받는다.
+경로를 코드에 고정하지 않으며, 매 활성마다 새로 입력받는다.
+입력받은 루트 하위에서 wip 인박스(`<루트>/wip`)와 확정지식 디렉토리(`<루트>/knowledge`)를 도출한다.
+
+디렉토리명은 동명 저장소가 있을 수 있어 신뢰할 수 없으므로, 검증은 git origin remote 조회로 한다. 이 검증 기준은 capture 의 "저장 경로 설정" 과 같다.
+
+### 검증 절차
+
+1. 입력 루트에서 origin remote 를 조회한다. `git -C <입력루트> remote get-url origin`
+2. 결과가 아래 기대 remote URL 과 정확히 일치하면 채택한다.
+3. 일치하지 않거나 조회에 실패하면 사유를 한 줄로 알리고 경로를 다시 입력받는다. 일치할 때까지 반복한다.
+4. 채택한 루트 하위 `wip/` 와 `knowledge/` 가 없으면 `mkdir -p` 로 생성한다.
+
+#### 기대 remote URL
+
+이 값이 경로 검증의 단일 기준이다.
+
+```
+git@github.com:Olbbemi/Herbarium.git
+```
+
+채택한 wip · knowledge 경로는 메인 LLM 컨텍스트에만 유지하며(세션 휘발), 별도 파일 · 인덱스에 저장하지 않는다.
+
+<PENETRATE>
+활성 직후 Herbarium 저장소 루트 경로를 사용자에게 입력받고, 그 하위로 wip 와 knowledge 디렉토리를 도출한다.
+</PENETRATE>
+
+<PENETRATE>
+입력 루트의 git origin remote 가 기대 remote URL 과 정확히 일치할 때만 경로로 채택한다.
+</PENETRATE>
+
+<RICOCHET>
+origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하지 않는다.
+</RICOCHET>
+
+<RICOCHET>
+wip · knowledge 경로를 코드에 고정 리터럴로 박지 않는다.
+</RICOCHET>
+
+---
+
 ## 실행 순서
+
+활성 직후 위 "경로 설정" 을 먼저 수행해 wip · knowledge 경로를 확정한 뒤, 아래 순서로 진행한다.
 
 1. 대상 선택
 2. 형식 변환
@@ -33,7 +75,7 @@
 
 ### 1. 대상 선택
 
-인자로 topic 또는 파일명이 오면 그 wip 를 대상으로 한다. 인자가 없으면 `wip/` 목록을 보여주고 사용자가 고르게 한다. 한 번에 하나의 wip 만 승급한다.
+인자로 topic 또는 파일명이 오면 그 wip 를 대상으로 한다. 인자가 없으면 채택한 wip 디렉토리 목록을 보여주고 사용자가 고르게 한다. 한 번에 하나의 wip 만 승급한다.
 
 ### 2. 형식 변환
 
@@ -165,7 +207,7 @@ wip 의 "관련 개념"·본문 언급을 relations 타입드 엣지로 만든�
 - `same_family` — 같은 계열의 동료
 - `related` — 그 밖에 엮인 연관 개념 (아직 종류 미분류)
 
-대상은 다른 확정지식의 id 다. `knowledge/` 를 Glob 으로 보고 실재 id 와 우선 연결하되, 아직 없는 id 도 그대로 적는다. 종류 세분화는 노드가 쌓인 뒤로 미룬다.
+대상은 다른 확정지식의 id 다. 채택한 knowledge 디렉토리를 Glob 으로 보고 실재 id 와 우선 연결하되, 아직 없는 id 도 그대로 적는다. 종류 세분화는 노드가 쌓인 뒤로 미룬다.
 
 <RICOCHET>
 가리키는 id 파일이 아직 없다는 이유로 그 관계를 relations 에서 빼지 않는다.
@@ -190,7 +232,7 @@ wip 의 "캡처 맥락" 격리 블록을 확정지식 본문에 그대로 남기
 
 ### 7. 사용자 확인 후 저장
 
-변환 결과 본문과 5·6 단계의 이슈(죽은 링크, 사실성 의심, 중복·충돌 후보)를 사용자에게 함께 제시하고 승인받는다. 승인 시 메인이 `/home/olbbemi/Project/Herbarium/knowledge/<id>.md` 로 저장한다.
+변환 결과 본문과 5·6 단계의 이슈(죽은 링크, 사실성 의심, 중복·충돌 후보)를 사용자에게 함께 제시하고 승인받는다. 승인 시 메인이 채택한 `<knowledge>/<id>.md` 로 저장한다.
 
 <PENETRATE>
 확정지식 저장 전 변환 결과와 검증·중복 이슈를 사용자에게 제시하고 승인받는다.
