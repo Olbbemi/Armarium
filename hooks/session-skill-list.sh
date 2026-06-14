@@ -2,9 +2,10 @@
 # SessionStart 훅: armarium 가 제공하는 스킬 목록을 세션 시작 시 화면에 보여준다.
 #
 # SessionStart 의 stdout/additionalContext 는 "컨텍스트로만" 들어가 화면에 안 뜬다.
-# 그래서 hookSpecificOutput.initialUserMessage 로 첫 턴을 강제 생성하고
-# (= 모델이 응답하게 만들고), additionalContext 에 실제 목록을 실어
-# 모델이 그 첫 응답에서 목록을 출력하게 한다.
+# initialUserMessage 는 비대화형(-p) 모드 전용이라 인터랙티브 세션에선 무시된다.
+# 따라서 화면 표시는 범용 출력 필드 systemMessage 로 한다 (모든 훅 이벤트 지원,
+# 사용자 화면에 표시되나 모델 컨텍스트엔 안 들어감).
+# 모델도 목록을 알게 하려면 additionalContext 를 함께 내보낸다.
 set -euo pipefail
 
 # 표준입력 훅 JSON 에서 source 추출 (jq 의존 없이).
@@ -52,25 +53,26 @@ count="$(printf '%s' "$rows" | grep -c '.')"
 list_text="armarium 스킬 ${count}개
 ${rows}"
 
-# 모델에게 줄 데이터(컨텍스트)와, 첫 턴을 만들 사용자 메시지.
+# 화면에 띄울 배너(systemMessage)와, 모델이 인지할 컨텍스트(additionalContext).
+system_message="$list_text"
 additional_context="아래는 이 세션에서 쓸 수 있는 armarium 플러그인 스킬 목록(이름 + 설명 첫 줄)이다.
 사용자가 목록을 요청하면, 아래 내용을 그대로 코드블록 하나에 담아 보여줘라. 군더더기 설명은 붙이지 마라.
 
 ${list_text}"
-initial_user_message="(세션 시작 자동 안내) 이 세션에서 쓸 수 있는 armarium 스킬 목록을 코드블록으로 보여줘."
 
-# JSON 출력으로 initialUserMessage 를 전달 (python3 우선, 없으면 plain stdout 로 폴백).
+# JSON 출력으로 systemMessage(화면) + additionalContext(컨텍스트) 전달.
+# python3 우선, 없으면 plain stdout 폴백(배너는 안 뜨지만 컨텍스트로는 주입됨).
 if command -v python3 >/dev/null 2>&1; then
-  AC="$additional_context" IUM="$initial_user_message" python3 -c '
+  SM="$system_message" AC="$additional_context" python3 -c '
 import json, os
 print(json.dumps({
+  "systemMessage": os.environ["SM"],
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": os.environ["AC"],
-    "initialUserMessage": os.environ["IUM"],
   }
 }, ensure_ascii=False))'
 else
-  # 폴백: 자동 표시는 안 되지만 컨텍스트로는 주입됨.
+  # 폴백: 배너 표시는 안 되지만 컨텍스트로는 주입됨.
   printf '%s\n' "$additional_context"
 fi
