@@ -26,13 +26,7 @@
 
 변경 대상과 영향 범위에 관련된 기존 코드를 파악한다. 모든 케이스 공통.
 
-**code-analyze 산출물 우선 확인:**
-
-프로젝트에 code-analyze 스킬이 만든 facet 산출물(`analyze/facet/`)이 있으면, 아래 수작업 도구보다 먼저 읽어 현재 구조 분석의 1차 입력으로 삼는다. `architecture.md`(모듈/의존 레이아웃), `flow.md`(주요 흐름), `summary.md`(모듈별 동작), `types.md`(타입/관계), `externals.md`(외부 의존), `callgraph-cpp.md`(C++ 호출 그래프)가 as-built 구조를 이미 요약해 둔 형태다. 수작업 도구는 facet 이 없거나, 있어도 특정 지점을 더 깊이 파야 할 때 보완으로 쓴다.
-
-<PENETRATE>
-code-analyze facet 산출물이 존재하면 수작업 탐색보다 먼저 그것을 현재 구조 분석의 1차 입력으로 삼는다.
-</PENETRATE>
+기존 코드 구조 파악에 code-analyze facet 산출물이 있으면 1차 입력으로 활용한다 -- 공통 원칙 6 (`00-principles.md`) 참조. 수작업 도구는 facet 이 없거나 특정 지점을 더 깊이 파야 할 때 보완으로 쓴다.
 
 **자주 쓰이는 도구** (`references/tools.md` 의 코드 인텔리전스 참고):
 - `tree` — 디렉토리 구조 파악
