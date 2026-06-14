@@ -1,6 +1,6 @@
 # Armarium
 
-**현재 버전: `0.12.0`**
+**현재 버전: `0.12.1`**
 
 개인 커스텀 스킬을 담아 **여러 프로젝트에서 공통으로 쓰는 비공개 Claude Code 플러그인**.
 
@@ -36,6 +36,9 @@ Armarium/
 ├── agents/                # 스킬이 호출하는 서브에이전트 정의 (플러그인 루트)
 │   ├── knowledge-writer.md
 │   └── skill-verify-*.md
+├── hooks/                 # 세션 시작 등 훅 스크립트 (플러그인 루트)
+│   ├── hooks.json
+│   └── session-skill-list.sh
 └── skills/                # 스킬 본체 (각 디렉토리 = 스킬 1개, 각자 README.md 포함)
     ├── code-design/
     ├── code-analyze/
@@ -64,6 +67,15 @@ Armarium/
 - GitHub `owner/repo` 로 add 하면 Claude Code 가 자동으로 clone·캐시한다 (`~/.claude/plugins/`). 직접 clone 할 필요 없다.
 - **user scope** 설치라 1회만 하면 어느 프로젝트에서 켜든 `armarium:<스킬>` 으로 노출된다.
 - 등록이 바로 안 보이면 `/reload-plugins` 또는 새 세션.
+
+---
+
+## 세션 시작 배너
+
+설치해 두면 새 세션 시작 시 화면 배너에 스킬 목록(이름 + 한 줄 설명)이 자동 표시된다.
+
+- SessionStart 훅(`hooks/session-skill-list.sh`)이 `skills/*/SKILL.md` 를 훑어 목록을 만든다.
+- 기존 대화를 잇는 맥락(resume·compact)에서는 안 띄운다.
 
 ---
 
