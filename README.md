@@ -1,6 +1,6 @@
 # Armarium
 
-**현재 버전: `0.12.2`**
+**현재 버전: `0.13.0`**
 
 개인 커스텀 스킬을 담아 **여러 프로젝트에서 공통으로 쓰는 비공개 Claude Code 플러그인**.
 
@@ -133,9 +133,9 @@ Armarium/
 |---|------|------|----------|
 | 1 | `.claude-plugin/plugin.json` | `"version"` 필드 | push 훅이 직전 푸시 대비 상승 여부 검사 |
 | 2 | `.claude-plugin/marketplace.json` | 해당 플러그인의 `"version"` 필드 | push 훅이 plugin.json 과 parity 검사 |
-| 3 | `README.md` | 상단 `**현재 버전: ...**` 줄 | **검사 안 됨 — 수동 갱신** |
+| 3 | `README.md` | 상단 `**현재 버전: ...**` 줄 | push 훅이 plugin.json 과 parity 검사 |
 
-`check-version-bump.sh` 훅은 1·2번만 잡는다. 3번(README)은 훅 사각지대이므로 누락하기 쉽다 — 버전을 올렸으면 README 상단 표기를 반드시 함께 바꾼다.
+`check-version-bump.sh` 훅은 1·2·3 세 곳을 모두 잡는다 — plugin.json 의 직전 푸시 대비 상승, marketplace.json parity, README 상단 표기 parity 를 검사한다. 그래도 버전을 올릴 때 세 곳을 같은 값으로 함께 바꾼다.
 
 ---
 
