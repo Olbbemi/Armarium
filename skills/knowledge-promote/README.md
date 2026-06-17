@@ -12,16 +12,15 @@ wip 산문 한 건을 골라 확정지식 형식(프론트매터 + 정제 본문
 
 ## 경로
 
-- wip 인박스: `/home/olbbemi/Project/Herbarium/wip/`
-- 확정지식: `/home/olbbemi/Project/Herbarium/knowledge/`
+wip 인박스와 확정지식 디렉토리는 Herbarium 저장소 하위에 있다. 경로를 코드에 고정하지 않고, 활성 직후 사용자에게 Herbarium 루트를 입력받아 git origin remote(`git@github.com:Olbbemi/Herbarium.git`)로 검증한 뒤 `<루트>/wip` 와 `<루트>/knowledge` 를 도출한다.
 
 ## 동작 흐름 (8단계)
 
 1. **대상 선택** — 인자(topic/파일명)가 있으면 그 wip, 없으면 `wip/` 목록에서 사용자 선택. 한 번에 하나만
-2. **형식 변환** — 산문을 프론트매터(id/title/summary/category/tags/relations) + 정제 본문으로
-3. **관계 추출** — "관련 개념"을 relations 타입드 엣지로. 종류 3개: `contrasts_with`(반대/경쟁), `same_family`(동료), `related`(그 외)
-4. **일반화** — 특정 프로젝트 색(이름·언어·규모·결정)을 걷어내고 조건 서술로 다듬음
-5. **검증** — 참고 URL 생존을 WebFetch로 확인, 사실성 의심 항목 표시
+2. **형식 변환** — 산문을 프론트매터(kind/id/title/summary/category/tags/relations) + 정제 본문으로. `kind`(concept/code)가 본문 골격을 가른다 — concept은 핵심·오해·참고 자유 골격, code는 문법·예제·주의점·통념 정정 골격(`language`·`since` 칸 추가). "노트가 답하는 질문"으로 kind 결정(무엇·왜=concept / 어떻게 쓰나=code)
+3. **관계 추출** — "관련 개념"을 relations 타입드 엣지로. 종류 4개: `contrasts_with`(반대/경쟁), `same_family`(동료), `part_of`(부분-전체), `related`(그 외). `타입:대상` 문자열 평탄 리스트로 저장
+4. **일반화** — 특정 프로젝트 색(이름·언어·규모·결정)을 걷어내고 조건 서술로 다듬음. 캡처 맥락이 `[전제 없음]` 표식이면 걷어낼 게 없다는 신호
+5. **검증** — 참고 URL 생존 확인, 조사 보류 목록 fetch·대조·정정, 하단 풀코드 컴파일·실행 확인, 사실성 의심 항목 표시
 6. **중복·충돌 점검** — 기존 확정지식과 summary 비교, 병합/대체/별도를 사용자에게 질의
 7. **사용자 확인 후 저장** — 변환 결과 + 검증·중복 이슈를 제시하고 승인받아 `knowledge/<id>.md` 저장
 8. **원본 wip 처리** — 삭제할지 남길지 사용자 확인
