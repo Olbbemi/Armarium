@@ -4,17 +4,23 @@
 
 ## 무엇을 하나
 
-지정한 코드 대상을 5개 facet 으로 분석한 뒤, 그 결과에서 세 가지 산출물을 항상 생성한다(분석은 한 번만 돈다).
+지정한 코드를 분석해 그 결과에서 세 청중용 산출물을 생성한다(분석은 한 번만 돈다). 핵심 산출은 **facet** — "읽기 좋은 요약"이 아니라 Claude 가 **리팩토링 + 유닛테스트(TDD 부족분 보강)** 에 바로 쓰는 다관점·최대 상세 레퍼런스다. 사람용 서술은 별도 산출물(markdown/html)이 맡는다.
 
-| facet | 보는 것 | 형식 |
-|------|---------|------|
-| 1 아키텍처/의존 | 모듈·디렉토리 레이아웃·의존성 방향·진입점 | 다이어그램 가능 |
-| 2 타입/관계 | 구조체·클래스·인터페이스 + 멤버 + 상속/구현 | 다이어그램 가능 |
-| 3 플로우 | 주요 시나리오의 호출·데이터 흐름 | 다이어그램 가능 |
-| 4 외부의존 | 사용 라이브러리·패키지 + 사용 위치 | 텍스트 |
-| 5 로직요약 | 모듈별 동작을 사람 말로 서술 | 텍스트 |
+facet 은 두 모양으로 나뉜다.
 
-변경 영향도(impact)는 별도 facet 이 아니라, 생성된 지도를 읽어 on-demand 로 추론한다(호출자·공개 노출 지점·관련 테스트를 architecture/flow facet 에서 짚음).
+- **구조 트리** — 소스 트리를 미러링한 코드-major 문서들. 노드 = 소스 파일 1개(선언/정의 분리 언어면 같은 단위로 묶음). 그 파일이 담은 타입/함수의 전체 시그니처 + 속성(역할/불변식/예외).
+- **가로지르는 관점 6종** — 파일 하나에 안 붙는 전체-뷰 문서.
+
+| 관점 | 보는 것 |
+|------|---------|
+| architecture | 경계/의존 지도 — 의존 방향, 진입점, 진입표면→핸들러 매핑, 포트←구현 |
+| flow | 트리거 + 생명주기에 앵커된 end-to-end 경로 망라(척추만) |
+| data-contract | 영속/설정 스키마 = 데이터 계약(있으면) |
+| test | 테스트 인벤토리 + 커버리지 공백 |
+| externals | 단일 소스 의존성 레지스트리(라이브러리·버전·경계) |
+| invariants | 전체 관통 규약/불변식 단일 소스 — TDD 금광 |
+
+**단일 소스 + 링크 원칙**: 개수·외부 의존·전역 불변식·노드 상세는 각각 한 곳만 소유하고, 나머지 문서는 링크만 한다(재서술 = 드리프트).
 
 ## 언제 쓰나
 
@@ -27,44 +33,37 @@
 ```
 <프로젝트 루트>/
   analyze/
-    facet/       facet 파일들 + index (Claude 가 읽는 층)
+    facet/       Claude 층 — 구조 트리(소스 미러) + 가로지르는 6종 + skeleton + index
     html/        인터랙티브 HTML (사람용, Mermaid 클라이언트 렌더)
-    markdown/    as-built 마크다운 문서 (사람용, 위키/명세)
-    .tmp/        렌더 중간 산출물(플로우 시퀀스 등). 렌더 후 삭제
+    markdown/    as-built 마크다운 문서 (사람용 — 가로지르는 5종 + 구조 개요를 엮은 내러티브)
+    .tmp/        렌더 중간 산출물. 렌더 후 삭제
 ```
-
-플로우(facet 3)의 시퀀스 다이어그램은 Claude 층에 무거우므로 facet 에는 산문만 남기고, 다이어그램은 `.tmp/` 로 빼서 렌더에 복사한 뒤 삭제한다. 구조형 다이어그램(아키텍처/타입/외부)은 Claude 에게도 유용해 facet 에 그대로 둔다.
 
 생성만 한다. 커밋·이동(특히 HTML 을 GitHub Pages 디렉토리로)·푸시는 사용자가 결과를 보고 직접 한다.
 
 **재분석 시 갱신:**
-- 기본: 기존 `analyze/` 를 덮어쓴다 (분석은 코드의 거울이라 항상 최신 하나만 둔다)
-- 릴리스 버저닝 단계(브랜치가 `release/*` 등): 그 버전의 as-built 를 `analyze_<버전>/` 로 스냅샷 누적 보존
-- 과거 시점 분석이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다
+- 기본: 기존 `analyze/` 를 덮어쓴다(분석은 코드의 거울이라 브랜치별 최신 한 벌만 둔다)
+- 릴리스 브랜치(`release/*` 등): 동결점이라 `analyze_<버전>/` 로 스냅샷 보존
+- 과거 시점이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다
 
 ## 구조
 
 - `overview.md` — 진입점. 실행 순서 정의
-- 플러그인 루트 `agents/` 의 에이전트 9개. 플러그인이 자동 발견해 Task 의 `subagent_type`(bare 이름)으로 호출된다
-  - 분석 5: `code-analyze-{architecture,types,flow,externals,summary}`
-  - 렌더 2: `code-analyze-{render-html,render-markdown}`
-  - 검증 1: `code-analyze-verify`
-  - 조건부 분석 1: `code-analyze-callgraph-cpp` (C++ + compile_commands.json 있을 때만)
+- 플러그인 루트 `agents/` 의 code-analyze 에이전트들. 플러그인이 자동 발견해 Task 의 `subagent_type`(bare 이름)으로 호출된다
+  - 골격(Stage 0, 조건부 위임): `code-analyze-survey`
+  - 구조(Stage 1, 서브트리-major): `code-analyze-structure`
+  - 가로지르는(Stage 1): `code-analyze-{architecture,flow,data-contract,test,externals,invariants}`
+  - 렌더: `code-analyze-{render-html,render-markdown}`
+  - 검증: `code-analyze-verify`
+  - 조건부: `code-analyze-callgraph-cpp` (C++ + compile_commands.json 있을 때만)
 
-## 동작 흐름
+## 동작 흐름 (Stage 0~4)
 
-1. **대상 경로 결정** — 대화 맥락에서 결정, 모호하면 사용자에게 질문. 결정된 경로를 모든 에이전트 입력으로 전달
-2. **Phase 1 분석(병렬)** — 분석 에이전트 5개를 한 응답에서 Task 로 병렬 호출. 각 에이전트는 결과 본문을 반환하고 메인이 `analyze/facet/<facet>.md` 로 저장. 플로우는 산문(`facet/flow.md`)과 시퀀스(`.tmp/flow.diagram.md`)를 나눠 저장
-2.5. **Phase 1 보강(조건부, C++)** — C++ + `compile_commands.json` 이 있으면 `code-analyze-callgraph-cpp` 호출. 텍스트 요약은 `facet/callgraph-cpp.md`, DOT 은 `.tmp/` 로 저장. 사전조건 없으면 스킵
-3. **Phase 2 인덱스 합성(메인)** — 저장된 facet 들을 보고 얇은 진입점/목차 `analyze/facet/index.md` 작성
-4. **Phase 3 렌더(병렬)** — (호출그래프 DOT 이 있으면 메인이 먼저 `dot -Tsvg` 로 SVG 렌더) 렌더 에이전트 2개를 병렬 호출(입력에 `.tmp/` 의 시퀀스·호출그래프 SVG 포함), 메인이 `analyze/html/`·`analyze/markdown/` 에 저장 후 `.tmp/` 삭제
-5. **Phase 4 검증** — `code-analyze-verify` 로 HTML 의 mermaid 문법/렌더 깨짐 확인. 깨짐·스킵을 사용자에게 보고
-6. **결과 안내** — 생성 파일 목록·경로·검증 요약 안내. 게시는 사용자 몫임을 알림
-
-## 입력 / 출력
-
-- **분석 대상 경로** — Claude 가 대화 맥락에서 결정하며, 불명확하면 사용자에게 묻는다
-- **출력** — `analyze/{facet,html,markdown}/` 3종 산출물
+0. **골격/인벤토리(직렬, 1회)** — 파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 `facet/skeleton.md` 로. 카운팅 규율을 여기서 1회 적용해 "공유 사실"의 단일 출처를 세운다. 기본 메인 직접, 대형이면 `survey` 위임. C++이면 `callgraph-cpp` 로 호출/참조맵 시드
+1. **facet 채우기(병렬)** — 골격을 입력으로 구조(서브트리-major) + 가로지르는 6종을 Task 병렬 호출. 각 에이전트는 골격 위에 **깊이만** 더한다(개수 재계산·서론 재도출 없음). 메인이 본문을 받아 저장
+2. **인덱스/점검/조인(메인)** — 얇은 `index.md` 작성. 교차 facet 조인(예: invariants × test → 미커버 불변식 공백)은 여기서
+3. **렌더(병렬)** — `render-html` / `render-markdown` 병렬 호출, `html/`·`markdown/` 저장 후 `.tmp/` 삭제
+4. **검증 + 결과 안내** — `verify` 로 HTML 다이어그램 깨짐 확인, 생성 파일·경로·검증 요약 안내
 
 ## 주의
 

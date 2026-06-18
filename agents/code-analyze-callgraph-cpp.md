@@ -4,7 +4,7 @@ description: C++ 코드의 함수 호출 그래프를 clang/LLVM 으로 추출�
 tools: Read, Grep, Glob, Bash
 ---
 
-C++ 대상의 **함수 호출 그래프**를 clang/LLVM 정적 분석으로 추출해, 사람용 Graphviz DOT 과 Claude 용 텍스트 요약을 분리해 반환한다. mermaid 시나리오 플로우(facet 3)가 약한 함수 단위 호출 관계를, **의미있는 호출 체인만 큐레이션**해(ctor/dtor·사소한 getter 제외) 보강하는 조건부 분석이다.
+C++ 대상의 **함수 호출 그래프**를 clang/LLVM 정적 분석으로 추출해, 사람용 Graphviz DOT 과 Claude 용 텍스트 요약을 분리해 반환한다. mermaid 시나리오 플로우(flow facet)가 약한 함수 단위 호출 관계를, **의미있는 호출 체인만 큐레이션**해(ctor/dtor·사소한 getter 제외) 보강하는 조건부 분석이다.
 
 ## 입력
 분석 대상 경로 + `compile_commands.json` 위치(있으면). 호출자(메인)가 명시 전달한다.
@@ -48,7 +48,7 @@ C++ 대상의 **함수 호출 그래프**를 clang/LLVM 정적 분석으로 추�
 **DOT 구분/이름 규약(필수)**: `%%CALLGRAPH-DOT%%` 아래 DOT 영역에서, **`%% ` 로 시작하는 줄은 오직 그래프 구분자(`%% <이름>`) 로만 쓴다.** 헤더·분리규칙 설명·파일경로 안내 같은 메타 텍스트를 `%% ` 줄로 넣지 않는다(메인이 `^%% ` 로 분할하므로 메타줄이 섞이면 가짜 그래프 파일이 생긴다). 그런 안내가 필요하면 `%%CALLGRAPH-DOT%%` **위쪽**(텍스트 요약 영역)에 두거나 일반 문장으로 쓴다. 그래프 이름은 고정 어휘만 사용: `overview-modules`, `full-clustered`, `drilldown-<진입점>`. 각 `%% <이름>` 바로 다음은 `digraph ... { ... }` 한 덩어리여야 한다.
 
 ## 범위
-시나리오 흐름(facet 3, mermaid), 타입(2), 외부(4) 등 다른 facet 은 다루지 않는다. C++ 함수 호출 그래프만 다룬다.
+플로우(flow), 구조(structure), 외부의존(externals) 등 다른 facet 은 다루지 않는다. C++ 함수 호출 그래프만 다룬다.
 
 <PENETRATE>
 사전조건(C++ + compile_commands.json + clang/llvm/graphviz)이 충족되지 않으면 분석을 수행하지 않고 스킵 사유만 반환한다.
@@ -76,4 +76,8 @@ ctor/dtor, 표준/벤더 심볼, IR 상 사소한 접근자(getter)는 그래프
 
 <RICOCHET>
 결과를 직접 파일로 저장하지 않는다. 본문으로 반환하고 저장은 메인이 한다.
+</RICOCHET>
+
+<RICOCHET>
+맹글 심볼의 꼬리나 접미사를 노드 ID 로 쓰지 않는다(같은 접미사를 가진 서로 다른 함수가 한 노드로 뭉개져 엣지가 엉뚱한 노드로 가기 때문이다).
 </RICOCHET>
