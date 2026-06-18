@@ -88,7 +88,7 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 
 | 에이전트 | 역할 | 산출 |
 |----------|------|------|
-| `code-analyze-structure` | 자기 소유 서브트리의 **파일노드당 1문서** -- 타입/멤버/시그니처/상속 + 속성(역할/불변식/예외). | `analyze/facet/<소스미러>/*.md` |
+| `code-analyze-structure` | 자기 소유 서브트리의 **파일노드당 1문서** -- 타입/멤버/시그니처/상속 + 속성(역할/불변식/예외). **직접 Write** | `analyze/facet/<소스미러>/*.md` (직접) |
 
 > 규모 적응: 작으면 구조 에이전트 1개가 전체를, 크면 모듈/서브트리당 1개가 **겹치지 않는 파일만** 소유. 공유 사실은 skeleton 이 출처라 재계산 금지.
 
@@ -121,7 +121,7 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 |----------|------|------|------|
 | `code-analyze-render-html` | facet 슬라이스 -> HTML 페이지들(다중 파일 사이트). **직접 Write** | 슬라이스 facet + 셸 템플릿 + `.tmp/` | `analyze/html/<슬라이스>` (직접) |
 | `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `analyze/facet/` + `.tmp/` | `analyze/markdown/` (직접) |
-| `code-analyze-verify` | 렌더 HTML mermaid/그래프 깨짐 검증 | `analyze/html/` | 리포트 본문 |
+| `code-analyze-verify` | 렌더 HTML mermaid/그래프 깨짐 + **내부 링크 무결성**(끊긴 상대 href) 검증 | `analyze/html/` | 리포트 본문 |
 | `code-analyze-callgraph-cpp` | (조건부) C++ 호출 그래프 추출. Stage0 호출/참조맵 시드 + flow 출발점. | 대상 경로 + compile_commands.json | facet 텍스트 + DOT(임시) |
 
 ---
@@ -142,7 +142,9 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 </PENETRATE>
 
 ### Stage 1 -- facet 채우기 (병렬)
-골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 한 응답에서 Task 로 **병렬 호출**한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음). 메인이 본문을 받아 해당 경로에 저장.
+골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 한 응답에서 Task 로 **병렬 호출**한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
+
+저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, Stage 2 조인에 메인이 그 내용을 쓰므로 메인 컨텍스트에 있어야 한다). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
 
 플로우 에이전트는 산문(척추)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `flow.md`, 아래를 `.tmp/flow.diagram.md` 로 저장.
 
@@ -154,21 +156,34 @@ Stage 1 에이전트는 골격이 준 공유 사실 위에 깊이만 더한다.
 Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을 재도출하지 않는다.
 </RICOCHET>
 
+<PENETRATE>
+구조 에이전트는 자기 노드 facet 을 직접 Write 하고 본문으로는 경로만 반환한다(부피 큰 구조가 메인 컨텍스트를 안 거치게 -- 렌더와 같은 부류).
+</PENETRATE>
+
 <RICOCHET>
-에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다.
+가로지르는(architecture/flow/data-contract/test/externals/invariants) 에이전트는 facet 을 직접 파일로 저장하지 않는다(본문 반환 -> 메인 저장, Stage 2 조인 입력).
 </RICOCHET>
 
 ### Stage 2 -- 인덱스/점검/조인 (메인)
 저장된 facet 을 보고 얇은 `index.md` 를 만든다(진입점/목차 + 어디에 무엇이 있는지 오리엔트만). 골격이 단일 출처라 무거운 교차 게이트는 불필요하지만, index 작성 중 골격 대비 개수/목록 모순이 보이면 가볍게 잡는다.
+
+**구조 노드 교차검산(저장 시점에서 이관)**: 구조 노드는 에이전트가 직접 Write 했으므로, 여기서 메인이 골격 인벤토리 대비 **노드 파일 존재/개수**를 가볍게 교차검산한다(빠진 노드/여분 파일 적발). 내용 전수 검토가 아니라 골격과의 목록 대조다.
 
 **교차 facet 조인**(두 facet이 다 나와야 가능한 것)은 여기서 메인이 한다. 대표: `invariants.md` 의 불변식 목록 × `test.md` 의 인벤토리를 조인해, **대응 프로퍼티/분기 테스트가 없는 불변식**을 공백으로 산출해 `test.md` 에 덧붙인다. (Stage 1 에이전트끼리는 서로 안 읽으므로 이런 조인은 Stage 1이 아니라 여기로 모은다.)
 
 ### Stage 3 -- 렌더 (병렬, 다중 파일 팬아웃)
 `.tmp/` 에 호출 그래프 DOT 이 있으면 `dot -Tsvg` 로 SVG 화.
 
-먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + 사이드바 네비), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿**(head 가 `../assets/...` 로 공유 자산 참조 + 사이드바 컨테이너 + 콘텐츠 슬롯) + 링크 스킴(`<파일>#<앵커>`) + 출력 경로 스킴(facet 경로 미러).
+먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + **`data-root` 접두사로 사이드바 네비 생성**), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿** + **통일 링크 스킴**(아래) + 출력 경로 스킴(facet 경로 미러).
+
+**통일 링크 스킴 (필수, 루트기준 + PREFIX).** 구조 노드는 소스 미러라 페이지마다 html 기준 깊이가 다르다(`html/src/glass/x.html`=2, `html/src/trunk/usecase/x.html`=3 ...). 깊이를 링크마다 손으로 세면 거의 다 틀어진다(실측 결함: 자산·교차링크 깨짐). 그래서 깊이 산수를 **메인 한 곳**으로 모은다 -- 메인이 페이지별 `PREFIX = "../" * (그 페이지의 html기준 디렉토리깊이)` 를 계산해 각 render 에이전트에 넘기고, 페이지의 **모든 경로를 `PREFIX + <html루트기준경로>` 한 규칙으로만** 적는다.
+- head 자산: `{PREFIX}assets/style.css`, `{PREFIX}assets/script.js` (고정 `../assets/` 금지).
+- `<body data-root="{PREFIX}">` -- 사이드바는 공유 `script.js` 가 이 `data-root` 를 접두사로 붙여 생성(페이지마다 사이드바 링크를 다시 쓰지 않는다).
+- 교차링크: `{PREFIX}<html루트기준 파일경로>#<앵커>` (예: depth3 페이지에서 flow 로 `../../../flow.html#login`). 링크마다 상대깊이를 따로 세지 않는다. in-page 앵커는 `#<앵커>` 그대로 둔다.
 
 그다음 render-html 을 **병렬 다중 호출**한다 -- 구조 **서브트리당 1회**(자기 서브트리의 파일노드당 `.html` 한 장씩) + 가로지르는 6종 **1회**(문서당 `.html`). render-markdown 도 병렬 호출(단일 문서). 각 렌더 에이전트는 자기 슬라이스를 `html/`·`markdown/` 에 **직접 Write** 하고 쓴 경로만 통지한다(아래 결과 처리 규약의 렌더 예외).
+
+render-html 은 facet 를 글자 그대로 옮기지 않고 **사람용으로 재포맷**한다 -- 내용(데이터)은 facet 와 동치로 보존하되, 표 칸은 짧은 요지(긴 것/SQL/코드는 표 밖 코드블록), 선형 흐름은 `<ol>`·분기는 mermaid, 교차링크는 하단 "관련/참고" 섹션에 모으는 모양으로 표현만 바꾼다.
 
 끝나면 `.tmp/` 삭제.
 
@@ -177,27 +192,40 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 </PENETRATE>
 
 <PENETRATE>
-HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 링크 스킴)은 메인이 만든다.
+HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 통일 링크 스킴)은 메인이 만들고, 페이지별 PREFIX 도 메인이 계산해 각 render 에이전트에 넘긴다.
 </PENETRATE>
+
+<PENETRATE>
+HTML 페이지의 자산·교차링크는 메인이 준 PREFIX 로 `PREFIX + <html루트기준경로>` 한 규칙으로만 적는다(깊이 산수는 PREFIX 한 곳).
+</PENETRATE>
+
+<RICOCHET>
+페이지 셸 자산을 고정 `../assets/` 로 적거나, 교차링크의 상대깊이를 링크마다 따로 세지 않는다(미러 깊이가 제각각이라 깨진다).
+</RICOCHET>
 
 <RICOCHET>
 렌더 산출(HTML/마크다운)을 한 본문으로 반환하게 해 단일 응답 토큰 한도에 걸리게 하지 않는다.
 </RICOCHET>
 
+<RICOCHET>
+render-html 은 facet 의 데이터를 요약하거나 삭제해 옮기지 않는다(표현만 바꾸고 내용은 facet 와 동치로 보존).
+</RICOCHET>
+
 ### Stage 4 -- 검증 + 결과 안내
-`code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG 보고. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
+`code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG **와 끊긴 내부 링크**(존재하지 않는 대상의 상대 href)를 보고. 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크라, 통일 스킴(PREFIX)으로 예방하되 verify 가 백스톱으로 잡는다. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
 
 ---
 
 ## 결과 처리 규약
-- 분석 facet 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장).
-- **렌더 산출물은 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
+- **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장 -- 소수이고 Stage 2 조인 입력이라 메인 컨텍스트에 필요).
+- **구조 노드 facet 은 예외** -- 노드 수십 개가 부피라 본문 반환 시 메인 컨텍스트/턴을 크게 먹으므로, 구조 에이전트가 `analyze/facet/<소스미러>/` 에 직접 Write 한다. 메인은 Stage 2 에서 골격 대비 존재/개수만 교차검산한다.
+- **렌더 산출물도 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
 - 에이전트 반환 본문에 `&`/`<`/`>` 가 HTML 엔티티로 이스케이프됐으면 저장 전 원복한다.
 
 <PENETRATE>
-분석 facet 의 결과 파일 저장은 메인이 한다.
+가로지르는 facet 의 결과 파일 저장은 메인이 한다(본문 반환 -> 메인 저장).
 </PENETRATE>
 
 <PENETRATE>
-렌더(html/markdown) 산출물은 render 에이전트가 직접 Write 한다(저장-메인 규율의 명시 예외).
+구조 노드 facet 은 구조 에이전트가, 렌더(html/markdown) 산출물은 render 에이전트가 직접 Write 한다(저장-메인 규율의 명시 예외 -- 둘 다 부피/잘림 때문).
 </PENETRATE>
