@@ -13,7 +13,7 @@
 - 분석은 한 번만 돌고, 그 결과(공유 facet 집합)에서 모든 산출물을 렌더한다. 산출물마다 코드를 다시 분석하지 않는다.
 
 <RICOCHET>
-이전 분석 결과를 분석 에이전트의 입력으로 주지 않는다(앵커링/stale 답습 방지). 입력은 코드뿐이다.
+이전 분석 결과를 분석 에이전트의 입력으로 주지 않는다(앵커링/stale 답습 방지).
 </RICOCHET>
 
 ---
@@ -43,7 +43,11 @@ facet 은 두 모양으로 나뉜다.
       <소스미러>/  구조 파일노드 문서들(예: facet/src/<...>.md)
       architecture.md  flow.md  data-contract.md  test.md  externals.md  invariants.md
       skeleton.md   index.md
-    html/         인터랙티브 HTML (사람, Mermaid)
+    html/         인터랙티브 HTML 사이트 (사람) -- 다중 파일
+      index.html         진입 허브(카테고리/목차)
+      <소스미러>/*.html  구조 노드 페이지(파일노드당 1장)
+      architecture.html flow.html data-contract.html test.html externals.html invariants.html
+      assets/style.css  assets/script.js   공유 셸(메인 소유, mermaid CDN 포함)
     markdown/     as-built 마크다운 문서 (사람, 위키/명세)
     .tmp/         렌더 중간 산출물. 렌더 후 삭제
 ```
@@ -63,7 +67,7 @@ facet 은 두 모양으로 나뉜다.
 analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 분석은 stale 다. 기본은 **덮어쓰기 = 기존 삭제 후 새 생성**이다 -- 재분석하면 기존 `analyze/` 를 갱신해 현재 코드에 맞는 거울 하나만 둔다. 보관 단위는 **브랜치별 한 벌**이다. 과거 시점이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다. 릴리스 브랜치(`release/*` 등)면 동결점이라 덮어쓰지 않고 `analyze_<버전>/` 로 스냅샷 보존한다.
 
 <RICOCHET>
-릴리스 버저닝 단계가 아니면 분석 결과를 별도 버전 디렉토리로 누적하지 않고 기존 analyze/ 를 덮어쓴다.
+릴리스 버저닝 단계가 아니면 분석 결과를 별도 버전 디렉토리로 누적하지 않는다.
 </RICOCHET>
 
 ---
@@ -108,15 +112,15 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 </RICOCHET>
 
 <RICOCHET>
-같은 사실(개수/외부 의존/전역 불변식)을 두 문서에 독립으로 적지 않는다. 단일 소스 + 링크.
+같은 사실(개수/외부 의존/전역 불변식)을 두 문서에 독립으로 적지 않는다.
 </RICOCHET>
 
 ### 렌더 / 검증 / 조건부
 
 | 에이전트 | 역할 | 입력 | 출력 |
 |----------|------|------|------|
-| `code-analyze-render-html` | facet -> 단일 인터랙티브 HTML | `analyze/facet/` + `.tmp/` | `analyze/html/` |
-| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음) | `analyze/facet/` + `.tmp/` | `analyze/markdown/` |
+| `code-analyze-render-html` | facet 슬라이스 -> HTML 페이지들(다중 파일 사이트). **직접 Write** | 슬라이스 facet + 셸 템플릿 + `.tmp/` | `analyze/html/<슬라이스>` (직접) |
+| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `analyze/facet/` + `.tmp/` | `analyze/markdown/` (직접) |
 | `code-analyze-verify` | 렌더 HTML mermaid/그래프 깨짐 검증 | `analyze/html/` | 리포트 본문 |
 | `code-analyze-callgraph-cpp` | (조건부) C++ 호출 그래프 추출. Stage0 호출/참조맵 시드 + flow 출발점. | 대상 경로 + compile_commands.json | facet 텍스트 + DOT(임시) |
 
@@ -131,7 +135,7 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 ### Stage 0 -- 골격/인벤토리 (직렬, 1회)
 파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 만들어 `analyze/facet/skeleton.md` 로 저장한다. **카운팅 규율을 여기서 1회 적용**(아래). 기본 메인 직접, 대형이면 `code-analyze-survey` 위임. C++ + `compile_commands.json` 이면 `code-analyze-callgraph-cpp` 를 여기서 호출해 호출/참조맵을 골격에 시드한다.
 
-> 카운팅 규율: (1) 셀 단위를 먼저 못 박는다(포함/제외 정의). (2) 숫자 freehand 금지 -- 구성원 목록을 먼저 만들고 개수=목록 길이. (3) 나열을 재현가능 검색/도구 결과에 근거(언어별 수단은 에이전트가 선택).
+> 카운팅 규율: (1) 셀 단위를 먼저 못 박는다(포함/제외 정의). (2) 숫자 freehand 금지 -- 구성원 목록을 먼저 만들고 개수=목록 길이. (3) 나열을 재현가능 검색/도구 결과에 근거(언어별 수단은 에이전트가 선택). (4) 헤드라인/합계 == 인벤토리 목록 행수 자가 교차검산(어긋나면 목록이 진실).
 
 <PENETRATE>
 개수/인벤토리/모듈 목록 같은 "공유 사실"은 Stage 0 골격에서 1회 확정하고, 이후 단계는 그것을 단일 출처로 삼는다.
@@ -151,7 +155,7 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 </RICOCHET>
 
 <RICOCHET>
-에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다(저장은 메인).
+에이전트가 facet 결과를 직접 파일로 저장하게 하지 않는다.
 </RICOCHET>
 
 ### Stage 2 -- 인덱스/점검/조인 (메인)
@@ -159,8 +163,26 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 
 **교차 facet 조인**(두 facet이 다 나와야 가능한 것)은 여기서 메인이 한다. 대표: `invariants.md` 의 불변식 목록 × `test.md` 의 인벤토리를 조인해, **대응 프로퍼티/분기 테스트가 없는 불변식**을 공백으로 산출해 `test.md` 에 덧붙인다. (Stage 1 에이전트끼리는 서로 안 읽으므로 이런 조인은 Stage 1이 아니라 여기로 모은다.)
 
-### Stage 3 -- 렌더 (병렬)
-`.tmp/` 에 호출 그래프 DOT 이 있으면 `dot -Tsvg` 로 SVG 화. render-html / render-markdown 을 Task 로 **병렬 호출**. 입력은 `analyze/facet/` + `.tmp/`. 메인이 `html/`, `markdown/` 에 저장. 끝나면 `.tmp/` 삭제.
+### Stage 3 -- 렌더 (병렬, 다중 파일 팬아웃)
+`.tmp/` 에 호출 그래프 DOT 이 있으면 `dot -Tsvg` 로 SVG 화.
+
+먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + 사이드바 네비), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿**(head 가 `../assets/...` 로 공유 자산 참조 + 사이드바 컨테이너 + 콘텐츠 슬롯) + 링크 스킴(`<파일>#<앵커>`) + 출력 경로 스킴(facet 경로 미러).
+
+그다음 render-html 을 **병렬 다중 호출**한다 -- 구조 **서브트리당 1회**(자기 서브트리의 파일노드당 `.html` 한 장씩) + 가로지르는 6종 **1회**(문서당 `.html`). render-markdown 도 병렬 호출(단일 문서). 각 렌더 에이전트는 자기 슬라이스를 `html/`·`markdown/` 에 **직접 Write** 하고 쓴 경로만 통지한다(아래 결과 처리 규약의 렌더 예외).
+
+끝나면 `.tmp/` 삭제.
+
+<PENETRATE>
+렌더 에이전트는 자기 슬라이스 파일을 직접 Write 하고, 본문으로는 쓴 경로만 반환한다.
+</PENETRATE>
+
+<PENETRATE>
+HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 링크 스킴)은 메인이 만든다.
+</PENETRATE>
+
+<RICOCHET>
+렌더 산출(HTML/마크다운)을 한 본문으로 반환하게 해 단일 응답 토큰 한도에 걸리게 하지 않는다.
+</RICOCHET>
 
 ### Stage 4 -- 검증 + 결과 안내
 `code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG 보고. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
@@ -168,9 +190,14 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 ---
 
 ## 결과 처리 규약
-- 작업(분석/렌더)은 에이전트에 위임하고, 파일 저장은 메인이 한다.
+- 분석 facet 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장).
+- **렌더 산출물은 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
 - 에이전트 반환 본문에 `&`/`<`/`>` 가 HTML 엔티티로 이스케이프됐으면 저장 전 원복한다.
 
 <PENETRATE>
-분석/렌더 작업은 에이전트에 위임하고, 결과 파일 저장은 메인이 수행한다.
+분석 facet 의 결과 파일 저장은 메인이 한다.
+</PENETRATE>
+
+<PENETRATE>
+렌더(html/markdown) 산출물은 render 에이전트가 직접 Write 한다(저장-메인 규율의 명시 예외).
 </PENETRATE>

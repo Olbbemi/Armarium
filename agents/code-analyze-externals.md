@@ -35,5 +35,5 @@ tools: Read, Glob, Grep
 </RICOCHET>
 
 <RICOCHET>
-같은 라이브러리 정보를 architecture/구조 노드에 중복으로 적게 두지 않는다 -- 여기가 단일 소스, 나머지는 링크.
+같은 라이브러리 정보를 architecture/구조 노드에 중복으로 적게 두지 않는다.
 </RICOCHET>
