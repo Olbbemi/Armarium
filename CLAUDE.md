@@ -9,7 +9,7 @@
 
 # 버전 규칙
 
-플러그인 버전을 올릴 때 `.claude-plugin/plugin.json` 과 `.claude-plugin/marketplace.json` 의 `version` 을 **항상 같은 값으로 함께** 올린다. 둘 중 하나만 올리면 `/plugin marketplace update` 시 카탈로그 버전이 어긋나 업데이트가 제대로 반영되지 않는다.
+플러그인 버전을 올릴 때 **세 곳을 항상 같은 값으로 함께** 올린다 -- `.claude-plugin/plugin.json` 과 `.claude-plugin/marketplace.json` 의 `version`, 그리고 `README.md` 상단의 `**현재 버전: ...**` 줄. 하나라도 빠지면 `/plugin marketplace update` 시 카탈로그 버전이 어긋나거나 README 표기가 실제 배포 버전과 달라진다. 현재 버전 값과 "언제 올리나 / SemVer / push 훅 동작"의 상세 규칙은 `README.md` 의 `## 버전 규칙` 을 단일 출처로 본다.
 
 # 커밋 규칙
 
