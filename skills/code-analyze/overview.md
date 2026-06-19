@@ -78,6 +78,20 @@ analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 
 릴리스 버저닝 단계가 아니면 분석 결과를 별도 버전 디렉토리로 누적하지 않는다.
 </RICOCHET>
 
+### facet 교차링크 규약
+
+facet 문서끼리의 교차링크(노드 <-> 노드, 가로지르는 <-> 노드 등)는 **링크가 적힌 파일 자신을 기준으로 한 상대경로**로 통일한다 -- 예: `facet/src/trunk/usecase/x.md` 에서 형제 어댑터로 `../../leaves/y.md`. facet 루트 기준(`src/leaves/y.md`)이나 프로젝트 루트 기준(`analyze/facet/...`)으로 적지 않는다. 기준이 섞이면 render 단계가 어긋난다(실측: architecture 가 프로젝트루트 오접두로 7곳을 깨뜨림).
+
+자기기준 상대로 통일하는 이유: HTML 산출물의 디렉토리 구조가 facet 구조와 **동형(미러)**이라, 자기기준 상대링크는 `.md` -> `.html` 치환만으로 HTML 에서 그대로 유효하다. 그래서 Stage 3 render 는 교차링크 깊이를 재계산하지 않고 **보존만** 한다. 이 링크 무결성은 Stage 2 의 link-lint 가 선보장한다.
+
+<PENETRATE>
+facet 교차링크는 링크가 적힌 파일 자신 기준의 상대경로로 적는다.
+</PENETRATE>
+
+<RICOCHET>
+facet 교차링크를 facet 루트 기준이나 프로젝트 루트 기준으로 적지 않는다(기준 혼재 -> render 어긋남).
+</RICOCHET>
+
 ---
 
 ## 하위 스킬 (에이전트) -- 신 로스터
@@ -183,17 +197,26 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 
 **구조 노드 교차검산(저장 시점에서 이관)**: 구조 노드는 에이전트가 직접 Write 했으므로, 여기서 메인이 골격 인벤토리 대비 **노드 파일 존재/개수**를 가볍게 교차검산한다(빠진 노드/여분 파일 적발). 내용 전수 검토가 아니라 골격과의 목록 대조다.
 
+**facet 링크 무결성 점검(link-lint)**: 메인이 `analyze/facet/` 의 모든 `.md` 에서 상대 `.md` 링크를 뽑아, **링크가 적힌 파일 자신의 디렉토리 기준**으로 resolve 해 대상 facet 파일이 실제로 존재하는지 검사한다(`normpath(join(파일디렉토리, target))`). 끊긴 링크나 오접두 링크(예: 프로젝트루트 기준 `analyze/facet/...` 오접두)를 적발해 자기기준 상대경로로 교정한다. 절대 URL 과 순수 in-page 앵커(`#...`)는 대상이 아니다. 이게 Stage 3 render 의 선결조건이다 -- html 이 facet 구조를 미러하므로, facet 링크가 자기기준으로 정확하면 render 는 `.md` -> `.html` 치환만으로 교차링크를 보존할 수 있다(render 가 깊이를 재계산하지 않아도 된다).
+
 **교차 facet 조인**(두 facet이 다 나와야 가능한 것)은 여기서 메인이 한다. 대표: `invariants.md` 의 불변식 목록 × `test.md` 의 인벤토리를 조인해, **대응 프로퍼티/분기 테스트가 없는 불변식**을 공백으로 산출해 `test.md` 에 덧붙인다. (Stage 1 에이전트끼리는 서로 안 읽으므로 이런 조인은 Stage 1이 아니라 여기로 모은다.)
+
+<PENETRATE>
+Stage 2 에서 메인은 facet 의 모든 상대 `.md` 링크를 적힌 파일 자신 기준으로 resolve 해 대상 존재를 검사하고(link-lint), 끊긴/오접두 링크를 교정한다 -- render(Stage 3)의 선결조건이다.
+</PENETRATE>
 
 ### Stage 3 -- 렌더 (병렬, 다중 파일 팬아웃)
 `.tmp/` 에 호출 그래프 DOT 이 있으면 `dot -Tsvg` 로 SVG 화.
 
-먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + **`data-root` 접두사로 사이드바 네비 생성**), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿** + **통일 링크 스킴**(아래) + 출력 경로 스킴(facet 경로 미러).
+먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + **`data-root` 접두사로 사이드바 네비 생성**), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿** + **링크 스킴**(아래) + 출력 경로 스킴(facet 경로 미러).
 
-**통일 링크 스킴 (필수, 루트기준 + PREFIX).** 구조 노드는 소스 미러라 페이지마다 html 기준 깊이가 다르다(`html/src/glass/x.html`=2, `html/src/trunk/usecase/x.html`=3 ...). 깊이를 링크마다 손으로 세면 거의 다 틀어진다(실측 결함: 자산·교차링크 깨짐). 그래서 깊이 산수를 **메인 한 곳**으로 모은다 -- 메인이 페이지별 `PREFIX = "../" * (그 페이지의 html기준 디렉토리깊이)` 를 계산해 각 render 에이전트에 넘기고, 페이지의 **모든 경로를 `PREFIX + <html루트기준경로>` 한 규칙으로만** 적는다.
+**링크 스킴 (필수, 두 세계 분할).** html 의 경로는 출처가 둘이라 규칙도 둘로 가른다 -- (1) html 이 발명한 셸 구조(자산·사이드바)는 PREFIX 로, (2) facet 을 미러한 콘텐츠 교차링크는 facet 상대링크 보존으로.
+
+(1) **셸/자산 경로 = PREFIX** (html 이 발명한 구조라 facet 에 원본이 없다). 구조 노드는 소스 미러라 페이지마다 html 기준 깊이가 다르다(`html/src/glass/x.html`=2, `html/src/trunk/usecase/x.html`=3 ...). 자산·사이드바 깊이를 링크마다 손으로 세면 틀어지므로, 깊이 산수를 **메인 한 곳**으로 모은다 -- 메인이 페이지별 `PREFIX = "../" * (그 페이지의 html기준 디렉토리깊이)` 를 계산해 각 render 에이전트에 넘긴다.
 - head 자산: `{PREFIX}assets/style.css`, `{PREFIX}assets/script.js` (고정 `../assets/` 금지).
 - `<body data-root="{PREFIX}">` -- 사이드바는 공유 `script.js` 가 이 `data-root` 를 접두사로 붙여 생성(페이지마다 사이드바 링크를 다시 쓰지 않는다).
-- 교차링크: `{PREFIX}<html루트기준 파일경로>#<앵커>` (예: depth3 페이지에서 flow 로 `../../../flow.html#login`). 링크마다 상대깊이를 따로 세지 않는다. in-page 앵커는 `#<앵커>` 그대로 둔다.
+
+(2) **콘텐츠 교차링크 = facet 상대링크 보존** (facet 을 미러한 구조라 깊이 재계산이 불필요하고, 재계산이 오히려 멀쩡한 링크를 깨뜨린다 -- 실측 결함). html 디렉토리 구조가 facet 구조와 동형이므로, facet 의 **자기 파일 기준 상대링크**(예: depth3 노드에서 형제 어댑터로 `../../leaves/x.md`, flow 로 `../../../flow.md#login`)를 `.md` -> `.html` 치환만 해 그대로 쓴다. 링크마다 깊이를 다시 세거나 PREFIX 를 붙이지 않는다. in-page 앵커는 `#<앵커>` 그대로 둔다. (facet 링크가 자기기준으로 정확함은 Stage 2 link-lint 가 선보장한다.)
 
 그다음 render-html 을 **백그라운드 병렬 다중 호출**(`run_in_background: true`)한다 -- 구조 **서브트리당 1회**(자기 서브트리의 파일노드당 `.html` 한 장씩) + 가로지르는 6종 **1회**(문서당 `.html`). render-markdown 도 백그라운드 병렬 호출(단일 문서). 각 렌더 에이전트는 자기 슬라이스를 `html/`·`markdown/` 에 **직접 Write** 하고 쓴 경로만 통지한다(아래 결과 처리 규약의 렌더 예외).
 
@@ -206,15 +229,23 @@ render-html 은 facet 를 글자 그대로 옮기지 않고 **사람용으로 �
 </PENETRATE>
 
 <PENETRATE>
-HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 통일 링크 스킴)은 메인이 만들고, 페이지별 PREFIX 도 메인이 계산해 각 render 에이전트에 넘긴다.
+HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 링크 스킴)은 메인이 만들고, 페이지별 PREFIX 도 메인이 계산해 각 render 에이전트에 넘긴다.
 </PENETRATE>
 
 <PENETRATE>
-HTML 페이지의 자산·교차링크는 메인이 준 PREFIX 로 `PREFIX + <html루트기준경로>` 한 규칙으로만 적는다(깊이 산수는 PREFIX 한 곳).
+HTML 페이지의 자산·사이드바 경로는 메인이 준 PREFIX 로 `{PREFIX}assets/...`·`data-root="{PREFIX}"` 로만 적는다(셸 깊이 산수는 PREFIX 한 곳).
+</PENETRATE>
+
+<PENETRATE>
+콘텐츠 교차링크는 facet 의 자기기준 상대링크를 `.md` -> `.html` 치환만 해 보존한다(깊이 재계산·PREFIX 부착 없음 -- html 이 facet 구조를 미러하므로 그대로 유효).
 </PENETRATE>
 
 <RICOCHET>
-페이지 셸 자산을 고정 `../assets/` 로 적거나, 교차링크의 상대깊이를 링크마다 따로 세지 않는다(미러 깊이가 제각각이라 깨진다).
+페이지 셸 자산을 고정 `../assets/` 로 적지 않는다(PREFIX 로 -- 미러 깊이가 제각각이라 깨진다).
+</RICOCHET>
+
+<RICOCHET>
+콘텐츠 교차링크의 깊이를 render 가 다시 세거나 PREFIX 를 붙여 재계산하지 않는다(facet 상대링크를 `.md` -> `.html` 보존 -- 재계산이 멀쩡한 링크를 깨뜨린 실측 결함).
 </RICOCHET>
 
 <RICOCHET>
@@ -226,7 +257,17 @@ render-html 은 facet 의 데이터를 요약하거나 삭제해 옮기지 않�
 </RICOCHET>
 
 ### Stage 4 -- 검증 + 결과 안내
-`code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG **와 끊긴 내부 링크**(존재하지 않는 대상의 상대 href)를 보고. 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크라, 통일 스킴(PREFIX)으로 예방하되 verify 가 백스톱으로 잡는다. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
+`code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG **와 끊긴 내부 링크**(존재하지 않는 대상의 상대 href)를 보고. 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크라, 교차링크는 facet 자기기준 상대링크 통일 + Stage 2 link-lint 로, 자산은 PREFIX 로 예방하되 verify 가 백스톱으로 잡는다. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
+
+**검증 보증범위도 함께 안내한다.** verify 는 **형식**만 검증한다 -- mermaid 문법/렌더, 내부 링크의 **대상 파일 존재**. 둘 다 결정론적으로 판정 가능한 형식 검사다. 반면 링크가 **올바른 대상**을 가리키는지, facet 내용이 실제 **코드와 일치**하는지(as-built 충실도)는 verify 밖이며 코드 대조가 필요하다(예: 멀쩡히 존재하지만 틀린 파일을 가리키는 링크는 "대상 존재" 검사를 통과한다). 그래서 verify green 을 "내용까지 다 맞다"로 보고하지 않는다.
+
+<PENETRATE>
+Stage 4 결과안내에 verify 의 보증범위(형식만 검증 -- 문법/렌더/링크 대상 존재; 의미 정합은 미검증)를 함께 명시한다.
+</PENETRATE>
+
+<RICOCHET>
+verify green 을 facet 내용의 정확성(올바른 링크 대상·코드 일치)으로 보고하지 않는다.
+</RICOCHET>
 
 ---
 

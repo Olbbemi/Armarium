@@ -37,6 +37,10 @@ tools: Read, Glob, Grep, Write
 골격 인벤토리에 있는 타입/함수를 빠짐없이 등장시키되 깊이는 복잡도에 비례한다.
 </PENETRATE>
 
+<PENETRATE>
+다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
+</PENETRATE>
+
 <RICOCHET>
 개수를 다시 세거나 파일 인벤토리를 재도출하지 않는다.
 </RICOCHET>

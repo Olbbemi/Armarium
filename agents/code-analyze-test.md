@@ -30,6 +30,10 @@ tools: Read, Glob, Grep
 구조적 커버리지 공백은 골격(진입표면/인벤토리/플로우)만 기준으로 병렬 산출한다.
 </PENETRATE>
 
+<PENETRATE>
+다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
+</PENETRATE>
+
 <RICOCHET>
 같은 Stage 1에서 병렬로 도는 다른 facet(invariants 등)을 읽거나 그 내용을 재도출하지 않는다.
 </RICOCHET>

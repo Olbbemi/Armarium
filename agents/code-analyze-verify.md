@@ -12,7 +12,7 @@ tools: Read, Bash
 ## 검증 항목
 - **문법 검증**: `html/` 전체 `.html` 을 순회하며 각 페이지의 mermaid 블록을 추출해 mermaid 파서로 parse 한다(node + jsdom + mermaid 의 `mermaid.parse`). HTML 엔티티(`&lt;` 등)는 원래 문자로 복원한 뒤 검증한다. 시퀀스 메시지에 `;`(statement separator 로 오인되는) 가 섞여 깨지는 케이스도 이 parse 가 잡는다.
 - **렌더 검증**: 헤드리스 브라우저(puppeteer)로 **각 `.html` 페이지**를 열고, 접힌 섹션(`<details>`)이나 탭이 있으면 펼친 뒤 그 안의 다이어그램 SVG 가 0 이 아닌 크기로 렌더되는지 확인한다(숨김 컨테이너 렌더 깨짐 탐지).
-- **내부 링크 무결성**: `html/` 전체 `.html` 의 모든 상대 href/src(`.html`/`.css`/`.js`, 앵커는 떼고)를 추출해 **대상 파일이 실제로 존재하는지** 검사한다(`os.path.normpath(join(페이지디렉토리, target))`). 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크(미러 깊이가 제각각이라 PREFIX 가 어긋나면 바로 깨짐)라 이 검사가 필수다. 끊긴 링크는 (페이지, href, 기대 경로)로 보고한다. 절대 URL(`http(s)://`)과 순수 in-page 앵커(`#...`)는 검사 대상이 아니다. node/puppeteer 없이도 가능한 정적 검사다.
+- **내부 링크 무결성**: `html/` 전체 `.html` 의 모든 상대 href/src(`.html`/`.css`/`.js`, 앵커는 떼고)를 추출해 **대상 파일이 실제로 존재하는지** 검사한다(`os.path.normpath(join(페이지디렉토리, target))`). 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크(facet 상대링크 보존이 틀어지거나 자산 PREFIX 가 어긋나면 깨짐)라 이 검사가 필수다. 끊긴 링크는 (페이지, href, 기대 경로)로 보고한다. 절대 URL(`http(s)://`)과 순수 in-page 앵커(`#...`)는 검사 대상이 아니다. node/puppeteer 없이도 가능한 정적 검사다.
 
 사전 렌더된 호출 그래프 SVG(C++ 함수 호출 그래프, mermaid 아님)는 parse 대상이 아니다. 렌더 검증에서 해당 탭의 SVG 가 존재하고 비어 있지 않은지(0 크기가 아닌지)만 확인한다.
 

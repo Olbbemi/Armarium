@@ -53,3 +53,7 @@ tools: Read, Glob, Grep
 <RICOCHET>
 시퀀스 다이어그램 메시지 텍스트에 `;` 를 쓰지 않는다(mermaid statement separator 로 오인돼 깨진다).
 </RICOCHET>
+
+<PENETRATE>
+다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
+</PENETRATE>
