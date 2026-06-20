@@ -15,11 +15,13 @@ set -uo pipefail
 input=$(cat)
 cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // ""')
 
-# git push 가 아니면 통과 (settings.json 의 if 필터로도 거르지만 이중 안전장치)
-case "$cmd" in
-  *"git push"*) ;;
-  *) exit 0 ;;
-esac
+# 이 훅은 모든 Bash 호출에서 실행된다(settings.json 에 if 게이트 없음). git push
+# 판정은 여기 한 곳에서만 하며, 복합 명령(`git push && ...`, `cd x && git push`)과
+# git 과 push 사이에 전역 옵션이 끼는 형태(`git -C <경로> push`, `git -c k=v push`)
+# 까지 잡는다. 명령 위치(줄 시작 또는 셸 구분자 뒤)의 git 만 보므로 `echo "git push"`
+# 같은 문자열 안의 가짜 매칭은 발동하지 않는다.
+push_re='(^|[;&|(]|&&|\|\|)[[:space:]]*git([[:space:]]+(-C[[:space:]]+[^[:space:]]+|-c[[:space:]]+[^[:space:]]+|--[A-Za-z-]+(=[^[:space:]]+)?|-[A-Za-z]+))*[[:space:]]+push([[:space:]]|$|;|&|\|)'
+printf '%s' "$cmd" | grep -qE "$push_re" || exit 0
 
 repo="${CLAUDE_PROJECT_DIR:-$PWD}"
 
