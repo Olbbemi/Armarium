@@ -87,6 +87,8 @@
 
 메인 Claude 가 직접 수행한다. 빠른 분기가 필요하고 후속 단계의 전제이기 때문에 에이전트로 위임하지 않는다.
 
+TaskCreate 로 "1단계: 구조 검증" task 를 등록하고 in_progress 로 설정한 뒤 검증을 시작한다. wip 파일 저장이 끝나면 completed 로 닫는다.
+
 `skills/skill-verify/checks/structure-check.md` 를 Read 툴로 로드해서 검증을 실행한다.
 
 검증 결과는 메인이 Write 툴로 `<대상 스킬 디렉토리>/wip/skill-verify-structure.md` 에 저장한다.
@@ -107,6 +109,8 @@
 5개 에이전트는 모두 백그라운드 호출(`run_in_background: true`)로 시작한다. 일반 호출로 바꾸면 메인이 통지 대기로 멈춰 3단계 병렬 진행이 막힌다.
 </PENETRATE>
 
+TaskCreate 로 "검증 에이전트 호출" task 를 등록하고 in_progress 로 설정한다. 아래 5개 에이전트를 한 응답에 호출한 즉시 completed 로 닫는다.
+
 - [ ] 에이전트 `skill-verify-frontmatter`: 백그라운드 호출 (`run_in_background: true`). 입력: 대상 스킬 디렉토리 경로. 출력: `<대상 스킬 디렉토리>/wip/skill-verify-frontmatter.md`
 - [ ] 에이전트 `skill-verify-description`: 백그라운드 호출 (`run_in_background: true`). 입력: 동일. 출력: `<대상 스킬 디렉토리>/wip/skill-verify-description.md`
 - [ ] 에이전트 `skill-verify-tag`: 백그라운드 호출 (`run_in_background: true`). 입력: 동일. 출력: `<대상 스킬 디렉토리>/wip/skill-verify-tag.md`
@@ -120,6 +124,8 @@
 메인 Claude 가 직접 수행한다. Read 툴로 실제 로드 흐름을 시뮬레이션해야 하므로 에이전트로 위임하지 않는다.
 
 2단계 백그라운드 호출을 시작한 직후 바로 진입한다. 3단계 검증 항목은 2단계 결과에 의존하지 않으므로 5개 에이전트 통지를 기다리지 않는다.
+
+TaskCreate 로 "3단계: 동작 검증" task 를 등록하고 in_progress 로 설정한다. wip 파일 저장이 끝나면 completed 로 닫는다.
 
 `skills/skill-verify/checks/behavior-check.md` 를 Read 툴로 로드해서 검증을 실행한다.
 
@@ -136,6 +142,8 @@
 </PENETRATE>
 
 일부만 도착한 시점에 보고서를 작성하면 결과가 불완전해진다.
+
+TaskCreate 로 "결과 취합 및 보고서 저장" task 를 등록하고 in_progress 로 설정한다. 보고서 저장이 완료되면 completed 로 닫는다.
 
 각 단계의 검증 결과를 취합해 두 가지를 처리한다.
 
