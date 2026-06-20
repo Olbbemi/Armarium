@@ -217,6 +217,19 @@ description에 스킬의 동작 요약, 워크플로 설명, 지시문("~할 것
 - 메인은 저장된 파일들을 참조해 통합 처리한다.
 ```
 
+#### 단계 시각화 (TaskCreate)
+
+실행 단계가 있는 스킬은 overview 에 TaskCreate 시각화 원칙을 명시한다.
+
+- 포그라운드 단계 -- 시작 시 in_progress, 완료 시 completed
+- 백그라운드 에이전트 호출 단계 -- 호출 즉시 completed ("위임 완료"). subject 는 "X 에이전트 호출" 형식
+- 사용자 확인 게이트 -- 확인 요청 직전 completed, 응답 후 다음 task in_progress
+- 아주 짧은 준비 작업(디렉토리 생성 등) -- task 생략
+
+<PENETRATE>
+복합 스킬의 실행 순서를 작성할 때 위 원칙에 따라 TaskCreate 시각화 지시를 각 단계에 포함한다.
+</PENETRATE>
+
 ---
 
 ## 7. 스킬 간 연결 방식
