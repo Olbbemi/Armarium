@@ -20,6 +20,7 @@
 `skills/` · `agents/` 를 수정할 때는 main 에 직접 커밋하지 않고 별도 브랜치를 만들어 PR 로 제출한다. 머지는 사용자가 직접 한다.
 
 1. 브랜치 준비: 반드시 main 에서 `skill/YYYY-MM-DD` (작업 당일 날짜) 브랜치를 딴다. 이미 있으면 그대로 체크아웃해 재사용하고, 없으면 main 에서 새로 생성한다. 이전 PR 이 이미 머지됐더라도 당일 날짜 브랜치가 존재하면 재사용한다 -- 새 브랜치를 만들지 않는다.
+   - 새로 생성하기 전에 `git fetch` 로 최신 `origin/main` 을 반영한다. 로컬 main 이 origin/main 보다 뒤처져 있으면(이미 머지된 PR 이 로컬에 안 당겨진 상태) 그 옛 베이스에서 따게 되어 이미 머지된 작업이 빠진다. `git checkout -b skill/YYYY-MM-DD origin/main` 처럼 origin/main 을 기점으로 명시하는 것이 안전하다.
 2. 수정·커밋 (커밋 메시지 규칙 동일 -- 영어)
 3. 사용자가 커밋·push 를 요청할 때만 push 한다.
 4. `gh pr list --head skill/YYYY-MM-DD` 로 PR 존재 여부를 먼저 확인한다.
