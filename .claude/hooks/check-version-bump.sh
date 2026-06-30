@@ -28,15 +28,25 @@ repo="${CLAUDE_PROJECT_DIR:-$PWD}"
 # armarium 플러그인 저장소가 아니면 통과
 [ -f "$repo/.claude-plugin/plugin.json" ] || exit 0
 
-# upstream 추적 브랜치가 없으면 비교 불가 → 통과 (예: 최초 push)
-git -C "$repo" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 || exit 0
+# 비교 기준(base) 결정: upstream 추적 브랜치가 있으면 그것을, 없으면(새 브랜치
+# 첫 push -- skill/YYYY-MM-DD 등) origin/main 으로 폴백한다. 둘 다 없으면 비교
+# 불가 → 통과. (예전엔 upstream 이 없으면 그냥 통과해서, 새 브랜치의 첫 push 가
+# 버전 검사 사각지대였다 -- 날짜 브랜치를 새로 딸 때마다 매번 샜다.)
+base=$(git -C "$repo" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)
+if [ -z "$base" ]; then
+  if git -C "$repo" rev-parse --verify -q origin/main >/dev/null 2>&1; then
+    base="origin/main"
+  else
+    exit 0
+  fi
+fi
 
-# 미푸시 커밋이 없으면 통과
-ahead=$(git -C "$repo" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)
+# base 대비 새 커밋이 없으면 통과
+ahead=$(git -C "$repo" rev-list --count "$base..HEAD" 2>/dev/null || echo 0)
 [ "${ahead:-0}" -gt 0 ] || exit 0
 
 cur=$(git -C "$repo" show HEAD:.claude-plugin/plugin.json 2>/dev/null | jq -r '.version // ""')
-old=$(git -C "$repo" show '@{u}:.claude-plugin/plugin.json' 2>/dev/null | jq -r '.version // ""')
+old=$(git -C "$repo" show "$base:.claude-plugin/plugin.json" 2>/dev/null | jq -r '.version // ""')
 
 # version 필드가 없으면(commit SHA 전략) 강제하지 않음 → 통과
 [ -n "$cur" ] || exit 0
@@ -61,7 +71,7 @@ if [ -n "$rdme" ] && [ "$rdme" != "$cur" ]; then
 fi
 
 if [ "$cur" = "$old" ]; then
-  reason="plugin.json version 이 '${cur}' 그대로입니다(직전 푸시와 동일). version 을 올리지 않으면 /plugin marketplace update 시 변경이 반영되지 않습니다. 버전을 먼저 올릴까요, 아니면 이대로 푸시할까요?"
+  reason="plugin.json version 이 '${cur}' 그대로입니다(비교 기준 -- 직전 푸시 또는 origin/main -- 과 동일). version 을 올리지 않으면 /plugin marketplace update 시 변경이 반영되지 않습니다. 버전을 먼저 올릴까요, 아니면 이대로 푸시할까요?"
   jq -nc --arg r "$reason" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"ask",permissionDecisionReason:$r}}'
   exit 0
 fi
