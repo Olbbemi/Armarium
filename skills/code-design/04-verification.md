@@ -31,7 +31,7 @@
 | 보안 | (해당 시) 점검 항목 작성 | 점검해 결과를 채움 |
 
 <RICOCHET>
-04-verification 에서 새 산출물 파일을 만들지 않는다 -- 03-implementation 이 만든 틀의 결과만 채운다.
+04-verification 에서 새 산출물 파일을 만들지 않는다.
 </RICOCHET>
 
 ---
