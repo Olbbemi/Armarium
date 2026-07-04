@@ -19,7 +19,7 @@ tools: Read, Glob, Grep
 시퀀스 다이어그램의 **개수**도 복잡도 비례다 -- 복잡한 경로에만 다이어그램을 그리고, 사소한 CRUD 는 산문 한 줄로 끝낸다. 망라는 산문 커버리지로 채우지 다이어그램 장수로 채우지 않는다.
 
 ## 입력
-- `analyze/facet/skeleton.md` (진입 표면 + 호출/참조 맵 시드 -- C++ 이면 callgraph 가 출발점).
+- `analyze/facet/skeleton.md` (진입 표면 + 호출/참조 맵 시드 -- 언어별 callgraph 보조가 있으면 그 산출이 출발점).
 - 분석 대상 경로.
 
 ## 산출

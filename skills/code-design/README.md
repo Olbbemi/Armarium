@@ -18,7 +18,7 @@
   - `00-ideation.md` -- 구상 (무엇을 왜 만들지/만들지 말지 방향 정의, go/no-go)
   - `01-requirements.md` -- 요구사항 명세
   - `02-design.md` -- 설계 (`02-design/new_project.md` · `02-design/extend_or_refactor.md` 분기, `02-design/tdd-planning.md` TDD 계획)
-  - `03-implementation.md` -- 구현. 경량 "최소 제약" 가드레일(G1~G14) 묶음 (언어 고유 가드레일은 `03-implementation/languages/cpp.md`)
+  - `03-implementation.md` -- 구현. 경량 "최소 제약" 가드레일(G1~G15) 묶음 (언어 고유 가드레일은 `03-implementation/languages/cpp.md`)
   - `04-verification.md` -- 검증. 03 산출물로 e2e·수동 QA·보안 판정
 
 ## 단계와 정상 흐름
