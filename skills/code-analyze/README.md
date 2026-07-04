@@ -26,12 +26,12 @@ facet 은 두 모양으로 나뉜다.
 
 `/code-analyze` 슬래시 명령으로 **명시적으로 호출**한 경우에만 동작한다. 자동 호출 대상이 아니며 "이 코드 분석해줘" 같은 자연어로는 발동하지 않는다.
 
-## 산출물 (3종 항상 생성)
+## 산출물 (실행 범위에 따라)
 
-분석 대상 프로젝트 최상위에 `analyze/` 를 만들고 종류별 하위 디렉토리에 저장한다.
+베이스 산출은 **facet** 이고, 시각화(html/markdown)와 검증은 착수 전 **실행 범위 게이트**에서 옵트인한다 -- facet 만 만들고 멈출 수도 있다(아래 "동작 흐름" 참조). **분석 대상 디렉토리 아래에** `analyze/` 를 만들고 종류별 하위 디렉토리에 저장한다(레포 루트가 아니라 분석한 그 디렉토리 밑).
 
 ```
-<프로젝트 루트>/
+<분석 대상 디렉토리>/
   analyze/
     facet/       Claude 층 — 구조 트리(소스 미러) + 가로지르는 6종 + skeleton + index
     html/        인터랙티브 HTML (사람용, Mermaid 클라이언트 렌더)
@@ -49,15 +49,20 @@ facet 은 두 모양으로 나뉜다.
 ## 구조
 
 - `overview.md` — 진입점. 실행 순서 정의
+- `languages/<언어>.md` — 언어 고유 규칙(노드 단위·한정자 어휘 등). 범용 에이전트가 메인이 판정한 언어의 파일을 로드해 적용. **언어 추가 = 규칙 파일 하나**(+ 필요 시 `callgraph-<언어>` 에이전트). 현 구현 `languages/cpp.md`
 - 플러그인 루트 `agents/` 의 code-analyze 에이전트들. 플러그인이 자동 발견해 Task 의 `subagent_type`(bare 이름)으로 호출된다
   - 골격(Stage 0, 조건부 위임): `code-analyze-survey`
   - 구조(Stage 1, 서브트리-major): `code-analyze-structure`
   - 가로지르는(Stage 1): `code-analyze-{architecture,flow,data-contract,test,externals,invariants}`
   - 렌더: `code-analyze-{render-html,render-markdown}`
   - 검증: `code-analyze-verify`
-  - 조건부: `code-analyze-callgraph-cpp` (C++ + compile_commands.json 있을 때만)
+  - 조건부(언어별 호출그래프 슬롯): `code-analyze-callgraph-<언어>` — 현 구현 cpp(C++ + compile_commands.json 있을 때만). 새 언어는 온디맨드로 추가
 
 ## 동작 흐름 (Stage 0~4)
+
+**사전 — 분석 대상 선택:** 레포 전체가 아니라 **한 응집 단위(디렉토리 하나)**를 대상으로 삼는다(독립 역할디렉토리·서브모듈을 한 번에 섞지 않는다). 시작 시 어느 디렉토리인지 묻고(README 등 구조 힌트가 있으면 참고, 없으면 물어보고, 그래도 없으면 직접 지정), **실제 존재하는 디렉토리**라야 진행한다. 산출 `analyze/` 는 그 대상 디렉토리 아래.
+
+**사전 — 실행 범위 게이트:** 착수 전 사용자와 시작·종료 스테이지를 정한다. facet 이 베이스라 Stage 2 에서 멈춰 facet 만 만들 수도 있고(render 옵트인), 중간 시작(1/2)은 선행 데이터(skeleton/facet)가 디스크에 있을 때만 허용한다. render 로부터 재시작(Stage 3/4 시작)은 render 재설계 뒤 로드맵 예정.
 
 0. **골격/인벤토리(직렬, 1회)** — 파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 `facet/skeleton.md` 로. 카운팅 규율을 여기서 1회 적용해 "공유 사실"의 단일 출처를 세운다. 기본 메인 직접, 대형이면 `survey` 위임. C++이면 `callgraph-cpp` 로 호출/참조맵 시드
 1. **facet 채우기(병렬)** — 골격을 입력으로 구조(서브트리-major) + 가로지르는 6종을 Task 병렬 호출. 각 에이전트는 골격 위에 **깊이만** 더한다(개수 재계산·서론 재도출 없음). 구조 노드 facet 은 구조 에이전트가 직접 Write(부피), 가로지르는 6종은 본문 반환 → 메인 저장(Stage 2 조인 입력)
