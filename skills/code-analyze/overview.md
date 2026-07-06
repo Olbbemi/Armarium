@@ -98,6 +98,20 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 노드 간 위임·디스패치·매핑·소비 참조는 추정 가능한 라벨이 아니라 실제 대상 노드를 명시하고 링크한다.
 </PENETRATE>
 
+노드 문서의 **파일명**은 스켈레톤(survey 산출)이 정한 노드 이름 하나를 따른다. 그 이름을 짓는 규칙(언어별)은 `languages/<언어>.md` 에 있다 -- 예컨대 cpp 는 짝의 공통 basename 에서 확장자를 뗀다.
+
+구조 에이전트는 이 이름으로 노드 문서를 Write 한다. 그 노드로 **링크하는** 다른 에이전트(test/architecture/flow/invariants)는 소스 파일명에서 문서명을 다시 만들지 말고, 스켈레톤의 노드 이름을 그대로 링크에 쓴다.
+
+격리된 에이전트가 각자 파일명에서 이름을 유추하면, 같은 노드를 서로 다른 이름으로 가리켜 링크가 끊긴다(실측: 소스-온리 `main.cpp` 를 한쪽은 `main.md`, 다른쪽은 `main.cpp.md` 로 가리킴).
+
+<PENETRATE>
+노드 문서명은 스켈레톤이 정한 노드 이름을 단일 출처로 쓴다.
+</PENETRATE>
+
+<RICOCHET>
+노드로 링크하는 에이전트는 소스 파일명에서 문서명을 재유도하지 않는다.
+</RICOCHET>
+
 ---
 
 ## 하위 스킬 (에이전트) -- 신 로스터
@@ -131,9 +145,9 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | architecture | `code-analyze-architecture` | 의존 방향(포트-어댑터 역전), 진입점, 진입표면->핸들러 매핑, 포트<-구현 관계엣지, 모듈 역할 서사. 불변식/외부경계는 링크만. |
 | flow | `code-analyze-flow` | 트리거 + 생명주기에 앵커된 end-to-end 경로 **망라**. 척추(호출 순서/분기/데이터 변환)만, 노드 상세는 구조 문서로 링크. |
 | data-contract | `code-analyze-data-contract` | 영속/설정 스키마(데이터 계약). 있으면. |
-| test | `code-analyze-test` | 테스트 인벤토리 + 커버리지 공백. **invariants 로 링크**해 미커버 불변식을 공백으로 집계. |
+| test | `code-analyze-test` | 테스트 인벤토리 + 커버리지 공백. 씨앗으로 받은 **invariants(INV-id)와 조인**해 미커버 불변식을 §4 로 집계. |
 | externals | `code-analyze-externals` | **단일 소스 의존성 레지스트리**(라이브러리+버전+감싸는 어댑터+벤더링+포트유무 칼럼). 척추, 나머지 문서는 링크만. |
-| invariants | `code-analyze-invariants` | **전체 관통 규약/불변식 단일 소스**(전칭+검증가능한 것만). TDD 프로퍼티/분기행렬의 씨앗. test/architecture 가 링크. |
+| invariants | `code-analyze-invariants` | **전체 관통 규약/불변식 단일 소스**(전칭+검증가능한 것만, 각 불변식에 안정 ID). test 의 커버리지 조인 씨앗 + TDD 프로퍼티/분기행렬의 씨앗. test/architecture 가 링크. |
 
 <PENETRATE>
 가로지르는 문서는 척추(자기 고유 정보)만 적고, 노드/타입 상세는 구조 문서로 링크한다.
@@ -173,8 +187,8 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 
 - **실행 범위 확정** (사용자 확인 게이트) -- 범위 협상 시작 시 in_progress, 사용자에게 범위 확인을 요청하기 직전 completed(응답 후 다음 매듭 in_progress).
 - **Stage 0 골격** -- 메인 직접이면 foreground(진입 시 in_progress, `skeleton.md` 저장 시 completed). survey/callgraph 로 위임하면 "골격 에이전트 호출" 매듭으로 호출 즉시 completed.
-- **Stage 1 facet 에이전트 호출** -- 구조 + 가로지르는 6종(+ 언어별 callgraph)을 한 응답에 백그라운드 호출한 즉시 completed.
-- **Stage 2 인덱스/점검/조인** -- foreground. Stage 1 통지를 받아 가로지르는 저장 · link-lint · 교차 조인 · `index.md` 저장까지, 저장 완료 시 completed.
+- **Stage 1 facet 에이전트 호출** -- 구조 + 가로지르는 6종(+ 언어별 callgraph)을 백그라운드 호출한 즉시 completed(invariants 씨앗 선행 -> test 후속 호출 포함).
+- **Stage 2 인덱스/점검** -- foreground. Stage 1 통지를 받아 가로지르는 저장 · 구조 교차검산 · link-lint · `index.md` 저장까지, 저장 완료 시 completed.
 - **Stage 3 렌더** -- 메인이 공유 셸 구축 후 render 에이전트를 백그라운드 호출한 즉시 completed.
 - **Stage 4 검증 + 결과 안내** -- verify 호출 시 in_progress, 통지 도착 후 결과 안내(생성 파일 · 실행 범위 · verify 보증범위) 출력 시 completed.
 
@@ -217,6 +231,33 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 
 <RICOCHET>
 존재하지 않는 디렉토리를 대상으로 진행하지 않는다.
+</RICOCHET>
+
+### 대상 안 소유권 경계 (우리 소스 vs 남의 원본)
+
+대상 디렉토리를 하나 골랐어도, 그 안에서 분석하는 것은 **우리가 작성/관리한 소스**다. 어떤 파일이 서드파티를 직접 include/호출하는지는 포함 여부와 **무관**하다 -- 그 기준으로 가르면 진입점(컴포지션 루트)·어댑터·포트처럼 경계에서 서드파티를 만지는, 정작 지도의 핵심인 노드가 잘려나간다. 우리가 썼으면 서드파티를 만지든 말든 대상이다.
+
+제외되는 것은 **우리가 쓰지 않은 남의 원본 코드**뿐이고, 두 경우로 나뉜다.
+
+- **밖에서 링크되는 서드파티**(시스템 설치 · 패키지매니저 · 형제 서브모듈): 원본이 대상 트리 밖이라 애초에 대상에 안 들어온다. 정적(.a)/공유(.so) 링크 방식은 무관하다 -- 링크는 컴파일된 바이너리를 합치는 것이지 소스를 트리에 들이는 게 아니다.
+- **벤더링된 서드파티 원본**(남의 소스를 트리 안에 복사해 같이 빌드 -- `third_party/` · `vendor/` · 라이브러리명 디렉토리): 이건 대상 디렉토리 **안에 중첩**돼 단위 축이 못 거른다. 우리 소스가 아니므로 제외한다. (판별 신호: 그 라이브러리의 원본 파일명 · 자체 LICENSE · 우리 것이 아닌 네임스페이스.)
+
+**제외한 별개 단위라도 의존 경계로는 가리킨다.** 대상이 형제 서브모듈이나 외부 라이브러리에 **의존**하면, 그 안을 펼쳐 노드 문서를 만들진 않되(대상 밖) 그 **경계 의존은 기록**한다 -- externals(의존성 레지스트리) · architecture(포트/경계)에 "대상이 X 에 의존" 엣지로 남긴다. "펼치지 않되 가리킨다."
+
+<PENETRATE>
+대상 디렉토리 안에서 우리가 작성/관리한 소스는 모두 분석 대상에 넣는다.
+</PENETRATE>
+
+<PENETRATE>
+분석 대상이 의존하는 제외 단위(서브모듈·외부 라이브러리)는 펼치지 않되 경계 의존으로 기록한다.
+</PENETRATE>
+
+<RICOCHET>
+"서드파티 직접 사용" 여부로 우리 소스 파일을 분석에서 제외하지 않는다.
+</RICOCHET>
+
+<RICOCHET>
+대상 트리 안에 벤더링된 서드파티 원본(우리가 쓰지 않은 남의 소스)을 분석 대상에 넣지 않는다.
 </RICOCHET>
 
 ### 실행 범위 게이트 (Stage 0 앞, 필수)
@@ -266,15 +307,21 @@ render 재설계 전까지 Stage 3/4 를 시작점으로 하는 재시작(render
 개수/인벤토리/모듈 목록 같은 "공유 사실"은 Stage 0 골격에서 1회 확정하고, 이후 단계는 그것을 단일 출처로 삼는다.
 </PENETRATE>
 
-### Stage 1 -- facet 채우기 (병렬)
-골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 한 응답에서 Task 로 **백그라운드 병렬 호출**(`run_in_background: true`)한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
+### Stage 1 -- facet 채우기 (invariants 씨앗 + 병렬)
+골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 백그라운드 호출(`run_in_background: true`)한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
 
-저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, Stage 2 조인에 메인이 그 내용을 쓰므로 메인 컨텍스트에 있어야 한다). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
+호출 순서에 **씨앗 하나**가 있다 -- test 의 불변식 커버리지 조인이 `invariants.md` 를 입력으로 쓰므로 **invariants 를 test 보다 먼저** 낸다. invariants + 나머지(구조 · architecture · flow · data-contract · externals)를 병렬 호출하고, **invariants 완료 통지가 오면 그 `invariants.md` 를 입력으로 test 를 호출**한다(아직 도는 다른 에이전트들과 병렬). test 외의 에이전트는 골격+코드만 입력이라 서로·invariants 를 읽지 않는다.
+
+저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 씨앗으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
 
 플로우 에이전트는 산문(척추)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `flow.md`, 아래를 `.tmp/flow.diagram.md` 로 저장.
 
 <PENETRATE>
 Stage 1 에이전트는 골격이 준 공유 사실 위에 깊이만 더한다.
+</PENETRATE>
+
+<PENETRATE>
+test 는 invariants 완료 후 그 invariants.md 를 입력으로 호출한다(불변식 커버리지 조인의 씨앗).
 </PENETRATE>
 
 <RICOCHET>
@@ -286,17 +333,15 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 </PENETRATE>
 
 <RICOCHET>
-가로지르는(architecture/flow/data-contract/test/externals/invariants) 에이전트는 facet 을 직접 파일로 저장하지 않는다(본문 반환 -> 메인 저장, Stage 2 조인 입력).
+가로지르는(architecture/flow/data-contract/test/externals/invariants) 에이전트는 facet 을 직접 파일로 저장하지 않는다(본문 반환 -> 메인 저장).
 </RICOCHET>
 
-### Stage 2 -- 인덱스/점검/조인 (메인)
+### Stage 2 -- 인덱스/점검 (메인)
 저장된 facet 을 보고 얇은 `index.md` 를 만든다(진입점/목차 + 어디에 무엇이 있는지 오리엔트만). 골격이 단일 출처라 무거운 교차 게이트는 불필요하지만, index 작성 중 골격 대비 개수/목록 모순이 보이면 가볍게 잡는다.
 
 **구조 노드 교차검산(저장 시점에서 이관)**: 구조 노드는 에이전트가 직접 Write 했으므로, 여기서 메인이 골격 인벤토리 대비 **노드 파일 존재/개수**를 가볍게 교차검산한다(빠진 노드/여분 파일 적발). 내용 전수 검토가 아니라 골격과의 목록 대조다.
 
 **facet 링크 무결성 점검(link-lint)**: 메인이 `analyze/facet/` 의 모든 `.md` 에서 상대 `.md` 링크를 뽑아, **링크가 적힌 파일 자신의 디렉토리 기준**으로 resolve 해 대상 facet 파일이 실제로 존재하는지 검사한다(`normpath(join(파일디렉토리, target))`). 끊긴 링크나 오접두 링크(예: 프로젝트루트 기준 `analyze/facet/...` 오접두)를 적발해 자기기준 상대경로로 교정한다. 절대 URL 과 순수 in-page 앵커(`#...`)는 대상이 아니다. 이게 Stage 3 render 의 선결조건이다 -- html 이 facet 구조를 미러하므로, facet 링크가 자기기준으로 정확하면 render 는 `.md` -> `.html` 치환만으로 교차링크를 보존할 수 있다(render 가 깊이를 재계산하지 않아도 된다).
-
-**교차 facet 조인**(두 facet이 다 나와야 가능한 것)은 여기서 메인이 한다. 대표: `invariants.md` 의 불변식 목록 × `test.md` 의 인벤토리를 조인해, **대응 프로퍼티/분기 테스트가 없는 불변식**을 공백으로 산출해 `test.md` 에 덧붙인다. (Stage 1 에이전트끼리는 서로 안 읽으므로 이런 조인은 Stage 1이 아니라 여기로 모은다.)
 
 <PENETRATE>
 Stage 2 에서 메인은 facet 의 모든 상대 `.md` 링크를 적힌 파일 자신 기준으로 resolve 해 대상 존재를 검사하고(link-lint), 끊긴/오접두 링크를 교정한다 -- render(Stage 3)의 선결조건이다.
@@ -369,7 +414,7 @@ verify green 을 facet 내용의 정확성(올바른 링크 대상·코드 일�
 ---
 
 ## 결과 처리 규약
-- **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장 -- 소수이고 Stage 2 조인 입력이라 메인 컨텍스트에 필요).
+- **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장 -- 소수이고 invariants.md 를 test 씨앗으로 넘기는 등 메인 컨텍스트에 필요).
 - **구조 노드 facet 은 예외** -- 노드 수십 개가 부피라 본문 반환 시 메인 컨텍스트/턴을 크게 먹으므로, 구조 에이전트가 `analyze/facet/<소스미러>/` 에 직접 Write 한다. 메인은 Stage 2 에서 골격 대비 존재/개수만 교차검산한다.
 - **렌더 산출물도 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
 - 에이전트 반환 본문에 `&`/`<`/`>` 가 HTML 엔티티로 이스케이프됐으면 저장 전 원복한다.
