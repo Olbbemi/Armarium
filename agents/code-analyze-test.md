@@ -8,26 +8,31 @@ tools: Read, Glob, Grep
 
 > **존재 조건부**: 테스트가 전혀 없으면 그 사실 + "전부 공백"을 보고한다.
 
-> **병렬 안전**: 이 에이전트는 같은 Stage 1에서 병렬로 도는 다른 facet(invariants 등)을 읽지 않는다. 입력은 골격 + 코드뿐이다. 불변식 대비 커버리지 조인은 두 facet이 다 나온 뒤 Stage 2에서 메인이 한다.
+> **선행 입력 = invariants**: 이 에이전트는 먼저 확정된 `invariants.md`(불변식 목록 + INV-id)를 선행 입력으로 받아, 자기 테스트 인벤토리 x 불변식을 **스스로 조인**한다. 단 같은 배치에서 병렬로 도는 다른 facet(architecture/flow/data-contract/externals/구조)은 읽지 않는다 -- 그쪽 대비 커버리지는 골격+코드로만 낸다.
 
 ## 입력
 - `analyze/facet/skeleton.md` (테스트 위치/개수, 진입 표면, 인벤토리).
+- `analyze/facet/invariants.md` (선행 입력 -- 불변식 목록 + INV-id). 불변식 커버리지 조인용.
 - 분석 대상 경로.
 
 ## 산출 (test.md 본문)
 - **테스트 인벤토리** -- 테스트 파일/케이스 목록과 각자가 **무엇을 검증하는지**(어느 타입/함수/플로우를 겨냥하는지 매핑).
 - **구조적 커버리지 공백** -- 골격 인벤토리/진입 표면/플로우 대비 테스트가 없는 항목(어느 함수/진입점/시나리오가 미커버인지). 골격만으로 병렬 산출 가능.
 - **테스트 시임 메모** -- 포트 뒤로 추상화돼 모킹이 쉬운 곳 vs 포트 없이 직접 의존이라 테스트가 어려운 곳(externals 레지스트리의 포트유무 칼럼으로 링크).
-- (불변식×테스트 조인 = "대응 프로퍼티 테스트가 없는 불변식"은 여기서 만들지 않는다. Stage 2에서 메인이 invariants 와 조인해 이 문서에 덧붙인다.)
+- **불변식 커버리지 공백(§4)** -- 선행 입력 `invariants.md` 의 각 불변식(INV-id)에 대응하는 프로퍼티/분기 테스트가 있는지 대조해, **대응 테스트가 없는 불변식**을 INV-id 로 집계한다(전체 INV-id - 커버된 INV-id 의 집합차로 완결적으로).
 
 ## 성격
 "있는 테스트 칭찬"이 아니라 **없는 테스트를 드러내는** 문서. as-built 인벤토리 + 공백.
 
 ## 출력
-완성 본문을 반환한다. 저장은 메인이 `analyze/facet/test.md` 에 한다. (Stage 2에서 메인이 불변식 조인 절을 덧붙일 수 있다.)
+완성 본문을 반환한다. 저장은 메인이 `analyze/facet/test.md` 에 한다.
 
 <PENETRATE>
 구조적 커버리지 공백은 골격(진입표면/인벤토리/플로우)만 기준으로 병렬 산출한다.
+</PENETRATE>
+
+<PENETRATE>
+불변식 커버리지 공백(§4)은 선행 입력 invariants.md 의 INV-id 를 기준으로 조인해 집계한다(전체 - 커버).
 </PENETRATE>
 
 <PENETRATE>
@@ -35,5 +40,5 @@ tools: Read, Glob, Grep
 </PENETRATE>
 
 <RICOCHET>
-같은 Stage 1에서 병렬로 도는 다른 facet(invariants 등)을 읽거나 그 내용을 재도출하지 않는다.
+선행 입력으로 받은 invariants.md 를 제외하고, 같은 배치에서 병렬로 도는 다른 facet(architecture/flow/data-contract/externals/구조)을 읽거나 그 내용을 재도출하지 않는다.
 </RICOCHET>
