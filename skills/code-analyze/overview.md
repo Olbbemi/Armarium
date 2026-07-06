@@ -72,7 +72,7 @@ facet 은 두 모양으로 나뉜다.
 
 ### 재분석 시 갱신 정책
 
-analyze 산출물은 코드의 거울(파생물)이라, 코드가 바뀌면 옛 분석은 stale 다. 기본은 **덮어쓰기 = 기존 삭제 후 새 생성**이다 -- 재분석하면 기존 `analyze/` 를 갱신해 현재 코드에 맞는 거울 하나만 둔다. 보관 단위는 **브랜치별 한 벌**이다. 과거 시점이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다. 릴리스 브랜치(`release/*` 등)면 동결점이라 덮어쓰지 않고 `analyze_<버전>/` 로 스냅샷 보존한다.
+analyze 산출물은 코드의 파생물이라, 코드가 바뀌면 옛 분석은 stale 다. 기본은 **덮어쓰기 = 기존 삭제 후 새 생성**이다 -- 재분석하면 기존 `analyze/` 를 갱신해 현재 코드에 맞는 분석 한 벌만 둔다. 보관 단위는 **브랜치별 한 벌**이다. 과거 시점이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다. 릴리스 브랜치(`release/*` 등)면 동결점이라 덮어쓰지 않고 `analyze_<버전>/` 로 스냅샷 보존한다.
 
 <RICOCHET>
 릴리스 버저닝 단계가 아니면 분석 결과를 별도 버전 디렉토리로 누적하지 않는다.
@@ -143,14 +143,14 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | facet | 에이전트 | 역할 |
 |------|----------|------|
 | architecture | `code-analyze-architecture` | 의존 방향(포트-어댑터 역전), 진입점, 진입표면->핸들러 매핑, 포트<-구현 관계엣지, 모듈 역할 서사. 불변식/외부경계는 링크만. |
-| flow | `code-analyze-flow` | 트리거 + 생명주기에 앵커된 end-to-end 경로 **망라**. 척추(호출 순서/분기/데이터 변환)만, 노드 상세는 구조 문서로 링크. |
+| flow | `code-analyze-flow` | 트리거 + 생명주기에 앵커된 end-to-end 경로 **망라**. 핵심(호출 순서/분기/데이터 변환)만, 노드 상세는 구조 문서로 링크. |
 | data-contract | `code-analyze-data-contract` | 영속/설정 스키마(데이터 계약). 있으면. |
-| test | `code-analyze-test` | 테스트 인벤토리 + 커버리지 공백. 씨앗으로 받은 **invariants(INV-id)와 조인**해 미커버 불변식을 §4 로 집계. |
-| externals | `code-analyze-externals` | **단일 소스 의존성 레지스트리**(라이브러리+버전+감싸는 어댑터+벤더링+포트유무 칼럼). 척추, 나머지 문서는 링크만. |
-| invariants | `code-analyze-invariants` | **전체 관통 규약/불변식 단일 소스**(전칭+검증가능한 것만, 각 불변식에 안정 ID). test 의 커버리지 조인 씨앗 + TDD 프로퍼티/분기행렬의 씨앗. test/architecture 가 링크. |
+| test | `code-analyze-test` | 테스트 인벤토리 + 커버리지 공백. 선행 입력으로 받은 **invariants(INV-id)와 조인**해 미커버 불변식을 §4 로 집계. |
+| externals | `code-analyze-externals` | **단일 소스 의존성 레지스트리**(라이브러리+버전+감싸는 어댑터+벤더링+포트유무 칼럼). 핵심만, 나머지 문서는 링크만. |
+| invariants | `code-analyze-invariants` | **전체 관통 규약/불변식 단일 소스**(전칭+검증가능한 것만, 각 불변식에 안정 ID). test 커버리지 조인의 선행 입력 + TDD 프로퍼티/분기행렬의 출발점. test/architecture 가 링크. |
 
 <PENETRATE>
-가로지르는 문서는 척추(자기 고유 정보)만 적고, 노드/타입 상세는 구조 문서로 링크한다.
+가로지르는 문서는 자기 고유 정보만 적고, 노드/타입 상세는 구조 문서로 링크한다.
 </PENETRATE>
 
 <RICOCHET>
@@ -168,9 +168,9 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | `code-analyze-render-html` | facet 슬라이스 -> HTML 페이지들(다중 파일 사이트). **직접 Write** | 슬라이스 facet + 셸 템플릿 + `.tmp/` | `analyze/html/<슬라이스>` (직접) |
 | `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `analyze/facet/` + `.tmp/` | `analyze/markdown/` (직접) |
 | `code-analyze-verify` | 렌더 HTML mermaid/그래프 깨짐 + **내부 링크 무결성**(끊긴 상대 href) 검증 | `analyze/html/` | 리포트 본문 |
-| 호출그래프 보조 (언어별 조건부 플러그인, 현 구현 `code-analyze-callgraph-cpp`) | (조건부) 언어별 호출 그래프 추출. Stage0 호출/참조맵 시드 + flow 출발점. | 대상 경로 + 언어별 사전조건(cpp: `compile_commands.json`) | facet 텍스트 + DOT(임시) |
+| 호출그래프 보조 (언어별 조건부 플러그인, 현 구현 `code-analyze-callgraph-cpp`) | (조건부) 언어별 호출 그래프 추출. Stage0 골격에 호출/참조맵 미리 채움 + flow 출발점. | 대상 경로 + 언어별 사전조건(cpp: `compile_commands.json`) | facet 텍스트 + DOT(임시) |
 
-**호출그래프 슬롯 계약.** 호출그래프 보조는 언어별 플러그인 슬롯이다 -- 새 언어를 지원하려면 `code-analyze-callgraph-<언어>` 에이전트를 그 언어에 맞게 만들어 이 슬롯을 채운다(현재 구현은 cpp 하나, 온디맨드로 추가). 슬롯을 채우는 플러그인은 다섯 축을 정의한다: (1) 추출 수단(cpp: clang IR -> `opt -dot-callgraph`), (2) 노드 유일 ID(cpp: 맹글 심볼 해시), (3) 잡음 노드 판정(cpp: IR 실체로 사소 접근자 걸러냄), (4) 기계적 노드 부류(cpp: ctor/dtor · 익명 네임스페이스), (5) 사전조건 게이트(cpp: C++ + `compile_commands.json` + clang/llvm/graphviz). 슬롯이 빈 언어(플러그인 없음)면 호출그래프 시드 없이 진행하고, flow 는 코드에서 직접 호출을 추적한다.
+**호출그래프 슬롯 계약.** 호출그래프 보조는 언어별 플러그인 슬롯이다 -- 새 언어를 지원하려면 `code-analyze-callgraph-<언어>` 에이전트를 그 언어에 맞게 만들어 이 슬롯을 채운다(현재 구현은 cpp 하나, 온디맨드로 추가). 슬롯을 채우는 플러그인은 다섯 축을 정의한다: (1) 추출 수단(cpp: clang IR -> `opt -dot-callgraph`), (2) 노드 유일 ID(cpp: 맹글 심볼 해시), (3) 잡음 노드 판정(cpp: IR 실체로 사소 접근자 걸러냄), (4) 기계적 노드 부류(cpp: ctor/dtor · 익명 네임스페이스), (5) 사전조건 게이트(cpp: C++ + `compile_commands.json` + clang/llvm/graphviz). 슬롯이 빈 언어(플러그인 없음)면 호출그래프 선반영 없이 진행하고, flow 는 코드에서 직접 호출을 추적한다.
 
 ---
 
@@ -187,7 +187,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 
 - **실행 범위 확정** (사용자 확인 게이트) -- 범위 협상 시작 시 in_progress, 사용자에게 범위 확인을 요청하기 직전 completed(응답 후 다음 매듭 in_progress).
 - **Stage 0 골격** -- 메인 직접이면 foreground(진입 시 in_progress, `skeleton.md` 저장 시 completed). survey/callgraph 로 위임하면 "골격 에이전트 호출" 매듭으로 호출 즉시 completed.
-- **Stage 1 facet 에이전트 호출** -- 구조 + 가로지르는 6종(+ 언어별 callgraph)을 백그라운드 호출한 즉시 completed(invariants 씨앗 선행 -> test 후속 호출 포함).
+- **Stage 1 facet 에이전트 호출** -- 구조 + 가로지르는 6종(+ 언어별 callgraph)을 백그라운드 호출한 즉시 completed(invariants 선행 -> test 후속 호출 포함).
 - **Stage 2 인덱스/점검** -- foreground. Stage 1 통지를 받아 가로지르는 저장 · 구조 교차검산 · link-lint · `index.md` 저장까지, 저장 완료 시 completed.
 - **Stage 3 렌더** -- 메인이 공유 셸 구축 후 render 에이전트를 백그라운드 호출한 즉시 completed.
 - **Stage 4 검증 + 결과 안내** -- verify 호출 시 in_progress, 통지 도착 후 결과 안내(생성 파일 · 실행 범위 · verify 보증범위) 출력 시 completed.
@@ -295,7 +295,7 @@ render 재설계 전까지 Stage 3/4 를 시작점으로 하는 재시작(render
 </RICOCHET>
 
 ### Stage 0 -- 골격/인벤토리 (직렬, 1회)
-파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 만들어 `analyze/facet/skeleton.md` 로 저장한다. **카운팅 규율을 여기서 1회 적용**(아래). 기본 메인 직접, 대형이면 `code-analyze-survey` 위임. 분석 언어에 호출그래프 보조 플러그인(`code-analyze-callgraph-<언어>`)이 있고 그 사전조건이 충족되면 여기서 호출해 호출/참조맵을 골격에 시드한다(현 구현 cpp: `compile_commands.json` 있을 때).
+파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 만들어 `analyze/facet/skeleton.md` 로 저장한다. **카운팅 규율을 여기서 1회 적용**(아래). 기본 메인 직접, 대형이면 `code-analyze-survey` 위임. 분석 언어에 호출그래프 보조 플러그인(`code-analyze-callgraph-<언어>`)이 있고 그 사전조건이 충족되면 여기서 호출해 호출/참조맵을 골격에 미리 채운다(현 구현 cpp: `compile_commands.json` 있을 때).
 
 > 카운팅 규율: (1) 셀 단위를 먼저 못 박는다(포함/제외 정의). (2) 개수는 구성원 목록을 먼저 만들고 목록 길이로 센다. (3) 나열을 재현가능 검색/도구 결과에 근거(언어별 수단은 에이전트가 선택). (4) 헤드라인/합계 == 인벤토리 목록 행수 자가 교차검산(어긋나면 목록이 진실).
 
@@ -307,21 +307,21 @@ render 재설계 전까지 Stage 3/4 를 시작점으로 하는 재시작(render
 개수/인벤토리/모듈 목록 같은 "공유 사실"은 Stage 0 골격에서 1회 확정하고, 이후 단계는 그것을 단일 출처로 삼는다.
 </PENETRATE>
 
-### Stage 1 -- facet 채우기 (invariants 씨앗 + 병렬)
+### Stage 1 -- facet 채우기 (invariants 선행 + 병렬)
 골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 백그라운드 호출(`run_in_background: true`)한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
 
-호출 순서에 **씨앗 하나**가 있다 -- test 의 불변식 커버리지 조인이 `invariants.md` 를 입력으로 쓰므로 **invariants 를 test 보다 먼저** 낸다. invariants + 나머지(구조 · architecture · flow · data-contract · externals)를 병렬 호출하고, **invariants 완료 통지가 오면 그 `invariants.md` 를 입력으로 test 를 호출**한다(아직 도는 다른 에이전트들과 병렬). test 외의 에이전트는 골격+코드만 입력이라 서로·invariants 를 읽지 않는다.
+호출 순서에 **선행 의존 하나**가 있다 -- test 의 불변식 커버리지 조인이 `invariants.md` 를 입력으로 쓰므로 **invariants 를 test 보다 먼저** 낸다. invariants + 나머지(구조 · architecture · flow · data-contract · externals)를 병렬 호출하고, **invariants 완료 통지가 오면 그 `invariants.md` 를 입력으로 test 를 호출**한다(아직 도는 다른 에이전트들과 병렬). test 외의 에이전트는 골격+코드만 입력이라 서로·invariants 를 읽지 않는다.
 
-저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 씨앗으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
+저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 선행 입력으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
 
-플로우 에이전트는 산문(척추)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `flow.md`, 아래를 `.tmp/flow.diagram.md` 로 저장.
+플로우 에이전트는 산문(핵심)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `flow.md`, 아래를 `.tmp/flow.diagram.md` 로 저장.
 
 <PENETRATE>
 Stage 1 에이전트는 골격이 준 공유 사실 위에 깊이만 더한다.
 </PENETRATE>
 
 <PENETRATE>
-test 는 invariants 완료 후 그 invariants.md 를 입력으로 호출한다(불변식 커버리지 조인의 씨앗).
+test 는 invariants 완료 후 그 invariants.md 를 입력으로 호출한다(불변식 커버리지 조인의 선행 입력).
 </PENETRATE>
 
 <RICOCHET>
@@ -414,7 +414,7 @@ verify green 을 facet 내용의 정확성(올바른 링크 대상·코드 일�
 ---
 
 ## 결과 처리 규약
-- **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장 -- 소수이고 invariants.md 를 test 씨앗으로 넘기는 등 메인 컨텍스트에 필요).
+- **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `analyze/facet/` 에 저장 -- 소수이고 invariants.md 를 test 선행 입력으로 넘기는 등 메인 컨텍스트에 필요).
 - **구조 노드 facet 은 예외** -- 노드 수십 개가 부피라 본문 반환 시 메인 컨텍스트/턴을 크게 먹으므로, 구조 에이전트가 `analyze/facet/<소스미러>/` 에 직접 Write 한다. 메인은 Stage 2 에서 골격 대비 존재/개수만 교차검산한다.
 - **렌더 산출물도 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
 - 에이전트 반환 본문에 `&`/`<`/`>` 가 HTML 엔티티로 이스케이프됐으면 저장 전 원복한다.
