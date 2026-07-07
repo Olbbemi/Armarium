@@ -44,7 +44,7 @@
 | `handoff.md` | design 산출물(설계 문서) -- 아래 "산출물 형식" 섹션의 템플릿이 그대로 채워진 형태. 03-implementation 입력으로 그대로 사용됨 | 사용자 승인 서명 확인 직후 |
 | `checklist.md` | 완료 기준 점검 결과 -- 아래 "완료 기준" 섹션의 템플릿이 채워진 형태. **제시 전 파일 먼저 작성**, 회차마다 갱신(이력은 git), 승인 시 사용자 서명 + 시각 스탬프 (overview "단계 전환 규칙") | 제시 전 (파일 먼저) |
 
-저장 경로: `{프로젝트 루트}/code-design/<브랜치>/02-design/`
+저장 경로: `{프로젝트 루트}/code-design/<브랜치 슬러그>/02-design/`
 
 **용어 정리:**
 - "산출물" = 설계 문서 본문 = `handoff.md` 의 내용
@@ -206,7 +206,7 @@ variant 파일은 분기 판단 직후, 사전 조사 시작 전에 사용자에
 # 설계: {기능명}
 
 ## 전제 (요구사항 요약)
-(01-requirements 핸드오프에서 요약 인용 -- 통째 복사 아님. 상세는 code-design/<브랜치>/01-requirements/handoff.md 원본, 로드맵은 roadmap.md, 어긋나면 원본 신뢰)
+(01-requirements 핸드오프에서 요약 인용 -- 통째 복사 아님. 상세는 code-design/<브랜치 슬러그>/01-requirements/handoff.md 원본, 로드맵은 roadmap.md, 어긋나면 원본 신뢰)
 - 확정 방향 / 유형: ...
 - 범위: In scope ... / Out of scope ... (다음 flow 예정 / 영구 제외)
 - 우선순위: 필수 ... / 선택 ...
@@ -299,7 +299,7 @@ B의 경우 variant 파일의 안내에 따라 세부 케이스를 추가 명시
 
 단계 종료 시 아래 형식으로 제시한다.
 
-**저장 경로:** `{프로젝트 루트}/code-design/<브랜치>/02-design/checklist.md`
+**저장 경로:** `{프로젝트 루트}/code-design/<브랜치 슬러그>/02-design/checklist.md`
 - 공통 원칙 5("단계 산출물 저장 정책")에 따른다.
 - 단일 파일을 회차마다 갱신하며, 회차 이력은 git 이 보존한다.
 
@@ -396,7 +396,7 @@ B의 경우 variant 파일의 안내에 따라 세부 케이스를 추가 명시
 
 03-implementation 은 design 의 핸드오프 파일을 입력으로 사용한다.
 
-**저장 경로:** `{프로젝트 루트}/code-design/<브랜치>/02-design/handoff.md`
+**저장 경로:** `{프로젝트 루트}/code-design/<브랜치 슬러그>/02-design/handoff.md`
 - 공통 원칙 5("단계 산출물 저장 정책")에 따른다.
 - 갱신 시 사용자 확인 -- 거절 시 처리 방향 재확인.
 
