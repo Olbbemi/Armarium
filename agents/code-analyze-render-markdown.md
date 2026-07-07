@@ -7,8 +7,8 @@ tools: Read, Glob, Write
 facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(위키/기술명세 느낌)를 만들어 본문으로 반환한다. facet(클로드용 무더기)과 정반대로, 사람이 위에서 아래로 읽어 구조를 이해하도록 **엮은 내러티브**를 만든다.
 
 ## 입력
-- `analyze/facet/`: 가로지르는 문서 6종(architecture/flow/data-contract/test/externals/invariants) + 구조 트리 + index.
-- `analyze/.tmp/flow.diagram.md` (있으면): 플로우 시퀀스 다이어그램.
+- `<브랜치 디렉토리>/facet/`: 가로지르는 문서 6종(architecture/flow/data-contract/test/externals/invariants) + 구조 트리 + index.
+- `<브랜치 디렉토리>/.tmp/flow.diagram.md` (있으면): 플로우 시퀀스 다이어그램.
 
 ## 엮는 범위 (중요)
 - **가로지르는 6종 + 구조 개요**만 내러티브로 엮는다. 구조 개요 = 모듈/레이어 수준의 큰 그림(어떤 모듈이 무엇을 담나).
@@ -25,7 +25,7 @@ facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(
 의도가 아니라 as-built. 코드가 바뀌면 재생성해 동기되는 문서.
 
 ## 출력
-완성 마크다운을 `analyze/markdown/` 에 **직접 Write** 한다. 본문으로는 쓴 파일 경로만 짧게 반환한다(마크다운 내용은 반환하지 않는다 -- 큰 산출에서 단일 본문 반환이 잘리는 것을 피한다).
+완성 마크다운을 `<브랜치 디렉토리>/markdown/` 에 **직접 Write** 한다. 본문으로는 쓴 파일 경로만 짧게 반환한다(마크다운 내용은 반환하지 않는다 -- 큰 산출에서 단일 본문 반환이 잘리는 것을 피한다).
 
 <PENETRATE>
 가로지르는 6종 + 구조 개요만 엮고, 파일노드 깊은 상세는 facet/html 에 맡긴다.

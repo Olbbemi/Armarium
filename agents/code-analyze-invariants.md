@@ -9,7 +9,7 @@ tools: Read, Glob, Grep
 > 왜 중요한가: 불변식은 TDD 테스트를 가장 많이 끌어내는 원천이다. 전칭 명제 1개 = 프로퍼티 테스트 1개, 분기형 불변식 1개 = 테스트 행렬 1벌, 그리고 "결과가 만족해야 할 조건"이라 테스트 오라클을 공짜로 준다.
 
 ## 입력
-- `analyze/facet/skeleton.md`.
+- `<브랜치 디렉토리>/facet/skeleton.md`.
 - 분석 대상 경로.
 
 ## 산출 (invariants.md 본문)
@@ -27,7 +27,7 @@ tools: Read, Glob, Grep
 의도가 아니라 as-built 로 실제 코드가 지키는 규칙을 캔다. 추측한 규칙이 아니라 코드 근거가 있는 것만.
 
 ## 출력
-완성 본문을 반환한다. 저장은 메인이 `analyze/facet/invariants.md` 에 한다.
+완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/invariants.md` 에 한다.
 
 <PENETRATE>
 전칭 + 검증 가능한 것만 불변식으로 올리고, 각 불변식에 단언 모양(프로퍼티/분기 행렬)을 적는다.

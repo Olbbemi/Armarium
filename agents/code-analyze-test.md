@@ -11,8 +11,8 @@ tools: Read, Glob, Grep
 > **선행 입력 = invariants**: 이 에이전트는 먼저 확정된 `invariants.md`(불변식 목록 + INV-id)를 선행 입력으로 받아, 자기 테스트 인벤토리 x 불변식을 **스스로 조인**한다. 단 같은 배치에서 병렬로 도는 다른 facet(architecture/flow/data-contract/externals/구조)은 읽지 않는다 -- 그쪽 대비 커버리지는 골격+코드로만 낸다.
 
 ## 입력
-- `analyze/facet/skeleton.md` (테스트 위치/개수, 진입 표면, 인벤토리).
-- `analyze/facet/invariants.md` (선행 입력 -- 불변식 목록 + INV-id). 불변식 커버리지 조인용.
+- `<브랜치 디렉토리>/facet/skeleton.md` (테스트 위치/개수, 진입 표면, 인벤토리).
+- `<브랜치 디렉토리>/facet/invariants.md` (선행 입력 -- 불변식 목록 + INV-id). 불변식 커버리지 조인용.
 - 분석 대상 경로.
 
 ## 산출 (test.md 본문)
@@ -25,7 +25,7 @@ tools: Read, Glob, Grep
 "있는 테스트 칭찬"이 아니라 **없는 테스트를 드러내는** 문서. as-built 인벤토리 + 공백.
 
 ## 출력
-완성 본문을 반환한다. 저장은 메인이 `analyze/facet/test.md` 에 한다.
+완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/test.md` 에 한다.
 
 <PENETRATE>
 구조적 커버리지 공백은 골격(진입표면/인벤토리/플로우)만 기준으로 병렬 산출한다.

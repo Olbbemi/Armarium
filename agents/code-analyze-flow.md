@@ -19,7 +19,7 @@ tools: Read, Glob, Grep
 시퀀스 다이어그램의 **개수**도 복잡도 비례다 -- 복잡한 경로에만 다이어그램을 그리고, 사소한 CRUD 는 산문 한 줄로 끝낸다. 망라는 산문 커버리지로 채우지 다이어그램 장수로 채우지 않는다.
 
 ## 입력
-- `analyze/facet/skeleton.md` (진입 표면 + 호출/참조 맵 -- 언어별 callgraph 보조가 있으면 그 산출이 출발점).
+- `<브랜치 디렉토리>/facet/skeleton.md` (진입 표면 + 호출/참조 맵 -- 언어별 callgraph 보조가 있으면 그 산출이 출발점).
 - 분석 대상 경로.
 
 ## 산출
@@ -32,7 +32,7 @@ tools: Read, Glob, Grep
 하위 모듈을 가로지르는 경로를 전체-뷰로 추적한다. as-built.
 
 ## 출력
-구분자로 나눈 본문을 반환한다. 메인이 산문을 `analyze/facet/flow.md`, 시퀀스를 `analyze/.tmp/flow.diagram.md` 로 저장한다.
+구분자로 나눈 본문을 반환한다. 메인이 산문을 `<브랜치 디렉토리>/facet/flow.md`, 시퀀스를 `<브랜치 디렉토리>/.tmp/flow.diagram.md` 로 저장한다.
 
 <PENETRATE>
 모든 트리거/생명주기를 빠짐없이 등장시키되 깊이는 복잡도에 비례한다.
