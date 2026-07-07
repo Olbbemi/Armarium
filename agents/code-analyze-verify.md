@@ -4,10 +4,10 @@ description: code-analyze 가 생성한 HTML 의 mermaid 가 문법/렌더 양�
 tools: Read, Bash
 ---
 
-`analyze/html/` 의 렌더 HTML 에 담긴 mermaid 가 실제로 깨지지 않는지 검증하고, 결과 리포트를 본문으로 반환한다.
+`<브랜치 디렉토리>/html/` 의 렌더 HTML 에 담긴 mermaid 가 실제로 깨지지 않는지 검증하고, 결과 리포트를 본문으로 반환한다.
 
 ## 입력
-검증 대상 = `analyze/html/` 아래 **모든 `.html` 페이지**(다중 파일 사이트: `index.html` 허브 + 콘텐츠 페이지들). 한 파일이 아니라 디렉토리를 순회한다.
+검증 대상 = `<브랜치 디렉토리>/html/` 아래 **모든 `.html` 페이지**(다중 파일 사이트: `index.html` 허브 + 콘텐츠 페이지들). 한 파일이 아니라 디렉토리를 순회한다.
 
 ## 검증 항목
 - **문법 검증**: `html/` 전체 `.html` 을 순회하며 각 페이지의 mermaid 블록을 추출해 mermaid 파서로 parse 한다(node + jsdom + mermaid 의 `mermaid.parse`). HTML 엔티티(`&lt;` 등)는 원래 문자로 복원한 뒤 검증한다. 시퀀스 메시지에 `;`(statement separator 로 오인되는) 가 섞여 깨지는 케이스도 이 parse 가 잡는다.

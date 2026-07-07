@@ -9,7 +9,7 @@ tools: Read, Glob, Grep
 > **존재 조건부**: 데이터 계약이 없는 프로젝트면 그 사실만 한 줄 보고하고 빈 산출을 반환한다.
 
 ## 입력
-- `analyze/facet/skeleton.md` (데이터 계약 위치 힌트).
+- `<브랜치 디렉토리>/facet/skeleton.md` (데이터 계약 위치 힌트).
 - 분석 대상 경로.
 
 ## 산출 (data-contract.md 본문)
@@ -22,7 +22,7 @@ tools: Read, Glob, Grep
 스키마가 "무엇을 보장하는가"를 테스트 작성자가 바로 단언으로 옮길 수 있게 적는다. as-built.
 
 ## 출력
-완성 본문을 반환한다. 저장은 메인이 `analyze/facet/data-contract.md` 에 한다.
+완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/data-contract.md` 에 한다.
 
 <RICOCHET>
 데이터 계약이 없으면 만들어내지 않는다.
