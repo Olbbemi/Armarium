@@ -8,7 +8,7 @@ facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(
 
 ## 입력
 - `<브랜치 디렉토리>/facet/`: 가로지르는 문서 6종(architecture/flow/data-contract/test/externals/invariants) + 구조 트리 + index.
-- `<브랜치 디렉토리>/.tmp/flow.diagram.md` (있으면): 플로우 시퀀스 다이어그램.
+- `<브랜치 디렉토리>/facet/flow.diagrams.md` (있으면): 플로우 시퀀스 다이어그램(facet 에 지속됨).
 
 ## 엮는 범위 (중요)
 - **가로지르는 6종 + 구조 개요**만 내러티브로 엮는다. 구조 개요 = 모듈/레이어 수준의 큰 그림(어떤 모듈이 무엇을 담나).
@@ -18,7 +18,7 @@ facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(
 - 단일 마크다운 문서 한 벌(예: `ARCHITECTURE.md`).
 - 구성: 인트로(이 시스템이 무엇인지 as-built) -> 아키텍처/구조 개요 -> 플로우 -> 데이터 계약 -> 불변식 -> 외부 의존 -> 테스트 현황.
 - facet 의 ```mermaid 블록(구조형)은 그대로 유지(GitHub native render). 시퀀스 메시지의 `;` 깨짐은 flow 가 회피하므로 그대로 옮긴다.
-- 플로우 섹션: facet 산문 + `flow.diagram.md` 시퀀스를 시나리오 순서로 함께(임시 파일 링크 말고 내용 복사).
+- 플로우 섹션: facet 산문(`flow.md`) + `flow.diagrams.md` 시퀀스를 시나리오 순서로 함께(파일 링크 말고 내용 복사).
 - facet 의 기계적 나열을 복붙하지 말고 읽기 흐름을 만든다.
 
 ## 성격
@@ -32,7 +32,7 @@ facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(
 </PENETRATE>
 
 <RICOCHET>
-임시 다이어그램 파일을 최종 문서에서 링크로 참조하지 않는다.
+다이어그램 파일을 최종 문서에서 링크로 참조하지 않는다(내용을 복사해 넣는다).
 </RICOCHET>
 
 <RICOCHET>

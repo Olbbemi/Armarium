@@ -42,29 +42,32 @@ facet 은 두 모양으로 나뉜다.
 
 ## 출력 구조
 
-분석 대상 디렉토리 아래에 `analyze/` 를 만들고, 그 밑에 **분석 시점 브랜치별 디렉토리**(= 브랜치 디렉토리)를 두어 종류별 하위 디렉토리에 저장한다(레포 루트가 아니라 분석한 그 디렉토리 밑 -- "분석 대상 선택" 참조). 브랜치 디렉토리 이름은 그 시점 git 브랜치 이름에서 `/` 를 `_` 로 치환한다(예: `feature/<이름>` -> `feature_<이름>`).
+분석 대상 디렉토리 아래에 `analyze/` 를 만든다. 그 밑에 **대상별 공용 뷰어 한 벌**(`_viewer/`)과 **분석 시점 브랜치별 디렉토리**(= 브랜치 디렉토리)를 둔다(레포 루트가 아니라 분석한 그 디렉토리 밑 -- "분석 대상 선택" 참조). 브랜치 디렉토리 이름은 그 시점 git 브랜치 이름에서 `/` 를 `_` 로 치환한다(예: `feature/<이름>` -> `feature_<이름>`).
+
+HTML 산출은 **고정 뷰어 + 데이터 분리** 구조다 -- 뷰어(스킬이 소유한 정적 에셋)를 대상별로 한 벌 설치해 모든 브랜치가 공유하고, 분석은 브랜치별 `data.js`(facet 를 옮긴 `window.DATA` 데이터)만 낸다. 뷰어는 매 분석마다 복사하지 않는다(아래 "공용 뷰어(HTML)" 참조).
 
 ```
 <분석 대상 디렉토리>/
   analyze/
+    _viewer/          대상별 공용 뷰어 한 벌 (모든 브랜치가 공유)
+      index.html  app.js  style.css  mermaid.min.js   스킬에서 복사한 정적 에셋
+      manifest.js       있는 브랜치 data.js 목록 (렌더마다 재생성)
     <브랜치 슬러그>/   브랜치 디렉토리 = 브랜치 하나의 분석 한 벌 (예: feature_<이름>, release_<버전>)
-      facet/        Claude 층: 구조 트리(소스 미러) + 가로지르는 관점 문서 + skeleton + index
+      facet/        Claude 층: 구조 트리(소스 미러) + 가로지르는 관점 문서 + 다이어그램 소스 + skeleton + index
         <소스미러>/  구조 파일노드 문서들(예: facet/src/<...>.md)
-        architecture.md  flow.md  data-contract.md  test.md  externals.md  invariants.md
+        architecture.md  flow.md  flow.diagrams.md  data-contract.md  test.md  externals.md  invariants.md
+        callgraph-cpp.md  callgraph.diagrams.md   (조건부, 언어별 callgraph 가 돌 때)
         skeleton.md   index.md
-      html/         인터랙티브 HTML 사이트 (사람) -- 다중 파일
-        index.html         진입 허브(카테고리/목차)
-        <소스미러>/*.html  구조 노드 페이지(파일노드당 1장)
-        architecture.html flow.html data-contract.html test.html externals.html invariants.html
-        assets/style.css  assets/script.js   공유 셸(메인 소유, mermaid CDN 포함)
+      data.js         뷰어용 데이터 (window.DATA = {...})
       markdown/     as-built 마크다운 문서 (사람, 위키/명세)
-      .tmp/         렌더 중간 산출물. 렌더 후 삭제
 ```
+
+렌더 중 조각 조립용 임시 디렉토리 `.dataparts/` 가 브랜치 디렉토리 밑에 잠깐 생겼다 조립 후 삭제된다(지속 산출이 아니다). 다이어그램 소스(flow 시퀀스·callgraph)는 `.tmp` 가 아니라 **facet 에 지속**한다 -- render 를 facet 로부터 재시작할 수 있어야 하기 때문이다.
 
 생성만 한다. 커밋 / 이동(특히 HTML 을 GitHub Pages 디렉토리로) / 푸시는 사용자가 결과를 보고 직접 한다.
 
 <PENETRATE>
-산출물은 분석 대상 디렉토리 아래 브랜치 디렉토리(`analyze/<브랜치 슬러그>/`)의 종류별 하위 디렉토리에 저장한다(레포 루트가 아님).
+브랜치별 산출(facet/ · data.js · markdown/)은 분석 대상 디렉토리 아래 브랜치 디렉토리(`analyze/<브랜치 슬러그>/`)에, 공용 뷰어는 `analyze/_viewer/` 에 저장한다(레포 루트가 아님).
 </PENETRATE>
 
 <PENETRATE>
@@ -72,7 +75,7 @@ facet 은 두 모양으로 나뉜다.
 </PENETRATE>
 
 <RICOCHET>
-종류별 산출 디렉토리(`facet/`, `html/`, `markdown/`, `.tmp/`)를 브랜치 디렉토리 없이 `analyze/` 바로 밑에 두지 않는다.
+브랜치별 산출(`facet/`, `markdown/`, `data.js`)을 브랜치 디렉토리 없이 `analyze/` 바로 밑에 두지 않는다(공용 `_viewer/` 만 `analyze/` 바로 밑이다).
 </RICOCHET>
 
 <RICOCHET>
@@ -83,19 +86,54 @@ facet 은 두 모양으로 나뉜다.
 
 analyze 산출물은 코드의 파생물이라, 코드가 바뀌면 옛 분석은 stale 다. 보관 단위는 **브랜치별 한 벌** -- 브랜치마다 자기 브랜치 디렉토리(`analyze/<브랜치 슬러그>/`)에 그 브랜치 코드를 반영한 분석 한 벌을 둔다. 같은 브랜치를 재분석하면 **그 브랜치 디렉토리 안에서만 덮어쓰기**(기존 삭제 후 새 생성)해 현재 코드에 맞는 한 벌로 갱신하고, 다른 브랜치 디렉토리는 건드리지 않는다. 그래서 여러 브랜치의 분석이 나란히 남아 개발 중 브랜치 간 비교에 쓸 수 있다(릴리스 브랜치도 특별 취급 없이 자기 브랜치 디렉토리 하나를 가질 뿐이다). 과거의 특정 시점이 필요하면 그 시점 코드(git)를 다시 분석해 재현한다. 오래된/죽은 브랜치 디렉토리 정리는 사용자 몫이다(스킬은 관여하지 않는다).
 
+예외 -- 공용 뷰어(`analyze/_viewer/`)는 브랜치 디렉토리 밖의 **대상 공유물**이라, 뷰어 사전 확인(설치/교체)과 Stage 3(`manifest.js` 재생성)이 여기에 쓴다. 이건 "브랜치 디렉토리 안에서만"의 명시 예외이며, 다른 **브랜치** 디렉토리는 여전히 불가침이다.
+
 <PENETRATE>
-재분석 시 덮어쓰기는 현재 브랜치의 브랜치 디렉토리 안에서만 한다.
+재분석 시 브랜치 산출 덮어쓰기는 현재 브랜치의 브랜치 디렉토리 안에서만 한다(공용 `_viewer/` 설치·버전·manifest 쓰기는 명시 예외).
 </PENETRATE>
 
 <RICOCHET>
 한 브랜치를 재분석할 때 다른 브랜치 디렉토리를 덮어쓰거나 삭제하지 않는다.
 </RICOCHET>
 
+### 공용 뷰어 (HTML)
+
+HTML 뷰어는 분석마다 만들지 않는다. **대상별 공용 인스턴스 한 벌**(`analyze/_viewer/`)을 두고, 분석은 브랜치별 `data.js` 만 갈아끼운다. 뷰어(index.html/app.js/style.css/mermaid.min.js)는 `skills/code-analyze/viewer/` 의 정적 에셋을 그대로 복사한 것이라, 어떤 브랜치든 같은 뷰어 + 다른 데이터로 열린다. 뷰어와 데이터의 계약은 `skills/code-analyze/viewer/SCHEMA.md`(window.DATA 구조)다.
+
+**뷰어 준비는 render 를 고를 때만, 착수 전에.** 종료 스테이지가 render(Stage 3 이상)를 포함하면, 착수 전 확인 단계에서 뷰어를 **내용 해시 비교**로 준비한다("실행 범위 게이트"·"뷰어 사전 확인" 참조). 스킬 `viewer/` 의 앱 파일(index.html/app.js/style.css/mermaid.min.js)과 배포된 `_viewer/` 의 같은 파일들을 해시로 비교한다(데이터 상태인 `manifest.js` 는 비교 제외). 별도 버전 숫자·표식 파일은 두지 않는다.
+- `_viewer/` 없음 -> 설치(스킬 `viewer/` 에서 복사).
+- 해시 같음 -> 재사용, 복사 안 함.
+- 해시 다름(뷰어가 실제로 바뀜) -> "뷰어가 갱신됐습니다, 교체할까요?"를 **1회 묻고** 사용자 응답대로 복사.
+
+facet 까지만(종료 <= 2) 돌리면 뷰어는 무관하니 건드리지도 묻지도 않는다. 데이터 생성(Stage 3)은 이 준비가 끝난 상태를 전제로 뷰어를 그대로 쓰고, 거기서 뷰어 설치/교체를 판단하지 않는다.
+
+**데이터 로딩 = 매니페스트.** `_viewer/manifest.js`(`window.MANIFEST = [...]`)에 그 대상의 브랜치 data.js 목록을 둔다. 이건 데이터 상태라 **Stage 3(데이터 생성)** 이 형제 브랜치 디렉토리를 훑어 **재생성**한다(삭제된 브랜치는 다음 렌더에서 자동 제외 -- 뷰어 에셋 설치와 별개). 뷰어는 manifest 를 읽어 데이터셋이 하나면 자동 로드(선택기 숨김), 여럿이면 상단 선택기를 띄운다. 주입한 data.js 가 없으면(수동 삭제 등) 뷰어가 그 항목을 건너뛴다.
+
+<PENETRATE>
+HTML 뷰어는 대상별 공용 한 벌(`analyze/_viewer/`)을 두고 브랜치는 data.js 만 낸다. 뷰어는 스킬 `viewer/` 정적 에셋을 복사해 재사용한다.
+</PENETRATE>
+
+<PENETRATE>
+종료가 render 를 포함할 때만 착수 전 확인에서 뷰어를 내용 해시 비교로 준비한다 -- 없으면 설치, 해시 같으면 재사용, 해시 다르면 물어보고 복사한다.
+</PENETRATE>
+
+<PENETRATE>
+Stage 3(데이터 생성)에서 메인은 형제 브랜치를 훑어 `_viewer/manifest.js` 를 재생성한다.
+</PENETRATE>
+
+<RICOCHET>
+뷰어 에셋(app.js/style.css/mermaid.min.js/index.html)을 브랜치마다 복사하지 않는다(대상별 공용 한 벌만).
+</RICOCHET>
+
+<RICOCHET>
+데이터 생성(Stage 3)에서 뷰어를 설치하거나 교체를 판단하지 않는다(뷰어 준비는 착수 전 확인에서 끝냄).
+</RICOCHET>
+
 ### facet 교차링크 규약
 
 facet 문서끼리의 교차링크(노드 <-> 노드, 가로지르는 <-> 노드 등)는 **링크가 적힌 파일 자신을 기준으로 한 상대경로**로 통일한다 -- 예: `facet/src/trunk/usecase/x.md` 에서 형제 어댑터로 `../../leaves/y.md`. facet 루트 기준(`src/leaves/y.md`)이나 분석 대상 디렉토리 기준(`<브랜치 디렉토리>/facet/...`)으로 적지 않는다. 기준이 섞이면 render 단계가 어긋난다(실측: architecture 가 최상위 오접두로 7곳을 깨뜨림).
 
-자기기준 상대로 통일하는 이유: HTML 산출물의 디렉토리 구조가 facet 구조와 **동형(미러)**이라, 자기기준 상대링크는 `.md` -> `.html` 치환만으로 HTML 에서 그대로 유효하다. 그래서 Stage 3 render 는 교차링크 깊이를 재계산하지 않고 **보존만** 한다. 이 링크 무결성은 Stage 2 의 link-lint 가 선보장한다.
+자기기준 상대로 통일하는 이유: facet 링크는 Claude 가 문서 사이를 오갈 때 따라가는 경로이자 Stage 2 link-lint 의 검사 기준이고, Stage 3 의 render-data 가 이 링크의 **대상 파일을 스켈레톤의 노드 ID 로 해석**해 data.js 의 교차참조(노드 ID)를 만든다. 기준이 섞이면 link-lint 가 대상을 못 찾고 render-data 가 엉뚱한 노드로 매핑한다. 이 링크 무결성은 Stage 2 의 link-lint 가 선보장한다.
 
 <PENETRATE>
 facet 교차링크는 링크가 적힌 파일 자신 기준의 상대경로로 적는다.
@@ -178,12 +216,12 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 
 | 에이전트 | 역할 | 입력 | 출력 |
 |----------|------|------|------|
-| `code-analyze-render-html` | facet 슬라이스 -> HTML 페이지들(다중 파일 사이트). **직접 Write** | 슬라이스 facet + 셸 템플릿 + `.tmp/` | `<브랜치 디렉토리>/html/<슬라이스>` (직접) |
-| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `<브랜치 디렉토리>/facet/` + `.tmp/` | `<브랜치 디렉토리>/markdown/` (직접) |
-| `code-analyze-verify` | 렌더 HTML mermaid/그래프 깨짐 + **내부 링크 무결성**(끊긴 상대 href) 검증 | `<브랜치 디렉토리>/html/` | 리포트 본문 |
-| 호출그래프 보조 (언어별 조건부 플러그인, 현 구현 `code-analyze-callgraph-cpp`) | (조건부) 언어별 호출 그래프 추출. Stage0 골격에 호출/참조맵 미리 채움 + flow 출발점. | 대상 경로 + 언어별 사전조건(cpp: `compile_commands.json`) | facet 텍스트 + DOT(임시) |
+| `code-analyze-render-data` | facet 슬라이스 -> `window.DATA` JSON 조각(스키마 준수). **직접 Write** | 슬라이스 facet + `viewer/SCHEMA.md` + 스켈레톤 | `<브랜치 디렉토리>/.dataparts/<슬라이스>.json` (직접) |
+| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `<브랜치 디렉토리>/facet/` | `<브랜치 디렉토리>/markdown/` (직접) |
+| `code-analyze-verify` | data.js 유효성 + data 안 mermaid 파스 + 매달린 참조(노드 ID) + 뷰어 무에러 로드 검증 | `<브랜치 디렉토리>/data.js` + 공용 `_viewer/` | 리포트 본문 |
+| 호출그래프 보조 (언어별 조건부 플러그인, 현 구현 `code-analyze-callgraph-cpp`) | (조건부) 언어별 호출 그래프 추출. Stage0 골격에 호출/참조맵 미리 채움 + flow 출발점. facet 에 텍스트 + mermaid 지속. | 대상 경로 + 언어별 사전조건(cpp: `compile_commands.json`) | facet 텍스트 + mermaid 그래프 |
 
-**호출그래프 슬롯 계약.** 호출그래프 보조는 언어별 플러그인 슬롯이다 -- 새 언어를 지원하려면 `code-analyze-callgraph-<언어>` 에이전트를 그 언어에 맞게 만들어 이 슬롯을 채운다(현재 구현은 cpp 하나, 온디맨드로 추가). 슬롯을 채우는 플러그인은 다섯 축을 정의한다: (1) 추출 수단(cpp: clang IR -> `opt -dot-callgraph`), (2) 노드 유일 ID(cpp: 맹글 심볼 해시), (3) 잡음 노드 판정(cpp: IR 실체로 사소 접근자 걸러냄), (4) 기계적 노드 부류(cpp: ctor/dtor · 익명 네임스페이스), (5) 사전조건 게이트(cpp: C++ + `compile_commands.json` + clang/llvm/graphviz). 슬롯이 빈 언어(플러그인 없음)면 호출그래프 선반영 없이 진행하고, flow 는 코드에서 직접 호출을 추적한다.
+**호출그래프 슬롯 계약.** 호출그래프 보조는 언어별 플러그인 슬롯이다 -- 새 언어를 지원하려면 `code-analyze-callgraph-<언어>` 에이전트를 그 언어에 맞게 만들어 이 슬롯을 채운다(현재 구현은 cpp 하나, 온디맨드로 추가). 슬롯을 채우는 플러그인은 다섯 축을 정의한다: (1) 추출 수단(cpp: clang IR -> `opt -dot-callgraph`), (2) 노드 유일 ID(cpp: 맹글 심볼 해시), (3) 잡음 노드 판정(cpp: IR 실체로 사소 접근자 걸러냄), (4) 기계적 노드 부류(cpp: ctor/dtor · 익명 네임스페이스), (5) 사전조건 게이트(cpp: C++ + `compile_commands.json` + clang/llvm -- SVG 를 안 내므로 graphviz 는 불필요). 슬롯이 빈 언어(플러그인 없음)면 호출그래프 선반영 없이 진행하고, flow 는 코드에서 직접 호출을 추적한다. 산출은 SVG/DOT 이 아니라 mermaid 소스이며 facet 에 지속한다.
 
 ---
 
@@ -202,7 +240,8 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 - **Stage 0 골격** -- 메인 직접이면 foreground(진입 시 in_progress, `skeleton.md` 저장 시 completed). survey/callgraph 로 위임하면 "골격 에이전트 호출" 매듭으로 호출 즉시 completed.
 - **Stage 1 facet 에이전트 호출** -- 구조 + 가로지르는 6종(+ 언어별 callgraph)을 백그라운드 호출한 즉시 completed(invariants 선행 -> test 후속 호출 포함).
 - **Stage 2 인덱스/점검** -- foreground. Stage 1 통지를 받아 가로지르는 저장 · 구조 교차검산 · link-lint · `index.md` 저장까지, 저장 완료 시 completed.
-- **Stage 3 렌더** -- 메인이 공유 셸 구축 후 render 에이전트를 백그라운드 호출한 즉시 completed.
+- **뷰어 사전 확인** (종료가 render 를 포함할 때만) -- 착수 전 확인에서 내용 해시 비교 처리. 설치/재사용이면 처리 완료 시 completed. 교체 물음이 필요하면(해시 다름) 사용자 확인 게이트처럼 물음 직전 completed(응답 후 다음 매듭).
+- **Stage 3 데이터 생성** -- render-data 를 백그라운드 호출한 즉시 completed(이후 조각 합침·`data.js` 생성·manifest 재생성은 이 매듭 안).
 - **Stage 4 검증 + 결과 안내** -- verify 호출 시 in_progress, 통지 도착 후 결과 안내(생성 파일 · 실행 범위 · verify 보증범위) 출력 시 completed.
 
 아주 짧은 준비(경로 결정 · 언어 판정 · `mkdir`)는 task 를 생략한다.
@@ -222,7 +261,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 ### 사전 준비
 1. **분석 대상 디렉토리를 정한다** -- 아래 "분석 대상 선택". 결정 경로를 모든 에이전트 입력으로 전달한다. 이때 대상의 **언어**(모듈 하나는 단일 언어 -- "분석 대상 선택" 참조)를 판정해, 언어별 규칙 파일(`skills/code-analyze/languages/<언어>.md`, 있으면) 경로와 함께 각 에이전트 입력으로 넘긴다 -- 범용 에이전트는 그 파일이 있으면 자기 소비 섹션을 로드해 적용한다.
 2. **실행 범위(시작 · 종료 스테이지)를 사용자와 정한다** -- 아래 "실행 범위 게이트". 이 스킬은 무조건 끝까지 진행하지 않는다.
-3. 브랜치 디렉토리를 정한다 -- **분석 대상 디렉토리 아래** `analyze/<브랜치 슬러그>/`(현재 git 브랜치 이름의 `/` 를 `_` 로 치환). **이 브랜치 디렉토리 경로를 모든 에이전트 입력으로 넘긴다** -- 에이전트는 이 경로 기준 상대로 읽고 쓴다. 이번 실행에서 돌릴 스테이지가 쓰는 하위 디렉토리만 브랜치 디렉토리 아래에 `mkdir -p`(예: facet만이면 `facet/`, 시각화까지면 `html/`·`markdown/`·`.tmp/` 도).
+3. 브랜치 디렉토리를 정한다 -- **분석 대상 디렉토리 아래** `analyze/<브랜치 슬러그>/`(현재 git 브랜치 이름의 `/` 를 `_` 로 치환). **이 브랜치 디렉토리 경로를 모든 에이전트 입력으로 넘긴다** -- 에이전트는 이 경로 기준 상대로 읽고 쓴다. 이번 실행에서 돌릴 스테이지가 쓰는 하위 디렉토리만 브랜치 디렉토리 아래에 `mkdir -p`(예: facet만이면 `facet/`, 시각화까지면 `markdown/` -- `data.js` 는 파일이라 mkdir 대상 아님, `.dataparts/` 는 렌더 중 임시 생성). 공용 뷰어 설치/갱신은 종료가 render 를 포함할 때 착수 전 확인에서 `analyze/_viewer/` 에 한다("뷰어 사전 확인"·"공용 뷰어(HTML)" 참조).
 
 ### 분석 대상 선택 (사전, 필수)
 
@@ -275,9 +314,11 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 
 ### 실행 범위 게이트 (Stage 0 앞, 필수)
 
-이 스킬의 베이스 목적은 **facet 생성**이고, 시각화(render, Stage 3)와 검증(Stage 4)은 그 위의 선택 산출물이다. 그래서 facet 을 만든 뒤 자동으로 시각화까지 진행하지 않고, 착수 전 사용자와 **어디서 시작해 어디까지 갈지**를 정한다.
+이 스킬의 베이스 목적은 **facet 생성**이고, 시각화(render, Stage 3)와 검증(Stage 4)은 그 위의 선택 산출물이다. 그래서 facet 을 만든 뒤 자동으로 시각화까지 진행하지 않고, 착수 전 사용자와 실행 범위(시작 · 종료 스테이지)를 정한다.
 
-**종료 스테이지 -- render 옵트인.** facet 만 필요하면 Stage 2 에서 멈춘다(시각화 · 검증 없음). 시각화까지면 Stage 3, 검증까지면 Stage 4. 종료 이후 스테이지는 스킵한다. 부분 실행은 종료 이후 산출물(예: 이전 실행의 `html/`)을 갱신하지 않으므로 그것들이 stale 로 남을 수 있다 -- 종료 시(어느 스테이지든) 실행 범위 · 스킵 · stale 을 결과 안내에 명시한다.
+**종료 스테이지 -- render 옵트인.** facet 만 필요하면 Stage 2 에서 멈춘다(시각화 · 검증 없음). 시각화까지면 Stage 3, 검증까지면 Stage 4. 종료 이후 스테이지는 스킵한다. 부분 실행은 종료 이후 산출물(예: 이전 실행의 `data.js` · markdown)을 갱신하지 않으므로 그것들이 stale 로 남을 수 있다 -- 종료 시(어느 스테이지든) 실행 범위 · 스킵 · stale 을 결과 안내에 명시한다.
+
+**뷰어 사전 확인 -- render 포함 시.** 종료 스테이지가 render 를 포함하면(3 이상), 이 착수 전 확인 단계에서 **뷰어도 함께 확인**한다 -- `analyze/_viewer/` 를 스킬 뷰어와 내용 해시로 비교해 없으면 설치, 해시가 다르면(뷰어가 실제로 바뀜) 교체를 물어 처리한다. 이건 스테이지 선택과 별개 축이 아니라 render 를 고른 것의 당연한 준비이고, render 가 실제로 돌기 전에(착수 전) 끝낸다. 종료 <= 2(facet 만)면 뷰어는 무관하니 묻지도 건드리지도 않는다. 해시 비교 상세는 "공용 뷰어(HTML)" 참조.
 
 **시작 스테이지 -- 선행 데이터 게이트.** 중간부터 시작하려면 그 스테이지의 입력이 디스크에 실제로 있어야 한다. 없으면 그 스테이지부터 시작하지 않고, 가장 이른 유효 시작점(부족분을 만드는 앞 스테이지, 최후엔 Stage 0)으로 되돌린다.
 
@@ -286,13 +327,19 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | Stage 0 | 소스 코드 (기본 게이트) | 분석 대상 없음 -- 진행 불가 |
 | Stage 1 | `facet/skeleton.md` | Stage 0 부터 |
 | Stage 2 | `facet/` 의 구조 노드 + 가로지르는 문서 | 부족분을 만드는 앞 스테이지부터 |
+| Stage 3 (시각화만) | `facet/` 완성본(구조 + 가로지르는 + 다이어그램 소스). 뷰어는 render 선택 시 착수 전 확인에서 준비된다 | facet 부족분은 앞 스테이지부터 |
+| Stage 4 (재검증만) | `<브랜치>/data.js` (렌더 산출) + `_viewer/`(render 준비 때 이미 존재) | data.js 없으면 Stage 3 부터 |
 
-흔한 프리셋: **전체**(0 -> 4), **facet만**(0 -> 2), **facet 이어서**(skeleton/facet 이 이미 있으면 1 또는 2 -> 2).
+흔한 프리셋: **전체**(0 -> 4), **facet만**(0 -> 2, 뷰어 무관), **facet 이어서**(skeleton/facet 이 이미 있으면 1 또는 2 -> 2), **시각화만**(facet 이 있으면 3 -> 4 또는 3 -> 3), **재검증만**(data.js 가 있으면 4). render 를 포함한 프리셋(전체·시각화만·재검증만)은 착수 전 확인에서 뷰어를 함께 준비한다.
 
-**render 로부터의 재시작(Stage 3/4 를 시작점으로 -- "시각화만" · "재검증만")은 아직 미지원 = 로드맵 예정.** render 구조 재설계(Stage 3 끝에 삭제되는 `.tmp` 렌더 입력의 지속화 포함)가 끝나야 열린다. 그전까지 render/verify 는 같은 실행에서 앞 스테이지를 거쳐 도달한 경우(종료 스테이지 >= 3)에만 돈다.
+**render 로부터의 재시작(Stage 3/4 를 시작점으로)이 열려 있다.** 다이어그램 소스(flow 시퀀스·callgraph)를 facet 에 지속하므로 facet 만으로 `data.js` 를 다시 뽑을 수 있고, verify 는 그 `data.js` + 공용 뷰어로 돈다. 시작 스테이지의 선행 데이터(Stage 3 은 `facet/`, Stage 4 는 `data.js`)가 디스크에 있어야 그 지점부터 시작한다.
 
 <PENETRATE>
 착수 전 실행 범위(시작 · 종료 스테이지)를 사용자와 확정한 뒤 진행한다.
+</PENETRATE>
+
+<PENETRATE>
+종료 스테이지가 render(Stage 3 이상)를 포함하면, 착수 전 확인에서 뷰어를 내용 해시로 비교해 없으면 설치하고 해시가 다르면 교체를 묻는다.
 </PENETRATE>
 
 <RICOCHET>
@@ -304,7 +351,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 </RICOCHET>
 
 <RICOCHET>
-render 재설계 전까지 Stage 3/4 를 시작점으로 하는 재시작(render 로부터 재시작)을 지원하지 않는다.
+종료가 facet 까지(Stage 2 이하)면 뷰어를 설치/갱신하거나 그것을 묻지 않는다(뷰어 준비는 render 포함 시에만).
 </RICOCHET>
 
 ### Stage 0 -- 골격/인벤토리 (직렬, 1회)
@@ -327,7 +374,7 @@ render 재설계 전까지 Stage 3/4 를 시작점으로 하는 재시작(render
 
 저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 소모하므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 선행 입력으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
 
-플로우 에이전트는 산문(핵심)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `flow.md`, 아래를 `.tmp/flow.diagram.md` 로 저장.
+플로우 에이전트는 산문(핵심)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `facet/flow.md`, 아래를 `facet/flow.diagrams.md` 로 저장한다(둘 다 facet 에 지속 -- render 재시작 대비). 언어별 callgraph 가 돌면 그 텍스트/mermaid 도 `facet/callgraph-cpp.md`·`facet/callgraph.diagrams.md` 로 저장.
 
 <PENETRATE>
 Stage 1 에이전트는 골격이 준 공유 사실 위에 깊이만 더한다.
@@ -354,67 +401,52 @@ Stage 1 에이전트가 개수를 다시 세거나 모듈 인벤토리/서론을
 
 **구조 노드 교차검산(저장 시점에서 이관)**: 구조 노드는 에이전트가 직접 Write 했으므로, 여기서 메인이 골격 인벤토리 대비 **노드 파일 존재/개수**를 가볍게 교차검산한다(빠진 노드/여분 파일 적발). 내용 전수 검토가 아니라 골격과의 목록 대조다.
 
-**facet 링크 무결성 점검(link-lint)**: 메인이 `<브랜치 디렉토리>/facet/` 의 모든 `.md` 에서 상대 `.md` 링크를 뽑아, **링크가 적힌 파일 자신의 디렉토리 기준**으로 resolve 해 대상 facet 파일이 실제로 존재하는지 검사한다(`normpath(join(파일디렉토리, target))`). 끊긴 링크나 오접두 링크(예: 프로젝트루트 기준 `<브랜치 디렉토리>/facet/...` 오접두)를 적발해 자기기준 상대경로로 교정한다. 절대 URL 과 순수 in-page 앵커(`#...`)는 대상이 아니다. 이게 Stage 3 render 의 선결조건이다 -- html 이 facet 구조를 미러하므로, facet 링크가 자기기준으로 정확하면 render 는 `.md` -> `.html` 치환만으로 교차링크를 보존할 수 있다(render 가 깊이를 재계산하지 않아도 된다).
+**facet 링크 무결성 점검(link-lint)**: 메인이 `<브랜치 디렉토리>/facet/` 의 모든 `.md` 에서 상대 `.md` 링크를 뽑아, **링크가 적힌 파일 자신의 디렉토리 기준**으로 resolve 해 대상 facet 파일이 실제로 존재하는지 검사한다(`normpath(join(파일디렉토리, target))`). 끊긴 링크나 오접두 링크(예: 프로젝트루트 기준 `<브랜치 디렉토리>/facet/...` 오접두)를 적발해 자기기준 상대경로로 교정한다. 절대 URL 과 순수 in-page 앵커(`#...`)는 대상이 아니다. 이게 Stage 3 render 의 선결조건이다 -- render-data 가 이 링크의 대상 파일을 스켈레톤의 노드 ID 로 해석해 `data.js` 교차참조를 만들므로, 링크가 자기기준으로 정확해야 대상 노드를 옳게 짚는다.
 
 <PENETRATE>
 Stage 2 에서 메인은 facet 의 모든 상대 `.md` 링크를 적힌 파일 자신 기준으로 resolve 해 대상 존재를 검사하고(link-lint), 끊긴/오접두 링크를 교정한다 -- render(Stage 3)의 선결조건이다.
 </PENETRATE>
 
-### Stage 3 -- 렌더 (병렬, 다중 파일 팬아웃)
-`.tmp/` 에 호출 그래프 DOT 이 있으면 `dot -Tsvg` 로 SVG 화.
+### 뷰어 사전 확인 (render 포함 시, 착수 전)
+종료 스테이지가 render(3 이상)를 포함할 때만, 착수 전 확인 단계에서 뷰어를 준비한다("공용 뷰어(HTML)"·"실행 범위 게이트" 참조). 메인이 스킬 `viewer/` 앱 파일과 `analyze/_viewer/` 앱 파일을 **내용 해시로 비교**한다(`manifest.js` 제외) -- 없으면 스킬 `viewer/` 에서 복사, 해시 같으면 재사용, 해시 다르면 교체를 1회 물어 복사. render 를 고른 것의 준비라 데이터 생성(Stage 3) **전에** 끝내, 그때는 `_viewer/` 가 이미 준비돼 있게 한다. 종료 <= 2(facet 만)면 이 준비를 건너뛴다(뷰어 무관).
 
-먼저 메인이 HTML 사이트의 **공유 셸**을 만든다 -- `html/index.html`(카테고리/진입 허브), `html/assets/style.css`, `html/assets/script.js`(mermaid CDN init + 보일 때 지연 렌더 + 줌/팬 + **`data-root` 접두사로 사이드바 네비 생성**), 그리고 모든 렌더 에이전트에 줄 **페이지 셸 템플릿** + **링크 스킴**(아래) + 출력 경로 스킴(facet 경로 미러).
+TaskCreate 매듭은 종료가 render 를 포함할 때만 만든다(범위 게이트 연동).
 
-**링크 스킴 (필수, 두 세계 분할).** html 의 경로는 출처가 둘이라 규칙도 둘로 가른다 -- (1) html 이 발명한 셸 구조(자산·사이드바)는 PREFIX 로, (2) facet 을 미러한 콘텐츠 교차링크는 facet 상대링크 보존으로.
+### Stage 3 -- 데이터 생성 + 마크다운
+HTML 산출은 고정 뷰어 + `data.js` 다. 이 스테이지는 **뷰어를 설치하지 않고 데이터만 만든다** -- 뷰어는 착수 전 확인("뷰어 사전 확인")에서 이미 준비됐으므로 여기선 뷰어 설치/교체를 판단하지 않고 그 뷰어를 그대로 쓴다.
 
-(1) **셸/자산 경로 = PREFIX** (html 이 발명한 구조라 facet 에 원본이 없다). 구조 노드는 소스 미러라 페이지마다 html 기준 깊이가 다르다(`html/src/glass/x.html`=2, `html/src/trunk/usecase/x.html`=3 ...). 자산·사이드바 깊이를 링크마다 손으로 세면 틀어지므로, 깊이 산수를 **메인 한 곳**으로 모은다 -- 메인이 페이지별 `PREFIX = "../" * (그 페이지의 html기준 디렉토리깊이)` 를 계산해 각 render 에이전트에 넘긴다.
-- head 자산: `{PREFIX}assets/style.css`, `{PREFIX}assets/script.js` (고정 `../assets/` 금지).
-- `<body data-root="{PREFIX}">` -- 사이드바는 공유 `script.js` 가 이 `data-root` 를 접두사로 붙여 생성(페이지마다 사이드바 링크를 다시 쓰지 않는다).
+순서:
+1. **data 조각 생성(백그라운드 팬아웃)** -- `code-analyze-render-data` 를 병렬 다중 호출(`run_in_background: true`)한다: 구조 **서브트리당 1회**(그 서브트리의 `nodes` 조각) + 가로지르는 **1회**(architecture/flows/invariants/tests/externals/dataContracts/callgraph 섹션). 각 호출은 자기 조각을 `<브랜치>/.dataparts/` 에 직접 Write 하고 경로만 통지한다. `meta`/`modules` 는 작고 결정적이라 메인이 skeleton 에서 직접 `.dataparts/base.json` 으로 만든다.
+2. **조각 합침(메인, 컨텍스트 우회)** -- 통지가 모이면 메인이 `jq` 로 조각들을 하나의 `window.DATA` 객체로 합쳐 `<브랜치>/data.js`(`window.DATA = {...}`)를 만든다(부피가 메인 LLM 컨텍스트를 거치지 않게 Bash 로 파일 리다이렉트). 합치는 방식은 `viewer/SCHEMA.md` 의 "조각 형태"를 따른다. 합친 뒤 `.dataparts/` 삭제.
+3. **manifest 재생성** -- 메인이 형제 브랜치를 훑어 `_viewer/manifest.js` 를 다시 쓴다.
+4. **마크다운(백그라운드)** -- `code-analyze-render-markdown` 을 병렬 호출(단일 문서, facet 에서 읽어 `markdown/` 에 직접 Write).
 
-(2) **콘텐츠 교차링크 = facet 상대링크 보존** (facet 을 미러한 구조라 깊이 재계산이 불필요하고, 재계산이 오히려 멀쩡한 링크를 깨뜨린다 -- 실측 결함). html 디렉토리 구조가 facet 구조와 동형이므로, facet 의 **자기 파일 기준 상대링크**(예: depth3 노드에서 형제 어댑터로 `../../leaves/x.md`, flow 로 `../../../flow.md#login`)를 `.md` -> `.html` 치환만 해 그대로 쓴다. 링크마다 깊이를 다시 세거나 PREFIX 를 붙이지 않는다. in-page 앵커는 `#<앵커>` 그대로 둔다. (facet 링크가 자기기준으로 정확함은 Stage 2 link-lint 가 선보장한다.)
-
-그다음 render-html 을 **백그라운드 병렬 다중 호출**(`run_in_background: true`)한다 -- 구조 **서브트리당 1회**(자기 서브트리의 파일노드당 `.html` 한 장씩) + 가로지르는 6종 **1회**(문서당 `.html`). render-markdown 도 백그라운드 병렬 호출(단일 문서). 각 렌더 에이전트는 자기 슬라이스를 `html/`·`markdown/` 에 **직접 Write** 하고 쓴 경로만 통지한다(아래 결과 처리 규약의 렌더 예외).
-
-render-html 은 facet 를 글자 그대로 옮기지 않고 **사람용으로 재포맷**한다 -- 내용(데이터)은 facet 와 동치로 보존하되, 표 칸은 짧은 요지(긴 것/SQL/코드는 표 밖 코드블록), 선형 흐름은 `<ol>`·분기는 mermaid, 교차링크는 하단 "관련/참고" 섹션에 모으는 모양으로 표현만 바꾼다.
-
-끝나면 `.tmp/` 삭제.
+render-data 는 facet 데이터를 스키마 필드로 **옮기기만** 하고 요약/삭제하지 않는다 -- 사람용 재포맷(표 요지화, 선형 흐름 리스트화, 분기 다이어그램화 등 표현)은 고정 뷰어가 맡는다. callgraph/flow 의 다이어그램 소스는 facet 지속본을 그대로 복사하고, architecture 그래프 mermaid 만 facet 엣지에서 생성한다.
 
 <PENETRATE>
-렌더 에이전트는 자기 슬라이스 파일을 직접 Write 하고, 본문으로는 쓴 경로만 반환한다.
+Stage 3 은 뷰어를 설치하지 않고 data.js 를 만든다 -- 뷰어는 착수 전 확인에서 준비되고, render-data 조각을 메인이 합쳐 data.js 를 낸다.
 </PENETRATE>
 
 <PENETRATE>
-HTML 사이트의 공유 셸(index.html / assets / 페이지 템플릿 / 링크 스킴)은 메인이 만들고, 페이지별 PREFIX 도 메인이 계산해 각 render 에이전트에 넘긴다.
+data.js 는 메인이 jq(없으면 python json)로 조각들을 하나의 window.DATA 객체로 합쳐 Bash 파일 리다이렉트로 만든다(부피가 메인 컨텍스트를 거치지 않게).
 </PENETRATE>
 
 <PENETRATE>
-HTML 페이지의 자산·사이드바 경로는 메인이 준 PREFIX 로 `{PREFIX}assets/...`·`data-root="{PREFIX}"` 로만 적는다(셸 깊이 산수는 PREFIX 한 곳).
-</PENETRATE>
-
-<PENETRATE>
-콘텐츠 교차링크는 facet 의 자기기준 상대링크를 `.md` -> `.html` 치환만 해 보존한다(깊이 재계산·PREFIX 부착 없음 -- html 이 facet 구조를 미러하므로 그대로 유효).
+렌더 에이전트(render-data/render-markdown)는 자기 슬라이스를 직접 Write 하고, 본문으로는 쓴 경로만 반환한다.
 </PENETRATE>
 
 <RICOCHET>
-페이지 셸 자산을 고정 `../assets/` 로 적지 않는다(PREFIX 로 -- 미러 깊이가 제각각이라 깨진다).
+렌더 산출(data 조각/마크다운)을 한 본문으로 반환하게 해 단일 응답 토큰 한도에 걸리게 하지 않는다.
 </RICOCHET>
 
 <RICOCHET>
-콘텐츠 교차링크의 깊이를 render 가 다시 세거나 PREFIX 를 붙여 재계산하지 않는다(facet 상대링크를 `.md` -> `.html` 보존 -- 재계산이 멀쩡한 링크를 깨뜨린 실측 결함).
-</RICOCHET>
-
-<RICOCHET>
-렌더 산출(HTML/마크다운)을 한 본문으로 반환하게 해 단일 응답 토큰 한도에 걸리게 하지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-render-html 은 facet 의 데이터를 요약하거나 삭제해 옮기지 않는다(표현만 바꾸고 내용은 facet 와 동치로 보존).
+render-data 는 facet 의 데이터를 요약하거나 삭제해 옮기지 않는다(표현은 뷰어가, 데이터는 facet 와 동치 보존).
 </RICOCHET>
 
 ### Stage 4 -- 검증 + 결과 안내
-`code-analyze-verify` 호출, 깨진 다이어그램/빈 SVG **와 끊긴 내부 링크**(존재하지 않는 대상의 상대 href)를 보고. 다중 파일 모드의 1순위 실패유형이 끊긴 교차링크라, 교차링크는 facet 자기기준 상대링크 통일 + Stage 2 link-lint 로, 자산은 PREFIX 로 예방하되 verify 가 최종 단계에서 잡는다. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
+`code-analyze-verify` 를 호출한다 -- `data.js` 유효성(파스·필수 키), data 안 mermaid 문법 파스, 매달린 참조(노드/불변식/테스트 ID), 뷰어 무에러 로드를 본다. SPA 모드의 실패유형은 다중 파일 시절의 끊긴 href 가 아니라 이 넷이다. 생성 파일 목록/경로/검증 요약 안내. Pages 이동/커밋은 사용자가 직접 한다고 알림.
 
-**검증 보증범위도 함께 안내한다.** verify 는 **형식**만 검증한다 -- mermaid 문법/렌더, 내부 링크의 **대상 파일 존재**. 둘 다 결정론적으로 판정 가능한 형식 검사다. 반면 링크가 **올바른 대상**을 가리키는지, facet 내용이 실제 **코드와 일치**하는지(as-built 충실도)는 verify 밖이며 코드 대조가 필요하다(예: 멀쩡히 존재하지만 틀린 파일을 가리키는 링크는 "대상 존재" 검사를 통과한다). 그래서 verify green 을 "내용까지 다 맞다"로 보고하지 않는다.
+**검증 보증범위도 함께 안내한다.** verify 는 **형식**만 검증한다 -- mermaid 문법/렌더, 참조 ID 의 **대상 존재**, 뷰어 로드. 모두 결정론적 형식 검사다. 반면 참조가 **올바른 대상**을 가리키는지, facet/data 내용이 실제 **코드와 일치**하는지(as-built 충실도)는 verify 밖이며 코드 대조가 필요하다(예: 존재하지만 틀린 노드를 가리키는 참조는 "대상 존재" 검사를 통과한다). 그래서 verify green 을 "내용까지 다 맞다"로 보고하지 않는다.
 
 <PENETRATE>
 Stage 4 결과안내에 verify 의 보증범위(형식만 검증 -- 문법/렌더/링크 대상 존재; 의미 정합은 미검증)를 함께 명시한다.
@@ -429,7 +461,7 @@ verify green 을 facet 내용의 정확성(올바른 링크 대상·코드 일�
 ## 결과 처리 규약
 - **가로지르는 facet** 의 저장은 메인이 한다(에이전트는 본문 반환, 메인이 `<브랜치 디렉토리>/facet/` 에 저장 -- 소수이고 invariants.md 를 test 선행 입력으로 넘기는 등 메인 컨텍스트에 필요).
 - **구조 노드 facet 은 예외** -- 노드 수십 개가 부피라 본문 반환 시 메인 컨텍스트/턴을 크게 소모하므로, 구조 에이전트가 `<브랜치 디렉토리>/facet/<소스미러>/` 에 직접 Write 한다. 메인은 Stage 2 에서 골격 대비 존재/개수만 교차검산한다.
-- **렌더 산출물도 예외** -- HTML/마크다운은 커서 단일 본문 반환이 잘리므로, render-html/render-markdown 이 자기 슬라이스를 `html/`·`markdown/` 에 직접 Write 한다. HTML 사이트의 공유 셸(index/assets/템플릿)은 메인 소유.
+- **렌더 산출물도 예외** -- data 조각/마크다운은 부피가 커 단일 본문 반환이 잘리므로, render-data/render-markdown 이 자기 슬라이스를 `.dataparts/`·`markdown/` 에 직접 Write 한다. 메인은 조각을 jq 로 합쳐 `data.js` 를 만든다(공용 뷰어 정적 에셋 복사는 렌더가 아니라 착수 전 "뷰어 사전 확인"에서 메인이 스킬 `viewer/` -> `_viewer/` 로 한다).
 - 에이전트 반환 본문에 `&`/`<`/`>` 가 HTML 엔티티로 이스케이프됐으면 저장 전 원복한다.
 
 <PENETRATE>
@@ -437,5 +469,5 @@ verify green 을 facet 내용의 정확성(올바른 링크 대상·코드 일�
 </PENETRATE>
 
 <PENETRATE>
-구조 노드 facet 은 구조 에이전트가, 렌더(html/markdown) 산출물은 render 에이전트가 직접 Write 한다(저장-메인 규율의 명시 예외 -- 둘 다 부피/잘림 때문).
+구조 노드 facet 은 구조 에이전트가, 렌더 산출물(data 조각/markdown)은 render 에이전트가 직접 Write 한다(저장-메인 규율의 명시 예외 -- 둘 다 부피/잘림 때문).
 </PENETRATE>
