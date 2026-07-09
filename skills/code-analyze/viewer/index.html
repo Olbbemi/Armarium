@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>code-analyze viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-target" id="target-name">-</span>
+        <span class="brand-sep">/</span>
+        <span class="brand-branch" id="branch-name">-</span>
+        <span class="chip" id="lang-chip" hidden></span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-wrap">
+        <input type="search" id="search" placeholder="검색 (노드/모듈/플로우/불변식/테스트/외부)" autocomplete="off" spellcheck="false">
+        <div class="search-results" id="search-results" hidden></div>
+      </div>
+      <label class="dataset-wrap" id="dataset-wrap" hidden>
+        <span class="dataset-label">데이터셋</span>
+        <select id="dataset-picker"></select>
+      </label>
+      <button type="button" class="icon-btn" id="theme-toggle" title="테마 전환" aria-label="테마 전환">◐</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav class="sidebar" id="nav" aria-label="뷰 이동"></nav>
+    <main class="content" id="view-root" tabindex="-1"></main>
+  </div>
+
+  <div class="banner" id="error-banner" hidden></div>
+
+  <script src="mermaid.min.js"></script>
+  <script src="manifest.js" onerror="window.__manifestError=true"></script>
+  <script src="app.js"></script>
+</body>
+</html>
