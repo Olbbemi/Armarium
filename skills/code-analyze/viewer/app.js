@@ -666,10 +666,7 @@
   }
 
   function buildPicker() {
-    var wrap = document.getElementById("dataset-wrap");
     var sel = document.getElementById("dataset-picker");
-    if (STATE.datasets.length <= 1) { wrap.hidden = true; return; }
-    wrap.hidden = false;
     clear(sel);
     STATE.datasets.forEach(function (ds, i) {
       sel.appendChild(el("option", { value: String(i) }, ds.branch || ("dataset " + (i + 1))));
