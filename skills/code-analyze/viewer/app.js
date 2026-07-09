@@ -21,6 +21,7 @@
     { id: "flow", label: "플로우", count: function (d) { return d.flows.length; }, visible: function (d) { return d.flows.length > 0; } },
     { id: "coverage", label: "커버리지", count: function (d) { return d.invariants.length; }, visible: function (d) { return d.invariants.length > 0 || d.tests.length > 0; } },
     { id: "externals", label: "외부의존", count: function (d) { return d.externals.length; }, visible: function (d) { return d.externals.length > 0; } },
+    { id: "conventions", label: "관례", count: function (d) { return d.conventions ? (d.conventions.naming.length + d.conventions.patterns.length + d.conventions.pitfalls.length) : 0; }, visible: function (d) { return !!d.conventions && (d.conventions.naming.length > 0 || d.conventions.patterns.length > 0 || d.conventions.pitfalls.length > 0 || d.conventions.skips.length > 0); } },
     { id: "datacontracts", label: "데이터계약", count: function (d) { return d.dataContracts.length; }, visible: function (d) { return Array.isArray(d.dataContracts) && d.dataContracts.length > 0; } }
   ];
 
@@ -139,6 +140,7 @@
       case "flow": renderFlow(r, d); break;
       case "coverage": renderCoverage(r, d); break;
       case "externals": renderExternals(r, d); break;
+      case "conventions": renderConventions(r, d); break;
       case "datacontracts": renderDataContracts(r, d); break;
       default: renderOverview(r, d);
     }
@@ -426,6 +428,64 @@
     r.appendChild(card);
   }
 
+  function renderConventions(r, d) {
+    var c = d.conventions || {};
+    r.appendChild(viewHead("관례", "프로젝트 고유 네이밍 / 패턴 / 함정 + 분석 스킵 기록."));
+
+    if (c.naming && c.naming.length) {
+      var nc = el("div", { class: "card" }, [el("h2", {}, ["네이밍 규칙", el("span", { class: "count-badge" }, "(" + c.naming.length + ")")])]);
+      nc.appendChild(el("div", { class: "table-scroll" }, el("table", { class: "grid" }, [
+        el("thead", {}, el("tr", {}, [el("th", {}, "범위"), el("th", {}, "규칙"), el("th", {}, "예")])),
+        el("tbody", {}, c.naming.map(function (n) {
+          return el("tr", {}, [
+            el("td", {}, el("span", { class: "tag" }, n.scope || "-")),
+            el("td", {}, n.rule || "-"),
+            el("td", {}, n.example ? el("span", { class: "mono" }, n.example) : el("span", { class: "muted" }, "-"))
+          ]);
+        }))
+      ])));
+      r.appendChild(nc);
+    }
+
+    if (c.patterns && c.patterns.length) {
+      var pc = el("div", { class: "card" }, [el("h2", {}, ["반복 패턴 / 이디엄", el("span", { class: "count-badge" }, "(" + c.patterns.length + ")")])]);
+      c.patterns.forEach(function (p) {
+        pc.appendChild(el("div", { class: "conv-item" }, [
+          el("div", {}, el("strong", {}, p.name || "-")),
+          p.description ? el("div", { class: "muted", style: "margin:2px 0 6px" }, p.description) : null,
+          (p.relatedNodes && p.relatedNodes.length) ? el("div", {}, [el("span", { class: "rel-label" }, "관련 노드  "), joinRefs(p.relatedNodes, refNode)]) : null
+        ]));
+      });
+      r.appendChild(pc);
+    }
+
+    if (c.pitfalls && c.pitfalls.length) {
+      var fc = el("div", { class: "card" }, [el("h2", {}, ["함정 (gotchas)", el("span", { class: "count-badge" }, "(" + c.pitfalls.length + ")")])]);
+      c.pitfalls.forEach(function (p) {
+        fc.appendChild(el("div", { class: "conv-item" }, [
+          el("div", {}, p.statement || "-"),
+          (p.relatedNodes && p.relatedNodes.length) ? el("div", { style: "margin-top:4px" }, [el("span", { class: "rel-label" }, "관련 노드  "), joinRefs(p.relatedNodes, refNode)]) : null
+        ]));
+      });
+      r.appendChild(fc);
+    }
+
+    if (c.skips && c.skips.length) {
+      var sc = el("div", { class: "card" }, [el("h2", {}, ["분석 스킵 기록", el("span", { class: "count-badge" }, "(" + c.skips.length + ")")])]);
+      sc.appendChild(el("div", { class: "table-scroll" }, el("table", { class: "grid" }, [
+        el("thead", {}, el("tr", {}, [el("th", {}, "경로 / 패턴"), el("th", {}, "사유")])),
+        el("tbody", {}, c.skips.map(function (s) {
+          return el("tr", {}, [el("td", {}, el("span", { class: "mono" }, s.path || "-")), el("td", {}, s.reason || "-")]);
+        }))
+      ])));
+      r.appendChild(sc);
+    }
+
+    if (!(c.naming && c.naming.length) && !(c.patterns && c.patterns.length) && !(c.pitfalls && c.pitfalls.length) && !(c.skips && c.skips.length)) {
+      r.appendChild(el("div", { class: "empty-state" }, "기록된 관례가 없습니다."));
+    }
+  }
+
   function renderDataContracts(r, d) {
     r.appendChild(viewHead("데이터 계약", "영속/설정 스키마."));
     d.dataContracts.forEach(function (c) {
@@ -498,6 +558,10 @@
     d.invariants.forEach(function (i) { idx.push({ kind: "불변식", name: i.id, sub: i.statement || "", go: function () { go("coverage", i.id); } }); });
     d.tests.forEach(function (t) { idx.push({ kind: "테스트", name: t.id, sub: t.name || "", go: function () { go("coverage", t.id); } }); });
     d.externals.forEach(function (e) { idx.push({ kind: "외부", name: e.name, sub: (e.version || "") + " " + (e.adapter || ""), go: function () { go("externals"); } }); });
+    if (d.conventions) {
+      (d.conventions.patterns || []).forEach(function (p) { idx.push({ kind: "관례", name: p.name || "", sub: p.description || "", go: function () { go("conventions"); } }); });
+      (d.conventions.pitfalls || []).forEach(function (p) { idx.push({ kind: "함정", name: trunc(p.statement || "", 40), sub: "", go: function () { go("conventions"); } }); });
+    }
     STATE.searchIndex = idx;
   }
 
@@ -592,14 +656,17 @@
     d.tests = d.tests || [];
     d.externals = d.externals || [];
     d.dataContracts = Array.isArray(d.dataContracts) ? d.dataContracts : [];
+    if (d.conventions) {
+      d.conventions.naming = d.conventions.naming || [];
+      d.conventions.patterns = d.conventions.patterns || [];
+      d.conventions.pitfalls = d.conventions.pitfalls || [];
+      d.conventions.skips = d.conventions.skips || [];
+    }
     return d;
   }
 
   function buildPicker() {
-    var wrap = document.getElementById("dataset-wrap");
     var sel = document.getElementById("dataset-picker");
-    if (STATE.datasets.length <= 1) { wrap.hidden = true; return; }
-    wrap.hidden = false;
     clear(sel);
     STATE.datasets.forEach(function (ds, i) {
       sel.appendChild(el("option", { value: String(i) }, ds.branch || ("dataset " + (i + 1))));

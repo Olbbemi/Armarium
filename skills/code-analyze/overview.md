@@ -32,7 +32,7 @@ facet 은 "읽기 좋은 요약"이 아니라, **Claude 가 리팩토링 + 유�
 
 facet 은 두 모양으로 나뉜다.
 - **코드-major 구조 트리**: 소스 트리(`src/` 등)를 미러링해, **노드 = 소스 파일 1개**(선언/정의가 분리된 언어면 같은 단위로 묶음). 각 노드 문서는 그 파일이 담은 타입/함수의 전체 시그니처 + 속성(역할/불변식/예외)을 담고, **고정 섹션 틀**(제목·순서 통일, 존재 조건부)을 따른다 -- 틀의 상세는 structure 에이전트가 소유한다(노드마다 섹션 제목이 갈리면 다운스트림이 같은 제목으로 못 짚는다).
-- **가로지르는 관점 문서**(본질적으로 파일 하나에 안 붙는 것): architecture / flow / data-contract / test / externals / invariants.
+- **가로지르는 관점 문서**(본질적으로 파일 하나에 안 붙는 것): architecture / flow / data-contract / test / externals / invariants / conventions.
 
 <PENETRATE>
 구조 정보는 소스 파일을 노드로 하는 코드-major 트리로, 파일 하나를 가로지르는 정보는 관점 문서로 분리해 적는다.
@@ -55,7 +55,7 @@ HTML 산출은 **고정 뷰어 + 데이터 분리** 구조다 -- 뷰어(스킬�
     <브랜치 슬러그>/   브랜치 디렉토리 = 브랜치 하나의 분석 한 벌 (예: feature_<이름>, release_<버전>)
       facet/        Claude 층: 구조 트리(소스 미러) + 가로지르는 관점 문서 + 다이어그램 소스 + skeleton + index
         <소스미러>/  구조 파일노드 문서들(예: facet/src/<...>.md)
-        architecture.md  flow.md  flow.diagrams.md  data-contract.md  test.md  externals.md  invariants.md
+        architecture.md  flow.md  flow.diagrams.md  data-contract.md  test.md  externals.md  invariants.md  conventions.md
         callgraph-cpp.md  callgraph.diagrams.md   (조건부, 언어별 callgraph 가 돌 때)
         skeleton.md   index.md
       data.js         뷰어용 데이터 (window.DATA = {...})
@@ -199,6 +199,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | test | `code-analyze-test` | 테스트 인벤토리 + 커버리지 공백. 선행 입력으로 받은 **invariants(INV-id)와 조인**해 미커버 불변식을 §4 로 집계. |
 | externals | `code-analyze-externals` | **단일 소스 의존성 레지스트리**(라이브러리+버전+감싸는 어댑터+벤더링+포트유무 칼럼). 핵심만, 나머지 문서는 링크만. |
 | invariants | `code-analyze-invariants` | **전체 관통 규약/불변식 단일 소스**(전칭+검증가능한 것만, 각 불변식에 안정 ID). test 커버리지 조인의 선행 입력 + TDD 프로퍼티/분기행렬의 출발점. test/architecture 가 링크. |
+| conventions | `code-analyze-conventions` | **프로젝트 고유 관례 단일 소스** -- 네이밍 규칙 / 반복 패턴·이디엄 / 함정(§1~3). 패턴·함정은 구조 노드로 링크. §4 분석 스킵 기록은 메인이 게이트 확정본으로 붙인다("분석 스킵" 참조). |
 
 <PENETRATE>
 가로지르는 문서는 자기 고유 정보만 적고, 노드/타입 상세는 구조 문서로 링크한다.
@@ -217,7 +218,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 | 에이전트 | 역할 | 입력 | 출력 |
 |----------|------|------|------|
 | `code-analyze-render-data` | facet 슬라이스 -> `window.DATA` JSON 조각(스키마 준수). **직접 Write** | 슬라이스 facet + `viewer/SCHEMA.md` + 스켈레톤 | `<브랜치 디렉토리>/.dataparts/<슬라이스>.json` (직접) |
-| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 5종 + 구조 개요만 엮음). **직접 Write** | `<브랜치 디렉토리>/facet/` | `<브랜치 디렉토리>/markdown/` (직접) |
+| `code-analyze-render-markdown` | facet -> as-built 마크다운(가로지르는 7종 + 구조 개요만 엮음). **직접 Write** | `<브랜치 디렉토리>/facet/` | `<브랜치 디렉토리>/markdown/` (직접) |
 | `code-analyze-verify` | data.js 유효성 + data 안 mermaid 파스 + 매달린 참조(노드 ID) + 뷰어 무에러 로드 검증 | `<브랜치 디렉토리>/data.js` + 공용 `_viewer/` | 리포트 본문 |
 | 호출그래프 보조 (언어별 조건부 플러그인, 현 구현 `code-analyze-callgraph-cpp`) | (조건부) 언어별 호출 그래프 추출. Stage0 골격에 호출/참조맵 미리 채움 + flow 출발점. facet 에 텍스트 + mermaid 지속. | 대상 경로 + 언어별 사전조건(cpp: `compile_commands.json`) | facet 텍스트 + mermaid 그래프 |
 
@@ -312,6 +313,25 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 대상 트리 안에 벤더링된 서드파티 원본(우리가 쓰지 않은 남의 소스)을 분석 대상에 넣지 않는다.
 </RICOCHET>
 
+### 분석 스킵 (프로젝트 고유 저가치 소스)
+
+소유권 경계로 남의 원본을 걸러낸 뒤에도, 대상 안에는 **우리 소스이지만 분석 가치가 낮은 것**이 있다 -- 생성된 코드(코드젠 산출), 체크인된 빌드 산출물, 죽은/레거시 디렉토리 등. 이건 서드파티가 아니라 우리 것이지만 지도에 담아도 노이즈라 survey 범위에서 덜어낸다. 소유권 경계(남의 원본 제외)와는 다른 축이다.
+
+수집은 **휴리스틱 제안 + 사용자 확인**이다. 메인이 보편 신호로 스킵 후보를 제안하고(생성물 마커 주석 · 빌드 출력 디렉토리 · 명백한 비소스), 사용자가 프로젝트 고유 스킵을 더하거나 빼 최종 확정한다. 휴리스틱이 잡는 건 보편 신호뿐이고, 이 팀만 아는 죽은 디렉토리 같은 프로젝트 고유는 사용자가 짚는다.
+
+확정된 스킵은 두 곳에 쓰인다.
+
+- **Stage 0 survey 제외** -- 스킵된 경로는 골격 인벤토리에서 빼, 이후 모든 단계가 그만큼 좁은 대상을 본다.
+- **관례 facet §4 기록** -- "무엇을 왜 뺐나"(경로/패턴 + 사유)를 `conventions.md` §4 에 남겨, 지도를 읽는 쪽이 그 부재가 누락이 아니라 의도적 제외임을 알게 한다.
+
+<PENETRATE>
+분석 스킵은 휴리스틱 제안 후 사용자 확인으로 확정하고, 확정된 스킵은 Stage 0 survey 인벤토리에서 제외하며 무엇을 왜 뺐는지 관례 facet §4 에 기록한다.
+</PENETRATE>
+
+<RICOCHET>
+휴리스틱 판정만으로 사용자 확인 없이 우리 소스를 분석에서 제외하지 않는다.
+</RICOCHET>
+
 ### 실행 범위 게이트 (Stage 0 앞, 필수)
 
 이 스킬의 베이스 목적은 **facet 생성**이고, 시각화(render, Stage 3)와 검증(Stage 4)은 그 위의 선택 산출물이다. 그래서 facet 을 만든 뒤 자동으로 시각화까지 진행하지 않고, 착수 전 사용자와 실행 범위(시작 · 종료 스테이지)를 정한다.
@@ -355,7 +375,7 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 </RICOCHET>
 
 ### Stage 0 -- 골격/인벤토리 (직렬, 1회)
-파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 만들어 `<브랜치 디렉토리>/facet/skeleton.md` 로 저장한다. **카운팅 규율을 여기서 1회 적용**(아래). 기본 메인 직접, 대형이면 `code-analyze-survey` 위임. 분석 언어에 호출그래프 보조 플러그인(`code-analyze-callgraph-<언어>`)이 있고 그 사전조건이 충족되면 여기서 호출해 호출/참조맵을 골격에 미리 채운다(현 구현 cpp: `compile_commands.json` 있을 때).
+파일 트리(소스 미러) + 파일별 인벤토리(타입/함수 이름·개수) + 진입 표면 + 스키마/테스트 존재를 만들어 `<브랜치 디렉토리>/facet/skeleton.md` 로 저장한다. 착수 전 확정한 **분석 스킵**("분석 스킵" 참조)은 여기서 트리/인벤토리에서 제외한다(pruning). **카운팅 규율을 여기서 1회 적용**(아래). 기본 메인 직접, 대형이면 `code-analyze-survey` 위임. 분석 언어에 호출그래프 보조 플러그인(`code-analyze-callgraph-<언어>`)이 있고 그 사전조건이 충족되면 여기서 호출해 호출/참조맵을 골격에 미리 채운다(현 구현 cpp: `compile_commands.json` 있을 때).
 
 > 카운팅 규율: (1) 셀 단위를 먼저 못 박는다(포함/제외 정의). (2) 개수는 구성원 목록을 먼저 만들고 목록 길이로 센다. (3) 나열을 재현가능 검색/도구 결과에 근거(언어별 수단은 에이전트가 선택). (4) 헤드라인/합계 == 인벤토리 목록 행수 자가 교차검산(어긋나면 목록이 진실).
 
@@ -368,13 +388,19 @@ facet 교차링크를 facet 루트 기준이나 분석 대상 디렉토리 기�
 </PENETRATE>
 
 ### Stage 1 -- facet 채우기 (invariants 선행 + 병렬)
-골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 6종(architecture/flow/data-contract/test/externals/invariants)을 백그라운드 호출(`run_in_background: true`)한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
+골격을 입력으로, 구조 에이전트(서브트리-major)와 가로지르는 에이전트 7종(architecture/flow/data-contract/test/externals/invariants/conventions)을 백그라운드 호출(`run_in_background: true`)한다. 각 에이전트는 골격이 준 공유 사실 위에 **깊이만** 채운다(개수 재계산·서론 재도출 없음).
 
-호출 순서에 **선행 의존 하나**가 있다 -- test 의 불변식 커버리지 조인이 `invariants.md` 를 입력으로 쓰므로 **invariants 를 test 보다 먼저** 낸다. invariants + 나머지(구조 · architecture · flow · data-contract · externals)를 병렬 호출하고, **invariants 완료 통지가 오면 그 `invariants.md` 를 입력으로 test 를 호출**한다(아직 도는 다른 에이전트들과 병렬). test 외의 에이전트는 골격+코드만 입력이라 서로·invariants 를 읽지 않는다.
+호출 순서에 **선행 의존 하나**가 있다 -- test 의 불변식 커버리지 조인이 `invariants.md` 를 입력으로 쓰므로 **invariants 를 test 보다 먼저** 낸다. invariants + 나머지(구조 · architecture · flow · data-contract · externals · conventions)를 병렬 호출하고, **invariants 완료 통지가 오면 그 `invariants.md` 를 입력으로 test 를 호출**한다(아직 도는 다른 에이전트들과 병렬). test 외의 에이전트는 골격+코드만 입력이라 서로·invariants 를 읽지 않는다.
 
-저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 소모하므로, 렌더와 같은 직접 Write 부류). **가로지르는 6종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 선행 입력으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
+저장 규약은 facet 종류로 갈린다 -- **구조 노드 facet 은 구조 에이전트가 직접 Write** 한다(노드 수십 개가 부피라 본문으로 돌리면 메인 컨텍스트/턴을 크게 소모하므로, 렌더와 같은 직접 Write 부류). **가로지르는 7종은 본문을 반환하고 메인이 저장**한다(소수이고, 메인이 invariants.md 를 test 에 선행 입력으로 넘기는 등 그 내용을 메인 컨텍스트에서 쓰므로). 구조 노드의 골격 대비 교차검산은 Stage 2 로 이관한다.
 
 플로우 에이전트는 산문(핵심)과 시퀀스 다이어그램을 `%%FLOW-DIAGRAMS%%` 구분자로 나눠 반환한다. 메인은 위를 `facet/flow.md`, 아래를 `facet/flow.diagrams.md` 로 저장한다(둘 다 facet 에 지속 -- render 재시작 대비). 언어별 callgraph 가 돌면 그 텍스트/mermaid 도 `facet/callgraph-cpp.md`·`facet/callgraph.diagrams.md` 로 저장.
+
+conventions 에이전트는 관례 §1~3(네이밍/패턴/함정) 본문을 반환하고, 메인이 착수 전 게이트에서 확정한 분석 스킵을 §4 로 이어붙여 `facet/conventions.md` 로 저장한다(§4 는 게이트 산물이라 메인이 소유 -- "분석 스킵" 참조).
+
+<PENETRATE>
+conventions.md 의 §4 분석 스킵 기록은 메인이 게이트 확정본으로 붙인다(에이전트는 §1~3 만 낸다).
+</PENETRATE>
 
 <PENETRATE>
 Stage 1 에이전트는 골격이 준 공유 사실 위에 깊이만 더한다.
@@ -416,7 +442,7 @@ TaskCreate 매듭은 종료가 render 를 포함할 때만 만든다(범위 게�
 HTML 산출은 고정 뷰어 + `data.js` 다. 이 스테이지는 **뷰어를 설치하지 않고 데이터만 만든다** -- 뷰어는 착수 전 확인("뷰어 사전 확인")에서 이미 준비됐으므로 여기선 뷰어 설치/교체를 판단하지 않고 그 뷰어를 그대로 쓴다.
 
 순서:
-1. **data 조각 생성(백그라운드 팬아웃)** -- `code-analyze-render-data` 를 병렬 다중 호출(`run_in_background: true`)한다: 구조 **서브트리당 1회**(그 서브트리의 `nodes` 조각) + 가로지르는 **1회**(architecture/flows/invariants/tests/externals/dataContracts/callgraph 섹션). 각 호출은 자기 조각을 `<브랜치>/.dataparts/` 에 직접 Write 하고 경로만 통지한다. `meta`/`modules` 는 작고 결정적이라 메인이 skeleton 에서 직접 `.dataparts/base.json` 으로 만든다.
+1. **data 조각 생성(백그라운드 팬아웃)** -- `code-analyze-render-data` 를 병렬 다중 호출(`run_in_background: true`)한다: 구조 **서브트리당 1회**(그 서브트리의 `nodes` 조각) + 가로지르는 **1회**(architecture/flows/invariants/tests/externals/conventions/dataContracts/callgraph 섹션). 각 호출은 자기 조각을 `<브랜치>/.dataparts/` 에 직접 Write 하고 경로만 통지한다. `meta`/`modules` 는 작고 결정적이라 메인이 skeleton 에서 직접 `.dataparts/base.json` 으로 만든다.
 2. **조각 합침(메인, 컨텍스트 우회)** -- 통지가 모이면 메인이 `jq` 로 조각들을 하나의 `window.DATA` 객체로 합쳐 `<브랜치>/data.js`(`window.DATA = {...}`)를 만든다(부피가 메인 LLM 컨텍스트를 거치지 않게 Bash 로 파일 리다이렉트). 합치는 방식은 `viewer/SCHEMA.md` 의 "조각 형태"를 따른다. 합친 뒤 `.dataparts/` 삭제.
 3. **manifest 재생성** -- 메인이 형제 브랜치를 훑어 `_viewer/manifest.js` 를 다시 쓴다.
 4. **마크다운(백그라운드)** -- `code-analyze-render-markdown` 을 병렬 호출(단일 문서, facet 에서 읽어 `markdown/` 에 직접 Write).

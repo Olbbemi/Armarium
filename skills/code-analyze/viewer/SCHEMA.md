@@ -21,8 +21,12 @@ window.DATA = { ...아래 구조... };
 `fetch` 가 아니라 `<script src>` 로 주입하므로(`file://` 에서 fetch 는 CORS 로 막힘) 반드시 `window.DATA` 전역 대입 형태여야 한다. 뷰어의 `manifest.js` 도 같은 이유로 `window.MANIFEST = [ ... ]` 전역 대입이다.
 
 <RICOCHET>
-data.js 를 fetch 로 읽는 별도 JSON 파일로 두지 않는다(file:// 에서 막힌다). window.DATA 전역 대입 스크립트로 둔다.
+data.js 를 fetch 로 읽는 별도 JSON 파일로 두지 않는다(file:// 에서 막힌다).
 </RICOCHET>
+
+<PENETRATE>
+data.js 는 window.DATA 전역 대입 스크립트로 둔다.
+</PENETRATE>
 
 ---
 
@@ -38,12 +42,13 @@ window.DATA = {
   invariants,    // 배열. 항상(비면 []).
   tests,         // 배열. 항상(비면 []).
   externals,     // 배열. 항상(비면 []).
+  conventions,   // 객체. 조건부 -- 없으면 키 자체 생략.
   dataContracts, // 배열. 조건부 -- 없으면 키 자체 생략.
   callgraph      // 객체. 조건부 -- 없으면 키 자체 생략.
 }
 ```
 
-조건부 섹션(`dataContracts`, `callgraph`)은 데이터가 없으면 **키를 생략**한다. 뷰어는 키 부재/빈 배열을 보고 해당 탭을 숨긴다.
+조건부 섹션(`conventions`, `dataContracts`, `callgraph`)은 데이터가 없으면 **키를 생략**한다. 뷰어는 키 부재/빈 배열을 보고 해당 탭을 숨긴다.
 
 <PENETRATE>
 조건부 섹션은 데이터가 없으면 키를 생략하고, 뷰어는 그 부재로 탭을 숨긴다.
@@ -122,6 +127,17 @@ tests:      [ { id, name, target, covers: [invariantId] } ]
 externals: [ { name, version, adapter, vendored, port } ]
 ```
 
+### conventions (조건부)
+프로젝트 고유 관례. facet 의 `conventions.md`(§1~4)를 옮긴 것. 각 배열은 비면 `[]`, 관례 자체가 없으면 `conventions` 키를 생략한다.
+```js
+conventions: {
+  naming:   [ { scope, rule, example } ],                 // §1 scope: "파일"|"타입"|"함수"|"디렉토리" ...
+  patterns: [ { name, description, relatedNodes: [nodeId] } ],  // §2 relatedNodes = node.id
+  pitfalls: [ { statement, relatedNodes: [nodeId] } ],         // §3 relatedNodes = node.id
+  skips:    [ { path, reason } ]                          // §4 분석 스킵 기록(노드 참조 아님)
+}
+```
+
 ### dataContracts (조건부)
 ```js
 dataContracts: [ { name, kind, fields: [ { name, type, constraints } ] } ]
@@ -157,6 +173,8 @@ callgraph 를 렌더된 SVG 로 담지 않는다(mermaid 소스로 담는다).
 | `architecture.entrySurfaceMap.handlerId` | `nodes[].id` |
 | `architecture.ports.implIds` | `nodes[].id` |
 | `flows[].relatedNodes` | `nodes[].id` |
+| `conventions.patterns[].relatedNodes` | `nodes[].id` |
+| `conventions.pitfalls[].relatedNodes` | `nodes[].id` |
 | `tests[].covers` | `invariants[].id` |
 | `invariants[].coveredBy` | `tests[].id` |
 
@@ -174,7 +192,7 @@ render-data 는 위 구조를 통째로 만들지 않고 **슬라이스별 조�
 |-----------|-----------|-------------|
 | `.dataparts/base.json` | `{ meta, modules }` | 메인(skeleton 에서 직접) |
 | `.dataparts/nodes-<서브트리>.json` | `nodes` 배열의 일부(그 서브트리 노드들) | render-data(구조 서브트리) |
-| `.dataparts/crosscutting.json` | `{ architecture, flows, invariants, tests, externals, dataContracts?, callgraph? }` | render-data(가로지르는) |
+| `.dataparts/crosscutting.json` | `{ architecture, flows, invariants, tests, externals, conventions?, dataContracts?, callgraph? }` | render-data(가로지르는) |
 
 합침(메인, Bash -- 부피가 메인 컨텍스트를 안 거침):
 ```
