@@ -10,7 +10,7 @@ facet 은 Claude 용 무더기 데이터고, 뷰어는 그 데이터를 여러 �
 
 ## 입력 (메인이 전달)
 - **스키마 경로**: `skills/code-analyze/viewer/SCHEMA.md`. `window.DATA` 구조와 조각 형태의 단일 출처. 자기 슬라이스에 해당하는 섹션/조각 형태를 여기서 확인해 그대로 따른다.
-- **슬라이스 지정**: (a) 구조 서브트리면 그 서브트리의 facet 파일노드 문서 경로 목록 + 서브트리 이름, (b) 가로지르는 묶음이면 `architecture/flow/data-contract/test/externals/invariants` facet 문서 + facet 에 지속된 다이어그램(flow 시퀀스, callgraph mermaid).
+- **슬라이스 지정**: (a) 구조 서브트리면 그 서브트리의 facet 파일노드 문서 경로 목록 + 서브트리 이름, (b) 가로지르는 묶음이면 `architecture/flow/data-contract/test/externals/invariants/conventions` facet 문서 + facet 에 지속된 다이어그램(flow 시퀀스, callgraph mermaid).
 - **브랜치 디렉토리** 경로 + **스켈레톤**(`facet/skeleton.md`) -- 노드 ID(교차참조 키)의 단일 출처.
 - 언어별 규칙 파일 경로(있으면).
 
@@ -18,7 +18,7 @@ facet 은 Claude 용 무더기 데이터고, 뷰어는 그 데이터를 여러 �
 자기 슬라이스에 맞는 조각 하나를 `.dataparts/` 에 JSON 으로 Write 한다.
 
 - **구조 서브트리 슬라이스** -> `.dataparts/nodes-<서브트리>.json` = 그 서브트리 노드들의 `nodes` 배열(스키마 `nodes[]` 형태). 각 노드의 `id` 는 스켈레톤이 정한 노드 이름을 그대로 쓴다(파일명에서 재유도 금지). 타입/함수/시그니처/속성(역할/불변식/예외)을 facet 노드 문서에서 옮기되 **데이터는 동치로 보존**한다(요약·삭제 없음 -- 사람용 재포맷은 뷰어 몫이라 여기선 데이터만).
-- **가로지르는 슬라이스** -> `.dataparts/crosscutting.json` = `{ architecture, flows, invariants, tests, externals, dataContracts?, callgraph? }`(스키마 형태, 없는 조건부 키 생략).
+- **가로지르는 슬라이스** -> `.dataparts/crosscutting.json` = `{ architecture, flows, invariants, tests, externals, conventions?, dataContracts?, callgraph? }`(스키마 형태, 없는 조건부 키 생략). `conventions` 는 `conventions.md` 를 옮긴 것으로 §2 패턴/§3 함정의 `relatedNodes` 는 스켈레톤 노드 ID 로 잇는다(§4 스킵 기록은 노드 참조가 아니라 경로/사유).
   - `architecture.mermaid` 는 facet 의 엣지 데이터에서 **생성**한다(의존 그래프). `flows[].mermaid` 와 `callgraph.graphs[].mermaid` 는 facet 에 지속된 다이어그램 소스를 **그대로 복사**한다(재생성하지 않는다 -- 특히 callgraph 는 툴체인 산출이라 옮기기만 한다).
 
 ## 교차참조 = 노드 ID (필수)

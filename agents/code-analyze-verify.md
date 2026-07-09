@@ -28,13 +28,15 @@ code-analyze 의 HTML 산출은 고정 뷰어(`_viewer/`) + 브랜치별 데이�
 | `architecture.entrySurfaceMap.handlerId` | `nodes[].id` |
 | `architecture.ports.implIds` | `nodes[].id` |
 | `flows[].relatedNodes` | `nodes[].id` |
+| `conventions.patterns[].relatedNodes` | `nodes[].id` |
+| `conventions.pitfalls[].relatedNodes` | `nodes[].id` |
 | `tests[].covers` | `invariants[].id` |
 | `invariants[].coveredBy` | `tests[].id` |
 
 이게 다중 파일 시절 "끊긴 링크"의 대체다 -- 경로가 아니라 ID 무결성을 본다.
 
 ### 4. 뷰어 무에러 로드
-헤드리스 브라우저(puppeteer)로 공용 뷰어를 이 `data.js` 로 열고, **콘솔 에러 없이** 로드되는지 + 각 뷰(개요/구조/아키텍처/플로우/커버리지/외부의존/데이터계약 중 존재하는 것)를 전환했을 때 JS 예외가 없는지 확인한다. 다이어그램이 그려지는 뷰는 접힌 섹션을 펼친 뒤 mermaid SVG 가 0 이 아닌 크기로 렌더되는지 본다(숨김 컨테이너 렌더 깨짐 탐지). 뷰어를 data 로 여는 방법은 뷰어의 매니페스트 로딩 규약을 따른다(해당 data.js 를 주입).
+헤드리스 브라우저(puppeteer)로 공용 뷰어를 이 `data.js` 로 열고, **콘솔 에러 없이** 로드되는지 + 각 뷰(개요/구조/아키텍처/플로우/커버리지/외부의존/관례/데이터계약 중 존재하는 것)를 전환했을 때 JS 예외가 없는지 확인한다. 다이어그램이 그려지는 뷰는 접힌 섹션을 펼친 뒤 mermaid SVG 가 0 이 아닌 크기로 렌더되는지 본다(숨김 컨테이너 렌더 깨짐 탐지). 뷰어를 data 로 여는 방법은 뷰어의 매니페스트 로딩 규약을 따른다(해당 data.js 를 주입).
 
 ## 도구 부재 시
 node / puppeteer 가 없거나 설치할 수 없으면, 가능한 검증만 수행하고(예: data.js 파스·매달린 참조는 정적이라 가능) 나머지는 "스킵"으로 보고한다. 검증 불가를 이유로 전체 파이프라인을 실패 처리하거나 중단하지 않는다.
