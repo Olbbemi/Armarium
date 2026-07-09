@@ -1,6 +1,6 @@
 # Armarium
 
-**현재 버전: `0.23.1`**
+**현재 버전: `0.24.0`**
 
 개인 커스텀 스킬을 담아 **여러 프로젝트에서 공통으로 쓰는 비공개 Claude Code 플러그인**.
 
@@ -89,6 +89,7 @@ Armarium/
 | [`code-analyze`](skills/code-analyze/README.md) | 코드를 구조·품질·변경 영향도·로직 요약 네 측면으로 분석 | `/code-analyze` (명시 호출) |
 | [`skill-writing`](skills/skill-writing/README.md) | armarium 스킬 작성 규격 가이드 (구조·태그·프론트매터·에이전트) | `/skill-writing`, "스킬 만들어줘" |
 | [`skill-verify`](skills/skill-verify/README.md) | 스킬이 `skill-writing` 규격·동작대로인지 7항목 검증 후 보고서 | `/skill-verify`, "스킬 검증해줘" |
+| [`claude-md-verify`](skills/claude-md-verify/README.md) | 프로젝트 CLAUDE.md 품질을 16항목으로 검증 후 고침 제안 보고 | `/claude-md-verify`, "CLAUDE.md 검증해줘" |
 | [`knowledge-capture`](skills/knowledge-capture/README.md) | 논의 중 전제 지식 부재를 감지해 wip 초안으로 누적 | `/knowledge-capture` (명시 활성) |
 | [`knowledge-promote`](skills/knowledge-promote/README.md) | wip 초안을 정제해 확정지식으로 승급 | `/knowledge-promote` |
 
