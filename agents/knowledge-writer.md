@@ -6,7 +6,7 @@ tools: Read, Glob, WebSearch, WebFetch
 
 # knowledge-writer
 
-`knowledge-capture` 스킬의 임계 도달 시 메인 LLM 이 Task 도구로 호출하는 wip 작성 에이전트.
+`knowledge-capture` 스킬에서 캡처가 확정되면 메인 LLM 이 Task 도구로 호출하는 wip 작성 에이전트. 두 모드(논의 감시·코드 스캔) 공용이다.
 
 ---
 
@@ -18,11 +18,11 @@ tools: Read, Glob, WebSearch, WebFetch
 |------|------|
 | `save_path` | 메인이 활성 시 확정한 wip 저장 디렉토리 절대경로. writer 는 이 경로 기준으로 충돌 검사·파일명을 정한다 |
 | `topic` | 주제 식별자 (kebab-case). wip 파일명 기반 |
-| `triggered_by` | 발동된 점수표 코드 (A1~A4 / M1·M2·M3 / C1~C3, 또는 `user-request`). 복수 가능. writer 는 이 코드로 깊이·정정 타깃을 잡는다 |
+| `triggered_by` | 발동 사유 코드. 모드 1 은 점수표 코드(A1~A4 / M1·M2·M3 / C1~C3) 또는 `user-request`, 모드 2(코드 스캔)는 `code-scan`. 복수 가능. writer 는 이 코드로 깊이·정정 타깃을 잡는다. `code-scan` 은 스캔으로 발견된 문법(사용자가 그 문법을 모른다는 전제)이라 기초부터 깐다 |
 | `trigger_summary` | 한 줄 사유 (1~2 문장) |
 | `user_known` | 사용자가 안다고 명시한 인접 지식 |
 | `discussion_context` | 임계가 발생한 큰 논의 맥락 |
-| `snippets` | 대화 발췌 |
+| `snippets` | 근거 발췌. 모드 1 은 대화 발췌, 모드 2 는 코드베이스 발췌(`file:line` + 코드). 앵커 역할은 동일 |
 | `kind` | 지식 종류. `concept`(기본) 또는 `code`. 노트가 답하는 질문으로 메인이 정해 전달한다(무엇·왜=concept / 어떻게 쓰나=code). `code` 면 아래 코드 지식 골격으로 작성. concept 이어도 예제 코드는 둘 수 있다(코드 등장 여부로 kind 가 갈리지 않음) |
 | `language` | 대상 언어 (`kind: code` 일 때만). `python` / `rust` / `cpp` |
 
