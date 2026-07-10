@@ -12,7 +12,7 @@ wip 산문 한 건을 골라 확정지식 형식(프론트매터 + 정제 본문
 
 ## 경로
 
-wip 인박스와 확정지식 디렉토리는 Herbarium 저장소 하위에 있다. 경로를 코드에 고정하지 않고, 활성 직후 사용자에게 Herbarium 루트를 입력받아 git origin remote(`git@github.com:Olbbemi/Herbarium.git`)로 검증한 뒤 `<루트>/wip` 와 `<루트>/knowledge` 를 도출한다.
+wip 폴더와 확정지식 디렉토리는 Herbarium 저장소 하위에 있다. 경로를 코드에 고정하지 않고, 활성 직후 사용자에게 Herbarium 루트를 입력받아 git origin remote(`git@github.com:Olbbemi/Herbarium.git`)로 검증한 뒤 `<루트>/wip` 와 `<루트>/knowledge` 를 도출한다.
 
 ## 동작 흐름 (8단계)
 
