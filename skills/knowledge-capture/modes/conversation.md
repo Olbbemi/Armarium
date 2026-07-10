@@ -172,7 +172,7 @@ user_known 구성(깊이 보정): 켜진 행 중 `user_known`·`both` 태그 행
 
 임계 점수를 넘긴 주제는 메인 LLM 이 즉시 `knowledge-writer` 에이전트를 호출해 wip 파일 작성을 위임한다.
 사용자 확인 없이 자동 진행되며, 같은 사안의 여러 측면을 한 항목으로 묶을지 별 항목으로 쪼갤지의 판단도 메인 LLM 의 자율에 맡긴다.
-개념(무엇·왜)과 코드 사용법(어떻게)이 한 주제에 섞인 straddle 주제는 concept wip 와 code wip 두 개로 나눠 캡처한다(kind 가 다르면 다른 wip -- promote `2. 형식 변환` 의 kind 결정 규칙 참조).
+개념(무엇·왜)과 코드 사용법(어떻게)이 한데 섞인 주제는 concept wip 와 code wip 두 개로 나눠 캡처한다(kind 가 다르면 다른 wip -- promote `2. 형식 변환` 의 kind 결정 규칙 참조).
 호출 형태 · 입력 포맷은 overview.md 의 `공유: knowledge-writer 호출` 섹션을 따른다.
 
 <PENETRATE>

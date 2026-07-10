@@ -40,7 +40,7 @@
 ### 컴파일 타임
 
 - `constexpr-consteval` -- `constexpr` / `consteval` / `constinit`, 컴파일 타임 계산. 런타임 비용 제거·상수 보장.
-- `if-constexpr` -- `if constexpr (...)`. 컴파일 타임 분기로 인스턴스화 가지치기.
+- `if-constexpr` -- `if constexpr (...)`. 컴파일 타임 분기로 미선택 분기 인스턴스화 제거.
 - `type-traits` -- `<type_traits>` 의 `std::is_*`, `std::decay_t` 등. 타입 특성 질의·변환.
 
 ### 함수 · 호출

@@ -7,6 +7,13 @@
 
 한 태그 블록 안에 "수행"과 "금지"를 섞지 않는다. 수행 규칙은 `<PENETRATE>`, 금지 규칙은 `<RICOCHET>` 로 분리해 표기한다.
 
+# 스킬 작업 규칙
+
+이 저장소의 스킬(`skills/<스킬>/`)을 새로 만들거나 고칠 때는 아래를 따른다.
+
+- 작업을 시작하기 전에 항상 `skill-writing` 스킬을 먼저 로드해 그 규격에 맞춘다.
+- 스킬 수정이 끝나면 커밋 전에 항상 `skill-verify` 로 대상 스킬을 검증한다. 여러 스킬을 고쳤으면 각각 검증한다.
+
 # 버전 규칙
 
 플러그인 버전을 올릴 때 **세 곳을 항상 같은 값으로 함께** 올린다 -- `.claude-plugin/plugin.json` 과 `.claude-plugin/marketplace.json` 의 `version`, 그리고 `README.md` 상단의 `**현재 버전: ...**` 줄. 하나라도 빠지면 `/plugin marketplace update` 시 카탈로그 버전이 어긋나거나 README 표기가 실제 배포 버전과 달라진다. 현재 버전 값과 "언제 올리나 / SemVer / push 훅 동작"의 상세 규칙은 `README.md` 의 `## 버전 규칙` 을 단일 출처로 본다.
