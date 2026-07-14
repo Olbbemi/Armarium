@@ -54,6 +54,6 @@
 - `ranges` -- 강앵커 `std::ranges::` / `views::`(`views::filter`/`transform` 등). 파이프 `|` 는 비트 OR 와 안 갈려 신호에서 뺀다. 지연 평가 시퀀스 변환.
 - `coroutines` -- `co_await` / `co_yield` / `co_return`, `promise_type`. 중단 가능 함수.
 - `optional-variant-any` -- `std::optional` / `std::variant` / `std::any`, `std::visit`. 합타입·부재 표현.
-- `three-way-comparison` -- `operator<=>`(우주선 연산자), `std::strong_ordering`. 비교 연산 자동 생성.
+- `three-way-comparison` -- `operator<=>`, `std::strong_ordering`. 비교 연산 자동 생성.
 - `span-string-view` -- `std::span` / `std::string_view`. 비소유 뷰로 복사 없이 참조.
 - `concurrency-primitives` -- `std::thread`/`jthread`, `mutex`/`lock_guard`/`scoped_lock`, `atomic`, `condition_variable`, `future`/`promise`. 동시성 기본 도구.
