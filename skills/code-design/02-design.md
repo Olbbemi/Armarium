@@ -180,7 +180,7 @@ variant 파일은 분기 판단 직후, 사전 조사 시작 전에 사용자에
 
 ### 4. 열린 보류 해소 (최종 게이트)
 
-01-requirements 에서 재개 시점 = 02-design 으로 릴레이된 열린 보류를 여기서 전부 결판낸다. 02-design 은 마지막 결정 단계다.
+01-requirements 에서 재개 시점 = 02-design 으로 넘어온 열린 보류를 여기서 전부 결판낸다. 02-design 은 마지막 결정 단계다.
 
 - 각 열린 보류를 사용자 확인으로 **해소**(결정 -> 값 확정)하거나, 정할 수 없으면 **로드맵 `[예정]`/`[미정]` 로 escalation**(다음 flow 로) 한다. escalation 은 roadmap.md 에 append 하고 출처를 남긴다(전이 주체 -- overview "로드맵").
 - 02-design 을 닫을 때 열린 보류가 **0** 이어야 한다 -- 03-implementation 은 열린 보류를 받지 않는다.
@@ -413,7 +413,7 @@ B의 경우 variant 파일의 안내에 따라 세부 케이스를 추가 명시
 
 ### 재설계 (같은 프로젝트를 다시 설계하는 경우)
 
-이미 handoff.md 가 있는 프로젝트를 다시 설계하면, 새 버전 파일을 만들지 않고 기존 handoff.md 를 그 자리에서 갱신한다. handoff 는 03-implementation 이 읽는 고정 경로의 단일 파일이라, 버전 파일을 만들면 03-implementation 이 그것을 읽지 못한다.
+이미 handoff.md 가 있는 프로젝트를 다시 설계하면, 새 버전 파일을 만들지 않고 기존 handoff.md 를 그 자리에서 갱신한다. handoff.md 는 03-implementation 이 읽는 고정 경로의 단일 파일이라, 버전 파일을 만들면 03-implementation 이 그것을 읽지 못한다.
 
 갱신은 섹션 성격에 따라 둘로 갈린다.
 
@@ -422,7 +422,7 @@ B의 경우 variant 파일의 안내에 따라 세부 케이스를 추가 명시
 
 본문을 교체해도 변경 이력은 원장 섹션이 보존하므로, 옛 본문 전체를 파일에 남겨둘 필요가 없다.
 
-예외(전환기 as-built 스냅샷): 재설계가 점진 전환이라 옛 본문이 전환 동안 현재 코드(as-built)의 참조로 가치가 있으면, 옛 handoff 전체를 `archive/` 하위로 옮겨 스냅샷으로 보존해도 된다. 이때 archive 파일명은 이동 시점 타임스탬프를 붙여(`handoff-{YYYY-MM-DD-HHMM}.md`, 초 제외) 재설계가 반복돼도 덮어쓰지 않게 한다(과거 스냅샷 보존용). 이 스냅샷은 03-implementation 이 읽는 대상이 아니라 동결된 참조이므로 금지 대상인 '버전 파일'이 아니다. 이 경우에도 원장은 새 handoff.md 로 이어받아 자족적으로 둔다.
+예외(전환기 as-built 스냅샷): 재설계가 점진 전환이라 옛 본문이 전환 동안 현재 코드(as-built)의 참조로 가치가 있으면, 옛 handoff.md 전체를 `archive/` 하위로 옮겨 스냅샷으로 보존해도 된다. 이때 archive 파일명은 이동 시점 타임스탬프를 붙여(`handoff-{YYYY-MM-DD-HHMM}.md`, 초 제외) 재설계가 반복돼도 덮어쓰지 않게 한다(과거 스냅샷 보존용). 이 스냅샷은 03-implementation 이 읽는 대상이 아니라 동결된 참조이므로 금지 대상인 '버전 파일'이 아니다. 이 경우에도 원장은 새 handoff.md 로 이어받아 자족적으로 둔다.
 
 <PENETRATE>
 archive 스냅샷을 두더라도 canonical handoff.md 는 03-implementation 이 읽는 target 설계만 담는다.
