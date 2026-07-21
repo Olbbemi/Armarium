@@ -161,6 +161,8 @@ CWD 가 git 최상위와 다르면(하위에서 실행 중) 진행하지 않는�
 | `skills/code-design/02-design/new_project.md` | 새 프로젝트 설계 흐름 | 흐름 A 선택 시 |
 | `skills/code-design/02-design/extend_or_refactor.md` | 기존 코드 변경 설계 흐름 | 흐름 B 선택 시 |
 | `skills/code-design/02-design/tdd-planning.md` | TDD 계획(테스트 케이스 목록) 작성법 | 흐름 A/B 공통, TDD 계획 작성 시 |
+| `skills/code-design/02-design/concurrency.md` | 동시성 hazard 체크리스트 + 대응 기록 | 공유 가변 상태에 동시·인터리빙 접근 시 (조건부) |
+| `skills/code-design/02-design/communication.md` | 통신 hazard 체크리스트 + 대응 기록 | 경계 너머 메시지 통신 시 (조건부) |
 
 **3. 구현**
 
