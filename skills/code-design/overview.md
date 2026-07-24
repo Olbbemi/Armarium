@@ -178,8 +178,7 @@ CWD 가 git 최상위와 다르면(하위에서 실행 중) 진행하지 않는�
 - 05-coverage(커버리지 추출)는 이 순차 흐름 밖의 이중 모드 단계다 -- 04-verification 뒤에 이어서도, code-design 로드 후 단독으로도 실행한다. 단독 실행 시 "중간 진입엔 직전 핸드오프 필수" 규칙의 예외로, 직전 핸드오프 없이 코드/테스트를 직접 읽어 시작한다(선결 게이트: 코드 존재 + 빌드 성공). 상세는 `05-coverage.md`.
 - 00-ideation 에서 01-requirements 로의 전환도 다른 단계와 같은 hard 의존이다 -- 01-requirements 는 00-ideation 의 핸드오프를 입력으로 받는다.
 - 방향이 이미 명확하면 00-ideation 은 fast-path 로 가볍게 통과한다(단계를 건너뛰지는 않는다 -- `00-ideation.md` 참조). 00-ideation 에서 진행 판단이 no-go 면 파이프라인에 진입하지 않고 00-ideation 에서 종료한다.
-- 단계 간 핸드오프의 형태는 단계마다 다르다 -- 00-ideation / 01-requirements / 02-design 은 `handoff.md` 문서가, 03-implementation -> 04-verification 은 코드와 검증 산출물 틀이 그 역할을 한다(03-implementation 은 별도 `handoff.md` 를 만들지 않음).
-    - 04-verification 은 하류 단계가 없어 핸드오프가 필수가 아니다. 상세는 원칙 5("핸드오프는 단계별로 형태가 다르다") 참조.
+- 단계 간 핸드오프의 형태는 단계마다 다르다 -- 00-ideation / 01-requirements / 02-design 은 `handoff.md` 문서가, 03-implementation -> 04-verification 은 코드와 검증 산출물 틀이 그 역할을 한다(03-implementation 은 별도 `handoff.md` 를 만들지 않음). 04-verification 은 하류 단계가 없어 핸드오프가 필수가 아니다(상세는 원칙 5 "핸드오프는 단계별로 형태가 다르다" 참조).
 - 각 flow 는 자기 브랜치 폴더(`code-design/<브랜치 슬러그>/`)와 공유 roadmap.md 만 입력으로 삼는다.
   - 다른 브랜치(옛 flow)의 핸드오프는 참고하지 않는다(원칙 5).
   - 결정 지연(보류)은 02-design 까지 모두 해소되거나 로드맵으로 escalation 되어, 03-implementation 진입 시 열린 보류가 0 이다(원칙 4).
