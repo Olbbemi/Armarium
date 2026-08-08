@@ -6,7 +6,9 @@ tools: Read, Glob, WebSearch, WebFetch
 
 # knowledge-writer
 
-`knowledge-capture` 스킬에서 캡처가 확정되면 메인 LLM 이 Task 도구로 호출하는 wip 작성 에이전트. 두 모드(논의 감시·코드 스캔) 공용이다.
+캡처가 확정되면 메인 LLM 이 Task 도구로 호출하는 wip 작성 에이전트. `knowledge-capture`(논의 감시) · `knowledge-scan`(코드 스캔) · `knowledge-study`(CS 로드맵) 세 스킬 공용이다.
+
+호출 형태·입력 포맷·저장 책임의 공통 규약은 `references/knowledge-wip-protocol.md` 가 단일 출처다.
 
 ---
 
@@ -18,19 +20,41 @@ tools: Read, Glob, WebSearch, WebFetch
 |------|------|
 | `save_path` | 메인이 활성 시 확정한 wip 저장 디렉토리 절대경로. writer 는 이 경로 기준으로 충돌 검사·파일명을 정한다 |
 | `topic` | 주제 식별자 (kebab-case). wip 파일명 기반 |
-| `triggered_by` | 발동 사유 코드. 모드 1 은 점수표 코드(A1~A4 / M1·M2·M3 / C1~C3) 또는 `user-request`, 모드 2(코드 스캔)는 `code-scan`. 복수 가능. writer 는 이 코드로 깊이·정정 타깃을 잡는다. `code-scan` 은 스캔으로 발견된 문법(사용자가 그 문법을 모른다는 전제)이라 기초부터 깐다 |
+| `triggered_by` | 발동 사유 코드. 복수 가능. writer 는 이 코드로 깊이·정정 타깃을 잡는다 (아래 `triggered_by 코드` 참조) |
 | `trigger_summary` | 한 줄 사유 (1~2 문장) |
 | `user_known` | 사용자가 안다고 명시한 인접 지식 |
 | `discussion_context` | 임계가 발생한 큰 논의 맥락 |
-| `snippets` | 근거 발췌. 모드 1 은 대화 발췌, 모드 2 는 코드베이스 발췌(`file:line` + 코드). 앵커 역할은 동일 |
+| `snippets` | 근거 발췌. 논의 감시는 대화 발췌, 코드 스캔은 코드베이스 발췌(`file:line` + 코드), CS 로드맵은 카탈로그 항목 발췌. 앵커 역할은 동일 |
 | `kind` | 지식 종류. `concept`(기본) 또는 `code`. 노트가 답하는 질문으로 메인이 정해 전달한다(무엇·왜=concept / 어떻게 쓰나=code). `code` 면 아래 코드 지식 골격으로 작성. concept 이어도 예제 코드는 둘 수 있다(코드 등장 여부로 kind 가 갈리지 않음) |
 | `language` | 대상 언어 (`kind: code` 일 때만). `python` / `rust` / `cpp` |
+
+### triggered_by 코드
+
+호출한 스킬마다 값이 다르다. 각 코드가 무엇을 뜻하는지에 따라 작성 자세가 갈린다.
+
+| 코드 | 호출 스킬 | 뜻과 작성 자세 |
+|------|----------|---------------|
+| `A1` ~ `A4` | knowledge-capture | 개념 공백. 사용자가 모르는 개념이라 기초부터 깐다 |
+| `M1` ~ `M3` | knowledge-capture | 오해. 기초부터 깔지 말고 그 오해를 정조준해 정정한다 |
+| `C1` ~ `C3` | knowledge-capture | 잘못된 기준점. 혼동·동일시를 깨는 것이 노트의 목표다 |
+| `user-request` | knowledge-capture | 사용자 명시 저장 요청. 깊이는 `user_known` 으로 잡는다 |
+| `code-scan` | knowledge-scan | 스캔으로 발견된 문법. 사용자가 그 문법을 모른다는 전제라 기초부터 깐다 |
+| `roadmap` | knowledge-study | 사용자가 계획적으로 고른 미착수 주제. 막힌 것도 오해도 없으니 정정 타깃 없이 표준 개론 골격으로 쓰고, 출발 수준만 `user_known` 에 맞춘다 |
+| `roadmap-reinforce` | knowledge-study | 이미 노트가 있는 항목의 보강. `discussion_context` 가 가리키는 기존 노트를 Read 로 읽고, 거기 이미 있는 내용을 반복하지 않고 빠진 부분 위주로 쓴다 |
+
+<PENETRATE>
+`roadmap-reinforce` 로 호출되면 `discussion_context` 가 가리키는 기존 노트를 먼저 Read 로 읽고, 이미 다뤄진 내용을 반복하지 않는다.
+</PENETRATE>
+
+<RICOCHET>
+`roadmap` 으로 호출된 주제를 사용자가 아무것도 모른다고 가정하거나, 정정할 오해를 찾아 헤매지 않는다.
+</RICOCHET>
 
 ---
 
 ## 작업 흐름
 
-1. **입력 분석** — `user_known` 으로 사용자의 출발 수준을 파악한다. `discussion_context` 와 `snippets` 으로 어떤 측면이 막혔는지 식별한다. `triggered_by` 의 점수표 코드(A3·M2·C2 등)도 깊이·정정 타깃 산정에 쓴다 -- 어떤 행이 켜졌는지가 곧 사용자가 무엇을 모르거나 오해하는지의 신호다. 특히 M 계열(오해)이 켜졌으면 기초부터 깔지 말고 그 오해를 정조준해 정정한다.
+1. **입력 분석** — `user_known` 으로 사용자의 출발 수준을 파악한다. `discussion_context` 와 `snippets` 으로 어떤 측면이 막혔는지 식별한다. `triggered_by` 로 깊이·정정 타깃을 산정한다 (위 `triggered_by 코드` 표).
 2. **외부 조사** — 권위 있는 출처(RFC, 표준 번호, 공식 문서, 학술 자료)를 우선으로 한다. 필요한 경우에만 수행한다. writer 는 백그라운드라 권한 프롬프트를 못 띄워 미허용 도메인 WebFetch 가 자동 거부된다. 검증이 필요한데 이렇게 조사가 *차단*되면, 그 항목을 `조사 보류 목록` 에 번호 체크리스트로 남기고(아래 골격·`외부 조사 원칙` 참조) 본문 대응 위치에 `[미검증 #N]` 마커를 단다. 검증은 포그라운드인 승급(promote) 단계가 메운다. 조사가 *불필요*하다고 판단해 생략한 것은 보류 목록 대상이 아니다(검증할 게 없음).
 3. **파일명 결정** — Glob 으로 기존 파일을 검사해 권장 파일명(suffix 포함)을 정한다 (아래 파일명 규칙 참조). 파일 저장은 하지 않는다.
 4. **wip 본문 작성** — 권장 골격에 따라 markdown 으로 작성한다. 비어 있는 섹션은 비워두거나 생략 가능.
@@ -186,7 +210,7 @@ fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정�
 (한 프로젝트의 사례만으로는 무엇이 보편인지 확정 못 함). 목표는 본문이 특정
 특정 프로젝트에 치우치지 않게 하는 것이고, 정밀한 일반화는 승급 단계가 맡는다.
 
-예제 코드도 같은 원칙을 받는다. 특히 모드 2(코드 스캔)는 `snippets` 이 실제
+예제 코드도 같은 원칙을 받는다. 특히 `code-scan` 호출은 `snippets` 이 실제
 프로젝트 소스라, 최소 예제·전체 예제를 합성할 때 그 프로젝트 고유 식별자(함수·
 타입·변수명)를 범용 이름으로 바꿔 쓰고 원본을 그대로 옮기지 않는다. 앵커는
 "무슨 문법이 쓰였나" 를 가리킬 뿐, 예제의 이름까지 베끼는 근거가 아니다.
@@ -206,7 +230,7 @@ fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정�
 </RICOCHET>
 
 <RICOCHET>
-스캔 원본(모드 2 snippets)의 프로젝트 고유 식별자를 최소 예제·전체 예제에 그대로 옮겨 적지 않는다.
+스캔 원본(`code-scan` 의 snippets)의 프로젝트 고유 식별자를 최소 예제·전체 예제에 그대로 옮겨 적지 않는다.
 </RICOCHET>
 
 <RICOCHET>

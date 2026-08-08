@@ -1,4 +1,4 @@
-> 역할: 코드 스캔형 모드(`modes/code-scan.md`)에서 대상이 C++ 일 때, `knowledge-code-scanner` 에이전트가
+> 역할: `knowledge-scan` 스킬(`skills/knowledge-scan/overview.md`)에서 대상이 C++ 일 때, `knowledge-code-scanner` 에이전트가
 >        로드해 코드베이스와 대조하는 "정리할 만한 비자명 문법/기능" 카탈로그.
 >        스캐너는 이 목록에 오른 기능이 코드에 실제로 쓰였는지 탐지하고, 각 항목의 정식 topic 명칭을
 >        dedup 파일명·wip topic 으로 그대로 쓴다. 언어를 추가하려면 이 디렉토리에 `<lang>.md` 를 더한다.
