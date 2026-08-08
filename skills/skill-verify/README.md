@@ -23,8 +23,8 @@
 | 구조 검증 | 메인 (1단계 게이트) |
 | 프론트매터 검증 | 에이전트 `skill-verify-frontmatter` (2단계 병렬) |
 | Description 검증 | 에이전트 `skill-verify-description` (2단계 병렬) |
-| 절대 규칙 태그 검증 | 에이전트 `skill-verify-tag` (2단계 병렬) |
-| 형식·언어 검증 | 에이전트 `skill-verify-format` (2단계 병렬) |
+| 금지 규칙 태그 검증 | 에이전트 `skill-verify-tag` (2단계 병렬). `<FORBIDDEN>` 만 허용. 하드 실패는 이름·형식·금지명령·과잉 태그·총량 18. 중복과 누락은 권고 후보로만 보고 |
+| 형식·언어 검증 | 에이전트 `skill-verify-format` (2단계 병렬). 은유와 실행에 안 쓰이는 서술은 권고 후보로 보고 |
 | 에이전트 검증 | 에이전트 `skill-verify-agent` (2단계 병렬, 조건부) |
 | 동작 검증 | 메인 (3단계 마무리) |
 

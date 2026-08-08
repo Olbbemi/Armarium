@@ -43,6 +43,6 @@ SKILL.md 의 `description` 필드가 `skill-writing §5` 작성 규칙을 따르
 **수정 제안:** (실패 항목별 수정 방법, 없으면 생략)
 ```
 
-<PENETRATE>
-`[x]` 표기 항목이 하나라도 있으면 결론은 실패다.
-</PENETRATE>
+<FORBIDDEN>
+`[x]` 표기 항목이 하나라도 있는데 결론을 통과로 적지 않는다.
+</FORBIDDEN>

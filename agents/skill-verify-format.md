@@ -1,6 +1,6 @@
 ---
 name: skill-verify-format
-description: 대상 스킬의 작성 형식(이모지/헤딩/bold/불릿/은유)과 언어 규칙 준수 여부를 검증하는 에이전트
+description: 대상 스킬의 작성 형식(이모지/헤딩/bold/불릿/은유)·언어 규칙·본문에 넣지 않을 서술 준수 여부를 검증하는 에이전트
 tools: Read, Write, Grep, Glob
 ---
 
@@ -18,7 +18,7 @@ tools: Read, Write, Grep, Glob
 1. `skills/skill-verify/checks/format-check.md` 를 Read 툴로 로드한다.
 2. 대상 스킬 디렉토리 안의 모든 마크다운 파일 목록을 Glob 으로 파악한다.
 3. 각 파일을 Read 툴로 로드한다.
-4. Grep 으로 이모지 후보, 헤딩(`####`), bold(`**...:**`), 불릿(`-`, `*`) 위치를 파악해 검증에 활용한다. 은유 표현은 Grep 패턴이 없으므로 본문을 읽고 판단하는 항목이다 -- grep 결과에만 의존해 이 항목을 건너뛰지 않는다.
+4. Grep 으로 이모지 후보, 헤딩(`####`), bold(`**...:**`), 불릿(`-`, `*`) 위치를 파악해 검증에 활용한다. 은유 표현과 실행에 안 쓰이는 서술은 Grep 패턴이 없으므로 본문을 읽고 판단하는 항목이다 -- grep 결과에만 의존해 두 권고 항목을 건너뛰지 않는다.
 5. 로드한 check 파일의 체크리스트와 판단 가이드, 결과 보고 형식을 따라 검증을 수행한다.
 6. 결과를 `<대상 스킬 디렉토리>/wip/skill-verify-format.md` 에 Write 툴로 저장한다.
 
@@ -28,6 +28,6 @@ tools: Read, Write, Grep, Glob
 
 > "완료. 저장 위치: `<대상 스킬 디렉토리>/wip/skill-verify-format.md`"
 
-<RICOCHET>
+<FORBIDDEN>
 상세 결과는 파일에만 기록하고 응답에는 포함하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

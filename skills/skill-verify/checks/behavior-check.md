@@ -33,11 +33,11 @@ overview.md 에서 명시한 모든 하위 파일을 Read 툴로 순차 로드�
 
 ### 4. 에이전트 호출 흐름 확인 (에이전트 있는 경우)
 
-overview.md 가 Task 도구로 호출하는 에이전트마다, 그 정의 파일이 플러그인 루트 `agents/` 에 존재하는지 점검한다. 실제 호출은 하지 않고 존재 여부만 확인한다.
+overview.md 가 Task 도구로 호출하는 에이전트마다, 그 정의 파일이 플러그인 루트 `agents/` 에 존재하는지만 점검한다.
 
-<RICOCHET>
+<FORBIDDEN>
 실제 Task 호출은 하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -68,6 +68,6 @@ overview.md 가 Task 도구로 호출하는 에이전트마다, 그 정의 파�
 **수정 제안:** (실패 항목별 수정 방법, 없으면 생략)
 ```
 
-<PENETRATE>
-`[x]` 표기 항목이 하나라도 있으면 결론은 실패다.
-</PENETRATE>
+<FORBIDDEN>
+`[x]` 표기 항목이 하나라도 있는데 결론을 통과로 적지 않는다.
+</FORBIDDEN>
