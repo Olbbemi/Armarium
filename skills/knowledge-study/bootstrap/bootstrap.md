@@ -26,9 +26,9 @@
 
 받은 초안을 사용자에게 보여주고 있다/없다를 손봐 확정한다. 이것이 부트스트랩의 유일한 실질 게이트다.
 
-<PENETRATE>
-영역 목록 초안을 사용자에게 제시하고, 사용자가 확정한 영역만 카탈로그 대상으로 삼는다.
-</PENETRATE>
+<FORBIDDEN>
+사용자가 확정하지 않은 영역을 카탈로그 대상으로 삼지 않는다.
+</FORBIDDEN>
 
 ### 2. 영역별 항목 채우기
 
@@ -36,9 +36,9 @@
 
 - [ ] 에이전트 `knowledge-roadmap-builder` (영역당 하나): 백그라운드 호출 (`run_in_background: true`). 입력: `mode: items` + `domain` + `domain_description`. 출력: 그 영역의 항목 목록(절 구분 + 슬러그 + 한 줄 설명 + 출처)을 최종 메시지로 반환
 
-<PENETRATE>
-영역이 여럿이면 `mode: items` 호출을 한 응답에 모두 포함해 병렬로 실행한다.
-</PENETRATE>
+<FORBIDDEN>
+영역이 여럿일 때 `mode: items` 호출을 여러 응답에 나눠 순차 실행하지 않는다.
+</FORBIDDEN>
 
 ### 3. 저장
 
@@ -50,19 +50,17 @@
 
 반환 본문의 `&`/`<`/`>` HTML 엔티티는 저장 전 원복한다.
 
-<PENETRATE>
-저장 직전에 영역 수·항목 수 요약을 사용자에게 보여주고 확인받은 뒤 카탈로그 파일을 쓴다.
-</PENETRATE>
+<FORBIDDEN>
+영역 수·항목 수 요약을 사용자에게 확인받기 전에 카탈로그 파일을 쓰지 않는다.
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 백그라운드 에이전트에게 카탈로그 파일을 직접 저장하게 하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<PENETRATE>
-카탈로그 파일 저장은 메인 에이전트가 수행한다.
-</PENETRATE>
-
-커밋과 푸시는 하지 않는다. 사용자가 요청할 때만 한다.
+<FORBIDDEN>
+사용자가 요청하지 않았는데 카탈로그 파일을 커밋하거나 푸시하지 않는다.
+</FORBIDDEN>
 
 ---
 

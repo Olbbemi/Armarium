@@ -38,17 +38,14 @@ tools: Read, Glob, WebSearch, WebFetch
 | `M1` ~ `M3` | knowledge-capture | 오해. 기초부터 깔지 말고 그 오해를 정조준해 정정한다 |
 | `C1` ~ `C3` | knowledge-capture | 잘못된 기준점. 혼동·동일시를 깨는 것이 노트의 목표다 |
 | `user-request` | knowledge-capture | 사용자 명시 저장 요청. 깊이는 `user_known` 으로 잡는다 |
+| `user-request-reinforce` | knowledge-capture | 명시 요청인데 기존 노트가 있어 사용자가 보강을 택함. `discussion_context` 가 가리키는 기존 노트를 Read 로 읽고, 거기 이미 있는 내용을 반복하지 않고 빠진 부분 위주로 쓴다 |
 | `code-scan` | knowledge-scan | 스캔으로 발견된 문법. 사용자가 그 문법을 모른다는 전제라 기초부터 깐다 |
 | `roadmap` | knowledge-study | 사용자가 계획적으로 고른 미착수 주제. 막힌 것도 오해도 없으니 정정 타깃 없이 표준 개론 골격으로 쓰고, 출발 수준만 `user_known` 에 맞춘다 |
 | `roadmap-reinforce` | knowledge-study | 이미 노트가 있는 항목의 보강. `discussion_context` 가 가리키는 기존 노트를 Read 로 읽고, 거기 이미 있는 내용을 반복하지 않고 빠진 부분 위주로 쓴다 |
 
-<PENETRATE>
-`roadmap-reinforce` 로 호출되면 `discussion_context` 가 가리키는 기존 노트를 먼저 Read 로 읽고, 이미 다뤄진 내용을 반복하지 않는다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 `roadmap` 으로 호출된 주제를 사용자가 아무것도 모른다고 가정하거나, 정정할 오해를 찾아 헤매지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -66,6 +63,29 @@ tools: Read, Glob, WebSearch, WebFetch
 
 권장 골격이지 강제 아님. writer 는 비어 있는 섹션은 비워두거나 생략 가능하다.
 
+### wip-meta 주석
+
+`kind` 와 무관하게 모든 wip 의 맨 첫 줄에 메타 주석을 둔다. 승급 단계가 읽는 기계용 머리글이며, 확정지식 최종본에는 남지 않는다.
+
+```
+<!-- wip-meta: kind=<concept|code> | triggered_by=<코드,코드> | language=<language> | since=<도입 버전> -->
+```
+
+| 키 | 필수 | 값 |
+|----|------|----|
+| `kind` | 항상 | 입력 `kind` 그대로 |
+| `triggered_by` | 항상 | 입력 `triggered_by` 그대로. 복수면 쉼표로 잇는다 |
+| `language` | `kind: code` 일 때만 | 입력 `language` |
+| `since` | `kind: code` 이고 알아냈을 때만 | 도입 버전 |
+
+wip-meta 의 값은 본문에 전사하지 않는다.
+
+<FORBIDDEN>
+`triggered_by` 를 wip 본문이나 `캡처 맥락` 섹션에 산문으로 옮겨 적지 않는다.
+</FORBIDDEN>
+
+### 개념 지식 wip 골격 (kind: concept)
+
 | 섹션 | 의미 |
 |------|------|
 | 요약 / TL;DR | 1~2 문장 핵심 |
@@ -78,15 +98,13 @@ tools: Read, Glob, WebSearch, WebFetch
 | 관련 개념 | 본문에서 언급된 인접 개념. 강제 섹션 (아래 `관련 개념`) |
 | 캡처 맥락 | 본문 보편 서술에서 걷어낸 프로젝트 특유 전제·결정만. 승급 시 일반화/삭제 대상. 정의·범위는 아래 `서술 톤` 참조 |
 
-세부 포맷(헤더 레벨, 구분선 등)은 실사용 누적 후 조정한다.
+세부 포맷(헤더 레벨, 구분선 등)은 강제하지 않는다.
 
 ### 코드 지식 wip 골격 (kind: code)
 
 입력 `kind` 가 `code` 면(언어 문법/기능 주제) 위 골격 대신 아래로 작성한다. `language` 로 작성 언어를 받는다. 권장 골격이며 해당 없는 섹션은 비워둔다.
 
-wip 의 맨 첫 줄에 메타 주석을 둔다: `<!-- wip-meta: kind=code | language=<language> | since=<도입 버전, 모르면 생략> -->`.
-승급 단계가 이 줄을 읽어 코드 지식인지 판별하고 frontmatter 의 language·since 출발값으로 삼는다.
-concept wip 에는 이 줄을 두지 않는다.
+이 골격에서는 wip-meta 에 `language` 와 `since` 가 함께 들어간다 (위 `wip-meta 주석`). 승급 단계가 그 줄을 읽어 코드 지식인지 판별하고 frontmatter 의 language·since 출발값으로 삼는다.
 
 | 섹션 | 의미 |
 |------|------|
@@ -132,23 +150,15 @@ concept wip 에는 이 줄을 두지 않는다.
 
 writer 는 컴파일 도구가 없어 실제 빌드는 못 한다. 구조적 완결(빠진 include·미정의 심볼 없음)만 보장하고, 실제 컴파일·실행 확인은 승급(promote) 검증 단계가 맡는다.
 
-<PENETRATE>
-API·사용법을 보여주는 코드 예제는 본문 끝에 `## 전체 예제` 제목으로 복붙 빌드되는 완결 코드를 둔다. 중간 설명 snippet 은 부분 코드를 허용한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 전체 예제에 `...` 플레이스홀더나 미정의 심볼을 남기지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 관련 개념
 
 본문에서 언급한 인접 개념을 한 줄씩 나열하는 강제 섹션이다. 승급(promote)이 이 섹션을 읽어 확정지식 frontmatter 의 relations 로 올리므로, 비워 두거나 섹션을 생략하지 않는다.
 
 넣을 인접 개념이 정말 없으면 `[관련 개념 없음]` 표식 한 줄만 둔다. 이 표식은 writer 가 검토한 뒤 비웠다는 신호이며(누락과 구분), 승급이 "관계 없음" 으로 읽는다. 표식 문자열은 승급이 패턴으로 인식하므로 `[관련 개념 없음]` 그대로 쓴다.
-
-<RICOCHET>
-관련 개념 섹션을 생략하거나 표식 없이 비우지 않는다.
-</RICOCHET>
 
 ### 미해결 질문 조건
 
@@ -165,13 +175,9 @@ API·사용법을 보여주는 코드 예제는 본문 끝에 `## 전체 예제`
 
 각 항목은 한 줄로, 무엇을 정해야 하는지가 드러나게 쓴다. 열 항목이 없으면 `[미해결 질문 없음]` 표식 한 줄만 둔다(표식 문자열 그대로). 여기 적힌 항목은 승급(promote) 단계에서 사용자와 함께 해소하는 대상이다. 구체적 해소 절차와 완료 조건은 승급이 도는 환경의 규칙이 정하므로, writer 는 무엇을 미해결로 담을지의 기준만 지킨다.
 
-<RICOCHET>
+<FORBIDDEN>
 fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정해지는 미지를 미해결 질문에 넣지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-미해결 질문 섹션을 생략하거나 표식 없이 비우지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 버전·지원 작성 형식
 
@@ -196,9 +202,9 @@ fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정�
 
 표준 도입 버전(어느 언어 표준부터 도입)은 writer 가 확신하는 핵심 지식이라 단정해도 된다. 단정을 피하는 대상은 구체 컴파일러·툴체인 최소 버전 수치다.
 
-<RICOCHET>
+<FORBIDDEN>
 버전·지원에 구체적 컴파일러·툴체인 최소 버전 수치를 단정형으로 적지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -225,21 +231,17 @@ fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정�
 - 넣지 않는 것: 작성 입력으로 받은 `discussion_context`/`trigger_summary`/`user_known` 의 전사, 그리고 "이 wip 가 왜/어떻게 생겨났나" 같은 과정·메타 서사. 이것들은 writer 의 작성 참고용 입력이지 출력에 옮겨 적는 대상이 아니다.
 - 걷어낼 프로젝트 특유 요소가 없으면 본문 밖 내용으로 채우지 말고 `[전제 없음]` 약속 표식 한 줄만 둔다. 이 표식은 "writer 가 검토하고 비웠다(누락이 아님)" 를 승급에 알리는 신호다. 거짓 메타로 채우는 것보다 이 표식이 옳다 -- 승급이 이 신호를 "들어낼 프로젝트 특유 요소 없음" 으로 읽어 올바르게 통과한다. 섹션을 통째로 생략하거나 표식 없이 진짜 빈칸으로 두면 누락과 구분이 안 되므로 그렇게 하지 않는다. 표식 문자열은 승급이 패턴으로 인식하므로 `[전제 없음]` 그대로 쓴다(자유 문구로 바꾸지 않는다).
 
-<RICOCHET>
+<FORBIDDEN>
 보편 사실을 서술하는 본문에 특정 프로젝트의 이름·언어·규모·아키텍처 같은 전제를 녹여 넣지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 스캔 원본(`code-scan` 의 snippets)의 프로젝트 고유 식별자를 최소 예제·전체 예제에 그대로 옮겨 적지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 캡처 맥락에 작성 입력(discussion_context, trigger_summary, user_known)이나 wip 가 생겨난 과정·메타 서사를 전사하지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-캡처 맥락 섹션을 생략하거나 표식 없이 비우지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -248,13 +250,9 @@ fetch 로 확인 가능한 사실이나 특정 프로젝트에서만 답이 정�
 권장 파일명의 기본형은 `<topic>.md` 이고, 메인이 저장할 기준 경로는 입력으로 받은 `save_path` 디렉토리다.
 writer 는 이 디렉토리 기준으로 파일명만 정해 반환하고, 실제 저장은 하지 않는다.
 
-<PENETRATE>
-writer 는 파일을 저장하지 않고 본문과 권장 파일명만 반환한다. 저장은 메인 에이전트가 수행한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 writer 가 Write/Edit 으로 wip 파일을 직접 저장하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -270,13 +268,9 @@ Glob 으로 `<save_path>/<topic>*.md` 패턴의 기존 파일을 검사한 뒤 �
 
 기존 파일을 덮어쓰는 파일명을 권장하지 않는다. 누적된 파일의 병합·정리는 promoter 영역이다.
 
-<RICOCHET>
+<FORBIDDEN>
 기존 wip 파일을 덮어쓰는 파일명을 권장하지 않는다.
-</RICOCHET>
-
-<PENETRATE>
-동일 topic 충돌 시 suffix 를 증분한 새 파일명을 권장한다.
-</PENETRATE>
+</FORBIDDEN>
 
 ---
 
@@ -287,13 +281,9 @@ Glob 으로 `<save_path>/<topic>*.md` 패턴의 기존 파일을 검사한 뒤 �
 - 확신 못 한 내용은 `미해결 질문` 섹션에 사용자 확인 항목으로 남긴다
 - 백그라운드 권한 제약(미허용 도메인 WebFetch 자동 거부)이나 그 밖의 사유로 검증이 필요한 조사가 막히면, 그 내용을 추측으로 채우지 말고 내장 지식 범위로만 쓴 뒤 `조사 보류 목록` 에 번호 체크리스트로 남기고 본문 대응 위치에 `[미검증 #N]` 마커를 단다. 조사가 불필요해 생략한 것은 대상이 아니다
 
-<RICOCHET>
+<FORBIDDEN>
 참고 자료 URL 을 bare URL 로 쓰지 않는다.
-</RICOCHET>
-
-<PENETRATE>
-참고 자료 URL 은 꺾쇠(`<url>`) 또는 `[라벨](url)` 형식으로 명시한다.
-</PENETRATE>
+</FORBIDDEN>
 
 ---
 
@@ -307,7 +297,3 @@ writer 는 파일을 저장하지 않으므로, 본문 전체를 메인에 반�
 - 2번째 줄부터: wip 파일 본문 전체 (markdown). 군더더기 설명·요약 없이 본문만.
 
 메인은 이 본문의 `&`/`<`/`>` HTML 엔티티를 원복해 `<save_path>/<filename>.md` 로 저장한다.
-
-<PENETRATE>
-writer 는 본문 전체를 반환하고, 파일 저장은 메인 에이전트가 수행한다.
-</PENETRATE>

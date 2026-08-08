@@ -9,18 +9,18 @@ wip 폴더와 확정지식 디렉토리는 모두 Herbarium 저장소 하위에 
 
 ## 활성 조건
 
-`knowledge-promote` 는 사용자가 `/knowledge-promote` 슬래시 명령으로 호출했을 때만 활성된다.
+`knowledge-promote` 는 `/knowledge-promote` 슬래시 명령으로 활성된다.
 
-<RICOCHET>
+<FORBIDDEN>
 사용자 호출 없이 자가판단으로 승급을 시작하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
 ## 경로 설정
 
 활성 직후, Herbarium 저장소 루트 경로를 사용자에게 입력받는다.
-경로를 코드에 고정하지 않으며, 매 활성마다 새로 입력받는다.
+경로는 매 활성마다 새로 입력받는다.
 입력받은 루트 하위에서 wip 폴더(`<루트>/wip`)와 확정지식 디렉토리(`<루트>/knowledge`)를 도출한다.
 
 디렉토리명은 동명 저장소가 있을 수 있어 신뢰할 수 없으므로, 검증은 git origin remote 조회로 한다. 이 검증 기준은 capture 의 "저장 경로 설정" 과 같다.
@@ -39,23 +39,15 @@ wip 폴더와 확정지식 디렉토리는 모두 Herbarium 저장소 하위에 
 git@github.com:Olbbemi/Herbarium.git
 ```
 
-채택한 wip · knowledge 경로는 메인 LLM 컨텍스트에만 유지하며(세션 휘발), 별도 파일 · 인덱스에 저장하지 않는다.
+채택한 wip · knowledge 경로는 메인 LLM 컨텍스트에만 유지한다(세션 휘발).
 
-<PENETRATE>
-활성 직후 Herbarium 저장소 루트 경로를 사용자에게 입력받고, 그 하위로 wip 와 knowledge 디렉토리를 도출한다.
-</PENETRATE>
+<FORBIDDEN>
+채택한 wip · knowledge 경로를 별도 파일 · 인덱스에 저장하지 않는다.
+</FORBIDDEN>
 
-<PENETRATE>
-입력 루트의 git origin remote 가 기대 remote URL 과 정확히 일치할 때만 경로로 채택한다.
-</PENETRATE>
-
-<RICOCHET>
-origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하지 않는다.
-</RICOCHET>
-
-<RICOCHET>
+<FORBIDDEN>
 wip · knowledge 경로를 코드에 고정 리터럴로 두지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -72,10 +64,6 @@ wip · knowledge 경로를 코드에 고정 리터럴로 두지 않는다.
 - 레이아웃은 골격의 `_config.yml` `defaults` 로 `knowledge/` 전체에 일괄 부여한다. 노트 frontmatter 에 `layout` 을 개별로 두지 않아 md 를 지식 내용만으로 깨끗이 유지한다.
 - `summary` 는 레이아웃이 `white-space: pre-line` 으로 출력한다. 그래서 값의 줄바꿈이 화면 줄바꿈으로 보인다(아래 summary 표기).
 - Mermaid 는 레이아웃이 포함한 클라이언트측 `mermaid.js` 가 렌더한다. Jekyll 플러그인은 쓰지 않는다.
-
-<RICOCHET>
-노트 frontmatter 에 layout 필드를 개별로 두지 않는다.
-</RICOCHET>
 
 ---
 
@@ -134,29 +122,19 @@ kind 는 주제가 무엇이냐가 아니라 **노트가 답하는 질문** 으�
 
 concept 과 code 가 둘 다 필요한 큰 주제는 제3의 hybrid kind 를 만들지 않고 concept 과 code 로 분리한다. 분리는 capture 단계에서 한다 -- 메인이 그런 주제를 concept wip 와 code wip 두 개로 나눠 캡처하므로(capture 의 묶음/분리 자율), promote 는 각 wip 를 1:1 로 승급하면 된다(한 wip 를 두 노드로 쪼개지 않는다). 두 노드는 relations 의 `part_of` 로 잇는다(code 노드가 concept 노드의 일부 -- `3. 관계 추출` 참조).
 
-<RICOCHET>
-concept 과 code 외의 제3의 hybrid kind 를 만들지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-코드 예제가 들어 있다는 이유만으로 concept 노트를 kind:code 로 분류하지 않는다.
-</RICOCHET>
-
 | code 전용 칸 | 내용 |
 |----|----|
 | language | 대상 언어. `python` / `rust` / `cpp` |
 | since | 도입된 표준·언어 버전(예: `C++20`, `python-3.10`). 검색·필터용 정규 단일값. 무관하면 생략 |
 
-`kind`·`language`·`since` 는 wip 맨 위 `<!-- wip-meta: kind=code | language=... | since=... -->` 주석에서 읽는다.
-주석이 없으면 `kind: concept` 으로 본다. (코드 wip 에는 capture 의 writer 가 이 주석을 단다.)
+`kind`·`language`·`since` 는 wip 맨 위 `<!-- wip-meta: ... -->` 주석에서 읽는다. writer 는 concept·code 가리지 않고 이 줄을 단다.
+주석이 없으면 `kind: concept` 으로 본다.
+
+wip-meta 에는 `triggered_by` 도 실려 온다. 이 값은 발동 기준을 개량하기 위한 기록이지 지식의 일부가 아니므로 frontmatter 로 올리지 않는다. wip-meta 줄 자체가 확정지식에 남지 않으므로 별도로 지울 것은 없다.
 
 wip-meta 의 `since` 가 복합값(예: `C++11 (constexpr) / C++20 (consteval)`)으로 와도 frontmatter `since` 는 단일 정규값으로 만든다 -- 가장 이른 도입 버전 하나만 남기고 괄호 주석·기능별 병기를 뗀다. 떨어져 나온 기능별 도입 버전 세부는 본문 `버전·지원` 이 담는다(아래 코드 지식 본문의 `since` vs 버전·지원 참조).
 
 본문은 wip 산문을 정제해 옮긴다. 산문 "관련 개념" 섹션은 본문에 두지 않고 relations 로 올린다. 관계의 단일 출처는 프론트매터다.
-
-<RICOCHET>
-관계 정보를 확정지식 본문에 산문으로 중복해 남기지 않는다.
-</RICOCHET>
 
 #### summary 표기
 
@@ -173,14 +151,6 @@ summary: |
   std::span 은 소유 없는 연속 메모리 구간의 경량 뷰다.
   포인터와 길이를 한 객체로 묶어 넘겨, 배열과 vector 를 같은 함수로 받는다.
 ```
-
-<PENETRATE>
-summary 가 2문장 이상이면 YAML 블록 스칼라 | 로 마침표 단위 문장별 개행한다.
-</PENETRATE>
-
-<RICOCHET>
-summary 값에 HTML 줄바꿈 태그나 두 칸 공백 줄바꿈을 쓰지 않는다.
-</RICOCHET>
 
 #### 본문 표기 규칙
 
@@ -293,7 +263,7 @@ wip 의 "관련 개념"·본문 언급을 relations 타입드 엣지로 만든�
 - `part_of` — 부분-전체 종속 (하위가 상위의 일부). 예: views 는 Ranges 의 일부
 - `related` — 그 밖에 엮인 연관 개념 (아직 종류 미분류)
 
-대상은 다른 확정지식의 id 다. 채택한 knowledge 디렉토리를 Glob 으로 보고 실재 id 와 우선 연결하되, 아직 없는 id 도 그대로 적는다.
+대상은 다른 확정지식의 id 다. 채택한 knowledge 디렉토리를 Glob 으로 보고 실재 id 와 우선 연결한다.
 
 저장 포맷 -- relations 는 `타입:대상` 문자열의 평탄 리스트로 frontmatter 에 둔다. 중첩 맵을 쓰지 않는다. GitHub 의 frontmatter 표는 중첩 맵을 제대로 못 그리지만 평탄 리스트는 `tags` 처럼 칩으로 깔끔하게 보이기 때문이다.
 
@@ -303,13 +273,9 @@ relations: [contrasts_with:characterization-test, same_family:bdd, part_of:range
 
 타입이 문자열 prefix 라 새 종류 추가가 스키마 변경이 아니다. 그래도 종류 남발은 피하고, 위 4종으로 안 잡히는 더 세밀한 세분화는 노드가 쌓인 뒤로 미룬다.
 
-<RICOCHET>
+<FORBIDDEN>
 가리키는 id 파일이 아직 없다는 이유로 그 관계를 relations 에서 빼지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-relations 를 중첩 맵으로 저장하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 4. 일반화
 
@@ -321,13 +287,9 @@ TaskCreate 로 "4. 일반화" task 를 등록하고 in_progress 로 설정한다
 
 캡처 맥락이 `[전제 없음]` 표식 한 줄이면, capture 의 writer 가 검토 후 걷어낼 프로젝트 특유 요소가 없다고 판단한 것이다. 이때는 본문을 그대로 통과시키고 추가로 덜어낼 프로젝트 특유 요소를 찾지 않는다(표식 줄만 strip). 반대로 캡처 맥락이 표식도 내용도 없이 진짜 비었거나 섹션 자체가 없으면 writer 누락을 의심해, 본문에 프로젝트 특유 요소가 남아 있는지 한 번 더 점검하고 의심되면 사용자에게 확인한다.
 
-<RICOCHET>
-wip 의 "캡처 맥락" 격리 블록을 확정지식 본문에 그대로 남기지 않는다.
-</RICOCHET>
-
-<RICOCHET>
+<FORBIDDEN>
 코드 예제·발췌에 스캔 원본 프로젝트의 고유 식별자를 그대로 남기지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 5. 검증
 
@@ -341,17 +303,9 @@ TaskCreate 로 "5. 검증" task 를 등록하고 in_progress 로 설정한다. �
   - 빌드는 됐는데 실패하면(검증 실패 = 코드 결함) 메인이 명백한 누락(빠진 include 등)을 정정해 재빌드한다. 몇 차례로도 통과 못 하면 8단계 이슈로 사용자에게 보고한다(자동 무한 정정은 하지 않는다).
 - 사실성이 의심되는 서술은 표시해 사용자 확인 항목으로 남긴다.
 
-<RICOCHET>
+<FORBIDDEN>
 조사 보류 목록에서 검증되지 못한 미검증 서술을 확정지식 본문에 단정형으로 올리지 않는다.
-</RICOCHET>
-
-<RICOCHET>
-참고 자료 URL 을 bare URL 로 두지 않는다.
-</RICOCHET>
-
-<PENETRATE>
-참고 자료 URL 은 꺾쇠(`<url>`) 또는 `[라벨](url)` 형식으로 교정한다.
-</PENETRATE>
+</FORBIDDEN>
 
 ### 6. 중복·충돌 점검
 
@@ -372,29 +326,25 @@ TaskCreate 로 "7. 브랜치 생성·체크아웃" task 를 등록하고 in_prog
 
 이후 8·9 단계(저장·원본 wip 처리)는 이 브랜치 위에서 수행한다.
 
-<PENETRATE>
-사용자 확인 후 저장 전, Herbarium 루트에서 `promote/<id>` 브랜치를 생성·체크아웃한 뒤 그 브랜치 위에서 저장·커밋한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 브랜치를 만들지 않고 Herbarium main 에 직접 저장하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 8. 초안 저장 후 사용자 검토·승인
 
 TaskCreate 로 "8. 확정지식 초안 저장" task 를 등록하고 in_progress 로 설정한 뒤, 7단계에서 만든 브랜치의 `<knowledge>/<id>.md` 로 변환 초안을 먼저 저장한다. 저장이 끝나면 completed 로 닫는다. 이어서 TaskCreate 로 "8. 사용자 검토·승인" task 를 등록하고 in_progress 로 설정한다. 검토를 요청하기 직전 completed 로 닫고, 응답을 받아 다음 단계로 간다.
 
-변환 초안을 대화창에 통째로 출력하지 않는다. 저장한 파일 경로를 알리고, 5·6 단계의 이슈(죽은 링크, 사실성 의심, 중복·충돌 후보)만 대화창에 함께 제시해, 사용자가 파일을 직접 열어 검토·승인하게 한다. 초안 전체를 대화창에 덤프하면 불필요하게 길어지고, 파일을 에디터나 Read 툴로 보는 편이 자연스럽기 때문이다. 사용자가 수정을 요청하면 파일을 고쳐 다시 검토받는다.
+저장한 파일 경로를 알리고, 5·6 단계의 이슈(죽은 링크, 사실성 의심, 중복·충돌 후보)만 대화창에 함께 제시해, 사용자가 파일을 직접 열어 검토·승인하게 한다. 초안 전체를 대화창에 덤프하면 불필요하게 길어지고, 파일을 에디터나 Read 툴로 보는 편이 자연스럽기 때문이다. 사용자가 수정을 요청하면 파일을 고쳐 다시 검토받는다.
 
 파일은 이 단계에서 이미 브랜치 작업트리에 쓰였고(커밋 전), 승인은 이후 10단계 커밋의 게이트가 된다.
 
-<PENETRATE>
-확정지식 초안을 먼저 파일로 저장한 뒤, 파일 경로와 검증·중복 이슈만 제시해 사용자 검토·승인을 받고, 그 승인을 이후 커밋의 게이트로 삼는다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 변환 초안 본문을 대화창에 통째로 출력하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
+
+<FORBIDDEN>
+사용자 승인을 받지 않은 초안을 10단계 커밋으로 넘기지 않는다.
+</FORBIDDEN>
 
 ### 9. 원본 wip 처리
 
@@ -402,19 +352,19 @@ TaskCreate 로 "9. 원본 wip 처리" task 를 등록하고 in_progress 로 설�
 
 승급 후 원본 wip 를 삭제할지 남길지 사용자에게 확인한다.
 
-<RICOCHET>
+<FORBIDDEN>
 사용자 확인 없이 원본 wip 파일을 삭제하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 10. 커밋
 
 TaskCreate 로 "10. 커밋" task 를 등록하고 in_progress 로 설정한다. 커밋이 완료되면 completed 로 닫는다.
 
-승급 산출(`knowledge/<id>.md`)과 원본 wip 처리 결과를 7단계에서 만든 브랜치에 커밋한다. 커밋 메시지 형식: `Promote <id> to knowledge`. 푸시·머지는 사용자가 한다.
+승급 산출(`knowledge/<id>.md`)과 원본 wip 처리 결과를 7단계에서 만든 브랜치에 커밋한다. 커밋 메시지 형식: `Promote <id> to knowledge`.
 
-<PENETRATE>
-저장과 원본 wip 처리가 완료된 뒤 그 브랜치에 커밋한다. 커밋 메시지는 `Promote <id> to knowledge` 형식으로 한다. 푸시·머지는 사용자에게 맡긴다.
-</PENETRATE>
+<FORBIDDEN>
+커밋한 브랜치를 대신 푸시하거나 머지하지 않는다.
+</FORBIDDEN>
 
 ---
 
