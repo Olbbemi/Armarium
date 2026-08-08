@@ -18,19 +18,11 @@
   - 어느 쪽이 적합한지 모호하면 공통 원칙 1 에 따라 사용자에게 묻는다
 - 디렉토리 배치: top-level 디렉토리 구조 + 모듈 -> 폴더 매핑 (세부 파일 위치는 03-implementation 몫 -- 이 매핑과 모순 안 되는 선)
 
-**도구 활용:**
-
-<PENETRATE>
-모듈 관계는 다이어그램으로 표현한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 순환 의존이 발생한 채로 설계를 종료하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<PENETRATE>
-순환 의존이 발견되면 즉시 재설계한다.
-</PENETRATE>
+**도구 활용:**
 
 자주 쓰이는 도구 (`references/tools.md` 의 "다이어그램 / 시각화" 참고):
 - `mermaid` -- 기본 선택. md 파일에 텍스트로 직접 작성, 별도 렌더링 단계 없음
