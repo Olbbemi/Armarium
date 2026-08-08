@@ -1,6 +1,6 @@
 # 지식 승급 (promote)
 
-`knowledge-capture` 가 쌓은 wip 초안을 확정지식으로 가공해 전역 지식 저장소에 올리는 스킬.
+캡처 스킬들(`knowledge-capture` · `knowledge-scan` · `knowledge-study`)이 쌓은 wip 초안을 확정지식으로 가공해 전역 지식 저장소에 올리는 스킬. 세 스킬 모두 같은 형식의 wip 를 같은 디렉토리에 쌓으므로, 승급은 누가 만들었는지 따지지 않는다.
 캡처(wip 누적)와 별개의 독립 스킬이며, 사용자가 직접 호출할 때만 동작한다.
 
 wip 폴더와 확정지식 디렉토리는 모두 Herbarium 저장소 하위에 있다. Herbarium 의 실제 경로는 고정이 아니므로, 활성 직후 사용자에게 저장소 루트를 입력받아 git origin remote 로 검증하고 wip/ 와 knowledge/ 를 그 하위로 도출한다 (아래 "경로 설정" 참조).

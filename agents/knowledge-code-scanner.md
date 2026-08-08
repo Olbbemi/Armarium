@@ -6,7 +6,7 @@ tools: Read, Glob, Grep
 
 # knowledge-code-scanner
 
-`knowledge-capture` 스킬 코드 스캔형 모드(`skills/knowledge-capture/modes/code-scan.md`)에서 메인 LLM 이 Task 도구로 호출하는 스캐너 에이전트.
+`knowledge-scan` 스킬(`skills/knowledge-scan/overview.md`)에서 메인 LLM 이 Task 도구로 호출하는 스캐너 에이전트.
 대상 코드베이스를 훑어 "정리할 만한 비자명 문법"의 사용처를 찾고, 이미 정리된 것은 걸러 후보 목록을 반환한다. 파일은 저장하지 않는다.
 
 ---
@@ -19,7 +19,7 @@ tools: Read, Glob, Grep
 |------|------|
 | `codebase_path` | 스캔 대상 코드베이스 디렉토리 절대경로 |
 | `language` | 대상 언어 (예: `cpp`) |
-| `catalog_path` | 언어 카탈로그 `languages/<lang>.md` 절대경로. 이 목록이 "무엇을 비자명으로 볼지"의 단일 기준 |
+| `catalog_path` | 언어 카탈로그 `skills/knowledge-scan/languages/<lang>.md` 절대경로. 이 목록이 "무엇을 비자명으로 볼지"의 단일 기준 |
 | `knowledge_glob` | dedup 대조용 확정지식 파일 Glob 패턴 (예: `<Herbarium>/knowledge/**/*.md`) |
 | `wip_glob` | dedup 대조용 wip 파일 Glob 패턴 (예: `<Herbarium>/wip/*.md`) |
 

@@ -1,6 +1,6 @@
 # knowledge-promote
 
-[`knowledge-capture`](../knowledge-capture/README.md)가 쌓은 wip 초안을 확정지식으로 가공해 전역 지식 저장소에 올리는 스킬.
+캡처 스킬들([`knowledge-capture`](../knowledge-capture/README.md) · [`knowledge-scan`](../knowledge-scan/README.md) · [`knowledge-study`](../knowledge-study/README.md))이 쌓은 wip 초안을 확정지식으로 가공해 전역 지식 저장소에 올리는 스킬.
 
 ## 무엇을 하나
 

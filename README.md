@@ -1,6 +1,6 @@
 # Armarium
 
-**현재 버전: `0.28.1`**
+**현재 버전: `0.29.0`**
 
 개인 커스텀 스킬을 담아 **여러 프로젝트에서 공통으로 쓰는 비공개 Claude Code 플러그인**.
 
@@ -39,12 +39,16 @@ Armarium/
 ├── hooks/                 # 세션 시작 등 훅 스크립트 (플러그인 루트)
 │   ├── hooks.json
 │   └── session-skill-list.sh
+├── references/            # 여러 스킬이 공유하는 참조 문서
+│   └── knowledge-wip-protocol.md
 └── skills/                # 스킬 본체 (각 디렉토리 = 스킬 1개, 각자 README.md 포함)
     ├── code-design/
     ├── code-analyze/
     ├── skill-writing/
     ├── skill-verify/
     ├── knowledge-capture/
+    ├── knowledge-scan/
+    ├── knowledge-study/
     └── knowledge-promote/
 ```
 
@@ -91,9 +95,23 @@ Armarium/
 | [`skill-verify`](skills/skill-verify/README.md) | 스킬이 `skill-writing` 규격·동작대로인지 7항목 검증 후 보고서 | `/skill-verify`, "스킬 검증해줘" |
 | [`claude-md-verify`](skills/claude-md-verify/README.md) | 프로젝트 CLAUDE.md 품질을 16항목으로 검증 후 고침 제안 보고 | `/claude-md-verify`, "CLAUDE.md 검증해줘" |
 | [`knowledge-capture`](skills/knowledge-capture/README.md) | 논의 중 전제 지식 부재를 감지해 wip 초안으로 누적 | `/knowledge-capture` (명시 활성) |
+| [`knowledge-scan`](skills/knowledge-scan/README.md) | 코드베이스를 훑어 쓰인 비자명 문법을 wip 초안으로 누적 | `/knowledge-scan` (명시 활성) |
+| [`knowledge-study`](skills/knowledge-study/README.md) | CS 로드맵에서 미착수 주제를 골라 wip 초안으로 누적 | `/knowledge-study` (명시 활성) |
 | [`knowledge-promote`](skills/knowledge-promote/README.md) | wip 초안을 정제해 확정지식으로 승급 | `/knowledge-promote` |
 
-`knowledge-capture` / `knowledge-promote` 는 지식 저장소(**Herbarium**)의 `wip/` 와 `knowledge/` 를 읽고 쓴다. 기본 경로는 `/home/olbbemi/Project/Herbarium` 이며 스킬 본문에 박혀 있다.
+### knowledge 계열 4개의 관계
+
+앞 3개가 wip 를 만들고 `knowledge-promote` 가 그것을 확정지식으로 올린다. 만드는 3개는 진입 경로만 다르고 산출물 형식이 같아서, 승급은 누가 만들었는지 따지지 않는다.
+
+| 스킬 | 진입 | 앵커 | 수명주기 |
+|------|------|------|---------|
+| `knowledge-capture` | 대화 중 감지 또는 명시 요청 | 대화 발췌 | 활성 후 상시 |
+| `knowledge-scan` | 코드베이스 스캔 명령 | 코드 발췌 | 단발 |
+| `knowledge-study` | CS 로드맵에서 주제 선택 | 카탈로그 항목 | 단발 |
+
+저장 경로 검증 · `knowledge-writer` 호출 · 반환 본문 저장은 만드는 3개가 [`references/knowledge-wip-protocol.md`](references/knowledge-wip-protocol.md) 를 공유한다. 스킬끼리는 서로를 참조하지 않는다.
+
+네 스킬 모두 지식 저장소(**Herbarium**)의 `wip/` 와 `knowledge/` 를 읽고 쓴다. 경로는 스킬 본문에 박지 않고 활성 시마다 사용자에게 입력받으며, 그 경로의 git origin remote 가 Herbarium 인지 검증한 뒤에만 채택한다. `knowledge-study` 는 로드맵 카탈로그가 있는 `roadmap/` 경로도 함께 받는다.
 
 ---
 
