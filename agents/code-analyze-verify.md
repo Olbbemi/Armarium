@@ -44,22 +44,14 @@ node / puppeteer 가 없거나 설치할 수 없으면, 가능한 검증만 수�
 ## 출력
 항목별 pass / fail / skip 과 실패 사유(파스 오류 지점, mermaid 블록 위치·라인·메시지, 매달린 참조 목록, 뷰어 콘솔 에러)를 표로 정리한 리포트 본문을 반환한다. 저장이 필요하면 메인이 한다.
 
-<PENETRATE>
-mermaid 문법 검증은 mermaid 의 parse 로 수행한다.
-</PENETRATE>
-
-<PENETRATE>
-스키마의 교차참조 필드가 가리키는 ID 가 실제 존재하는지 대조해 매달린 참조를 보고한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 검증 도구를 설치/실행할 수 없다는 이유로 전체 파이프라인을 실패 처리하거나 중단하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 결과 리포트를 직접 파일로 저장하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 verify green 을 facet 내용의 정확성(올바른 참조 대상·코드 일치)으로 보고하지 않는다 -- verify 는 형식(파스·문법·ID 존재·무에러 로드)만 본다.
-</RICOCHET>
+</FORBIDDEN>

@@ -26,22 +26,10 @@ tools: Read, Glob, Grep
 ## 출력
 완성 본문(+ mermaid)을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/architecture.md` 에 한다.
 
-<PENETRATE>
-진입 표면 -> 핸들러 매핑과 포트 <- 구현 짝을 코드에 있는 실제 형태로 적고, 그 대상 노드를 추정 라벨 없이 명시하고 링크한다.
-</PENETRATE>
-
-<PENETRATE>
-다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
-</PENETRATE>
-
-<PENETRATE>
-mermaid 다이어그램을 그리면 노드/엣지 라벨은 특수문자 판단 없이 항상 따옴표로 감싼다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 전역 불변식 / 외부 의존 인벤토리 / 데이터 계약 / 노드 시그니처를 여기 재서술하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 개수/모듈 목록을 다시 세지 않는다.
-</RICOCHET>
+</FORBIDDEN>

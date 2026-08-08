@@ -29,22 +29,10 @@ tools: Read, Glob, Grep
 ## 출력
 완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/invariants.md` 에 한다.
 
-<PENETRATE>
-전칭 + 검증 가능한 것만 불변식으로 올리고, 각 불변식에 단언 모양(프로퍼티/분기 행렬)을 적는다.
-</PENETRATE>
-
-<PENETRATE>
-각 불변식에 안정 ID(`INV-NN`)를 부여해, 다른 facet(특히 test)이 그 ID 로 불변식을 참조·조인할 수 있게 한다.
-</PENETRATE>
-
-<PENETRATE>
-강제 지점 등 다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 검증 불가능한 스타일/관습을 불변식으로 올리지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 강제 지점의 구현 상세(시그니처/멤버)를 재서술하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

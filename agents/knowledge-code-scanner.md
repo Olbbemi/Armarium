@@ -36,13 +36,9 @@ tools: Read, Glob, Grep
 
 기존 knowledge/wip 파일명은 topic(kebab-case)이라, 파일명만으로 이미 정리된 주제인지 판별할 수 있다. 매번 모든 파일 본문을 로드해 비교하는 것은 토큰·시간 낭비다. dedup 은 Glob 으로 파일명 목록만 긁어 대조한다.
 
-<RICOCHET>
-dedup 을 위해 knowledge/wip 파일 본문을 로드하지 않는다. 파일명 Glob 대조로만 판정한다.
-</RICOCHET>
-
-<PENETRATE>
-후보는 카탈로그에 등재된 문법 중, 코드베이스에 실제로 쓰였고(Read 확증), 기존 knowledge/wip 파일명에 없는 것만으로 구성한다.
-</PENETRATE>
+<FORBIDDEN>
+dedup 을 위해 knowledge/wip 파일 본문을 로드하지 않는다.
+</FORBIDDEN>
 
 ---
 
@@ -65,14 +61,10 @@ dedup 을 위해 knowledge/wip 파일 본문을 로드하지 않는다. 파일�
 - 후보가 없으면 "정리할 신규 비자명 문법 없음" 을 명시한다.
 - 카탈로그 밖 발견이 있으면 목록 끝에 "카탈로그 보강 후보" 로 구분해 붙인다.
 
-<RICOCHET>
+<FORBIDDEN>
 usages 를 토픽당 3개를 넘겨 담거나, 사용 빈도(횟수) 수치를 후보에 매기지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<PENETRATE>
-스캐너는 파일을 저장하지 않고 후보 목록만 반환한다. wip 작성·저장은 이후 단계(writer·메인)가 맡는다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 스캐너가 Write/Edit 으로 파일을 저장하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

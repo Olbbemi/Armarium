@@ -35,22 +35,14 @@ tools: Read, Glob, Grep, Bash
 ## 출력
 완성된 골격 전체를 본문으로 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/skeleton.md` 에 한다.
 
-<PENETRATE>
-개수/인벤토리/모듈 목록은 재현가능한 도구 결과에 근거해 목록으로 먼저 만들고 개수=목록 길이로 적는다.
-</PENETRATE>
-
-<PENETRATE>
-헤드라인/합계 숫자를 인벤토리 목록 행수와 교차검산하고, 어긋나면 목록을 진실로 삼아 합계를 고친다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 타입/함수의 시그니처·역할 같은 깊은 상세를 골격에 적지 않는다(그건 Stage 1 몫).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 숫자를 어림(freehand)으로 적지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 목록 없이 나온 개수는 신뢰하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

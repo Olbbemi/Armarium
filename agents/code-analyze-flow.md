@@ -34,26 +34,15 @@ tools: Read, Glob, Grep
 ## 출력
 구분자로 나눈 본문을 반환한다. 메인이 산문을 `<브랜치 디렉토리>/facet/flow.md`, 시퀀스를 `<브랜치 디렉토리>/facet/flow.diagrams.md` 로 저장한다(둘 다 facet 에 지속).
 
-<PENETRATE>
-모든 트리거/생명주기를 빠짐없이 등장시키되 깊이는 복잡도에 비례한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 플로우 문서에 노드 내부 상세(시그니처/멤버/불변식)를 재서술하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 대표 시나리오만 표본으로 뽑고 끝내지 않는다(망라가 기준).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 사소한 CRUD 플로우에는 시퀀스 다이어그램을 그리지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
-시퀀스 다이어그램 메시지 텍스트에 `;` 를 쓰지 않는다(mermaid statement separator 로 오인돼 깨진다).
-</RICOCHET>
-
-<PENETRATE>
-다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- Stage 2 link-lint 가 이 기준으로 대상 존재를 검사하고, render-data 가 대상 파일을 스켈레톤의 노드 ID 로 해석해 교차참조를 만든다.
-</PENETRATE>

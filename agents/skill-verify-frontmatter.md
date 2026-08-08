@@ -27,6 +27,6 @@ tools: Read, Write, Bash, Glob
 
 > "완료. 저장 위치: `<대상 스킬 디렉토리>/wip/skill-verify-frontmatter.md`"
 
-<RICOCHET>
+<FORBIDDEN>
 상세 결과는 파일에만 기록하고 응답에는 포함하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

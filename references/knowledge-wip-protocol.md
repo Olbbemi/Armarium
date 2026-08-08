@@ -34,17 +34,13 @@ git@github.com:Olbbemi/Herbarium.git
 
 채택한 경로는 메인 LLM 컨텍스트에만 유지하며(세션 휘발), 별도 파일 · 인덱스에 저장하지 않는다.
 
-<PENETRATE>
-지식 파일 경로를 사용자에게 입력받고, 그 경로의 git origin remote 가 기대 remote URL 과 정확히 일치할 때만 채택한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 지식 파일 경로를 코드에 고정 리터럴로 두지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -61,9 +57,9 @@ origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하�
 | `run_in_background` | `true` (백그라운드) |
 | writer 출력 | wip 파일 전체 본문을 최종 메시지로 반환 (Write 안 함) |
 
-<PENETRATE>
-`knowledge-writer` 호출은 백그라운드(`run_in_background: true`)로 한다. 메인은 완료 통지 도착까지 다른 일을 계속한다.
-</PENETRATE>
+<FORBIDDEN>
+`knowledge-writer` 를 포그라운드로 호출하지 않는다.
+</FORBIDDEN>
 
 ### 입력 포맷
 
@@ -83,9 +79,9 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 
 `triggered_by` 의 값 목록을 이 파일에 나열하지 않는 이유는, 그 값이 각 스킬의 발동 논리에 종속되기 때문이다. 여기 모아 두면 스킬 하나가 코드를 바꿀 때마다 공용 파일을 함께 고쳐야 한다.
 
-<RICOCHET>
+<FORBIDDEN>
 `triggered_by` 의 스킬별 값 목록을 이 공용 파일에 나열하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ### 입력 예시
 
@@ -117,14 +113,6 @@ writer 는 파일을 저장하지 않는다. 메인 에이전트가 완료 통�
 - 저장 위치는 `<save_path>/<권장파일명>` 이다. 권장 파일명은 writer 가 충돌 검사를 거쳐 반환한다.
 - 반환 본문의 `&`/`<`/`>` HTML 엔티티는 저장 전 원래 문자로 원복한다. task-notification 이 이스케이프해 넘기기 때문이다.
 
-<PENETRATE>
-조사·작문은 백그라운드 서브에이전트 writer 에 위임하고, wip 파일 저장은 메인 에이전트가 완료 통지 도착 시 직접 수행한다.
-</PENETRATE>
-
-<PENETRATE>
-반환 본문의 `&`/`<`/`>` HTML 엔티티는 저장 전 원복한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 백그라운드 writer 에게 Write/Edit 으로 wip 파일을 직접 저장하게 하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

@@ -1,12 +1,8 @@
 # 코드 설계 및 구현 파이프라인 -- Overview
 
-<PENETRATE>
-어느 단계 스킬이든 이 파일을 먼저 읽은 뒤에 진입한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 이 파일을 읽지 않은 상태에서 개별 단계 스킬을 단독으로 실행하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 전체 개발 파이프라인 지도.
 어떤 단계들이 있고 지금 어디로 진입할지, 각 단계의 목적이 무엇인지를 안내한다.
@@ -64,21 +60,17 @@
 
 **컴포넌트 단위 운용:** 한 레포가 루트 아래 여러 컴포넌트(독립 관리하는 디렉토리)를 담더라도, 실행은 항상 레포 루트에서 하고 **작업할 경로 입력으로 대상 컴포넌트를 지목**한다. 컴포넌트 디렉토리로 옮겨 실행하지 않는다 -- 산출물은 그와 무관하게 루트의 `code-design/<브랜치 슬러그>/` 아래에 저장된다.
 
-<PENETRATE>
-프로젝트 루트는 git 최상위(`git rev-parse --show-toplevel`)로 판정하고, CWD 가 그와 일치할 때만 루트로 인정한다.
-</PENETRATE>
+<FORBIDDEN>
+루트·브랜치·작업할 경로·진입 단계를 사용자에게 확인받기 전에 산출물 생성을 시작하지 않는다.
+</FORBIDDEN>
 
-<PENETRATE>
-착수 전 루트·브랜치·작업할 경로·진입 단계를 사용자에게 보여주고 확인받은 뒤 산출물 생성을 시작한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 CWD 가 git 최상위와 다르면(하위에서 실행 중) 진행하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 중간 진입(00-ideation 이 아닌 단계로 진입)인데 그 단계의 직전 핸드오프가 없으면 진행하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 저장 경로의 구체적 패턴은 공통 원칙 5("단계 산출물 저장 정책") 참조.
 
@@ -90,9 +82,9 @@ CWD 가 git 최상위와 다르면(하위에서 실행 중) 진행하지 않는�
 
     skills/code-design/principles.md
 
-<RICOCHET>
+<FORBIDDEN>
 하위 단계 스킬(01, 02, ...)은 principles.md 에 적힌 공통 원칙을 자기 파일에 다시 적지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 필요할 때는 위 경로를 가리켜 참조하는 형태로만 사용한다.
 
@@ -124,13 +116,9 @@ CWD 가 git 최상위와 다르면(하위에서 실행 중) 진행하지 않는�
 
 **전이 주체:** 00-ideation 이 로드맵 관리 주체다(flow 시작 승격 · `[미정]` 재검토 · `[기각]` 되살리기 판단). 그 외 전이도 정해진 이벤트에서 해당 단계가 즉시 쓴다 -- mid-flow 게이트의 보류 escalation(새 `[예정]`/`[미정]` append), 03-implementation 의 범위 축소·신규 범위 발견(G12/G9 -- 발견 시 사용자 확인 후 append), 04-verification 의 descope 결함·신규 범위 발견(flow 종료 시 append), flow 종료 시 `[진행]` -> `[완료]`. 모든 쓰기는 사용자 확인 + 출처 기록.
 
-<PENETRATE>
-새 flow 시작 시 00-ideation 은 roadmap.md 를 읽어 다음 청크를 `[진행]`으로 승격하고 열린 `[미정]` 을 전부 재검토한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 로드맵 청크 상태를 사용자 확인 없이 전이시키거나, 기각 청크를 사유 반박 없이 되살리지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 

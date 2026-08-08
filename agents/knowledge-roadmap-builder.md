@@ -31,9 +31,9 @@ tools: Read, Glob, WebSearch, WebFetch
 2. **정리** -- `mode` 에 맞는 출력 형식으로 목록을 구성한다.
 3. **반환** -- 목록을 최종 메시지로 반환한다. 파일은 저장하지 않는다.
 
-<RICOCHET>
-조사 결과를 Write/Edit 으로 파일에 저장하지 않는다. 저장은 메인 에이전트가 수행한다.
-</RICOCHET>
+<FORBIDDEN>
+조사 결과를 Write/Edit 으로 파일에 저장하지 않는다.
+</FORBIDDEN>
 
 ---
 
@@ -44,9 +44,9 @@ tools: Read, Glob, WebSearch, WebFetch
 - 백그라운드 호출이면 권한 프롬프트를 못 띄워 미허용 도메인 WebFetch 가 자동 거부된다. 조사가 막히면 추측으로 채우지 말고 내장 지식 범위로만 목록을 구성한 뒤, 출처 줄에 "조사 차단 -- 내장 지식 기준" 을 명시한다.
 - 특정 언어·프레임워크·회사 제품에 묶인 항목은 넣지 않는다. 이 카탈로그는 언어 중립적인 CS 기초를 담는다. 언어 문법은 `knowledge-scan` 의 언어 카탈로그 소관이다.
 
-<RICOCHET>
+<FORBIDDEN>
 특정 언어·프레임워크·제품에 묶인 항목을 CS 로드맵 카탈로그에 넣지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
 ---
 
@@ -57,10 +57,6 @@ tools: Read, Glob, WebSearch, WebFetch
 - kebab-case 영어로 쓴다. 한국어·공백·대문자·밑줄을 쓰지 않는다.
 - 그 주제를 그대로 가리키는 이름으로 짓는다. 축약은 널리 통용되는 것만 쓴다 (`tcp`, `dns`, `acid` 등).
 - 슬러그가 곧 wip·확정지식 파일명과 대조될 값이므로 임의로 접두사를 붙이지 않는다. 영역 이름을 슬러그에 반복해 넣지 않는다 (`network-tcp-handshake` 가 아니라 `tcp-handshake`).
-
-<PENETRATE>
-슬러그는 kebab-case 영어로 쓰고, 영역 이름을 슬러그에 중복해 넣지 않는다.
-</PENETRATE>
 
 ---
 
@@ -110,10 +106,6 @@ CS 를 나누는 영역 목록을 반환한다. 항목 수는 8~12개를 기준�
 - `exclude` 로 받은 슬러그는 목록에서 뺀다.
 
 한 항목은 노트 하나로 정리될 만한 크기여야 한다. 너무 크면(예: "TCP") 쪼개고, 너무 작으면(예: "TCP 헤더의 window 필드") 상위 항목에 합친다.
-
-<PENETRATE>
-항목은 노트 하나로 정리될 만한 크기로 쪼갠다. 영역 전체나 단일 필드 수준으로 두지 않는다.
-</PENETRATE>
 
 ---
 

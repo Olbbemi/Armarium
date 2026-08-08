@@ -45,38 +45,18 @@ tools: Read, Glob, Grep, Write
 ## 출력 (직접 Write)
 자기 소유 노드 문서를 `<브랜치 디렉토리>/facet/<소스미러>/<노드>.md` 에 **직접 Write** 하고, 본문으로는 **쓴 파일 경로 목록만** 짧게 반환한다(노드 내용을 본문으로 돌려주지 않는다). 구조 노드는 수가 많아(서브트리당 수십 개) 본문으로 돌리면 메인 컨텍스트/턴을 크게 먹으므로, 렌더와 같은 "직접 Write" 부류다. 골격 대비 교차검산은 메인이 Stage 2 에서 한다.
 
-<PENETRATE>
-노드 문서는 고정 섹션 틀(제목·순서: 타입 -> 함수 -> 상수 -> C++ 속성 심화 -> 다른 노드로의 참조)을 따르고, 노드에 없는 섹션만 생략한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 참조 섹션을 `## 다른 노드로의 참조` 외 다른 제목(`소비/위임 참조 요약` 등)이나 상단 인라인 불릿으로 적지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 멤버 함수를 각 타입 헤딩 밑으로 흩지 않는다(메서드는 `## 함수` 한 곳에 모은다).
-</RICOCHET>
+</FORBIDDEN>
 
-<PENETRATE>
-자기 소유 노드 facet 을 직접 Write 하고, 본문으로는 쓴 파일 경로 목록만 반환한다(노드 내용을 본문으로 돌려주지 않는다).
-</PENETRATE>
-
-<PENETRATE>
-골격 인벤토리에 있는 타입/함수를 빠짐없이 등장시키되 깊이는 복잡도에 비례한다.
-</PENETRATE>
-
-<PENETRATE>
-다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
-</PENETRATE>
-
-<PENETRATE>
-이 노드가 다른 노드로 위임·디스패치·소비하는 참조는 추정 가능한 라벨이 아니라 실제 대상 노드를 명시하고 링크한다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 개수를 다시 세거나 파일 인벤토리를 재도출하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 자기 소유 밖의 파일을 문서화하지 않는다(겹침=드리프트).
-</RICOCHET>
+</FORBIDDEN>

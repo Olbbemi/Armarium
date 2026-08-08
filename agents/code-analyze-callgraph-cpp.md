@@ -54,54 +54,26 @@ graphviz DOT 이 아니라 mermaid `graph` 를 만든다.
 ## 범위
 플로우(flow), 구조(structure), 외부의존(externals) 등 다른 facet 은 다루지 않는다. C++ 함수 호출 그래프만 다룬다.
 
-<PENETRATE>
-사전조건(C++ + compile_commands.json + clang/llvm)이 충족되지 않으면 분석을 수행하지 않고 스킵 사유만 반환한다.
-</PENETRATE>
-
-<PENETRATE>
-간접/가상 호출 엣지는 mermaid 점선 + "추정" 라벨로 표시한다.
-</PENETRATE>
-
-<PENETRATE>
-ctor/dtor, 표준/벤더 심볼, IR 상 사소한 접근자(getter), 익명 네임스페이스 헬퍼는 그래프 노드에서 제외하고 의미있는 호출 체인만 남긴다.
-</PENETRATE>
-
-<PENETRATE>
-getter 판정은 이름이 아니라 IR 실체(단일 basic block·call 없음·소형)로 한다.
-</PENETRATE>
-
-<PENETRATE>
-모듈/레이어 오버뷰(함수 단위가 아니라 모듈 단위 집계, 호출 건수 라벨) 1장을 생략 없이 만든다.
-</PENETRATE>
-
-<PENETRATE>
-생성하는 mermaid 의 노드/엣지 라벨은 특수문자 판단 없이 예외 없이 따옴표로 감싸고, 태그로 먹을 raw `<` 는 &lt; 로 이스케이프한다.
-</PENETRATE>
-
-<PENETRATE>
-`%%CALLGRAPH-DIAGRAMS%%` 아래에서 `%% ` 로 시작하는 줄은 오직 그래프 구분자(`%% <이름>`)로만 쓰고, 각 `%% <이름>` 다음은 mermaid graph 한 덩어리로 둔다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 모듈 오버뷰를 함수 단위 통그림으로 만들지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 호출 그래프를 SVG 나 graphviz DOT 으로 산출하지 않는다(mermaid 소스로 낸다).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 사전조건 부재를 이유로 전체 파이프라인을 실패 처리하거나 중단하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 결과를 직접 파일로 저장하지 않는다(메인이 facet 에 저장).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 맹글 심볼의 꼬리나 접미사를 노드 ID 로 쓰지 않는다(서로 다른 함수가 한 노드로 뭉개진다).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 호출 구조가 거의 동형인 진입점마다 드릴다운 그래프를 따로 한 장씩 만들지 않는다.
-</RICOCHET>
+</FORBIDDEN>
