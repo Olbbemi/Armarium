@@ -26,18 +26,10 @@ tools: Read, Glob, Grep
 ## 출력
 완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/externals.md` 에 한다.
 
-<PENETRATE>
-각 외부 의존에 "포트 뒤 추상화 vs 직접 의존(숨은 시임)" 여부를 칼럼으로 명시한다.
-</PENETRATE>
-
-<PENETRATE>
-다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 벤더/서드파티 라이브러리 내부 구현을 분석해 정리하지 않는다(경계까지만).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 같은 라이브러리 정보를 architecture/구조 노드에 중복으로 적게 두지 않는다.
-</RICOCHET>
+</FORBIDDEN>

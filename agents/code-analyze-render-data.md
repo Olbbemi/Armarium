@@ -26,24 +26,16 @@ facet 문서끼리의 교차링크(플로우->구조 노드, externals->어댑�
 
 facet 에 대상이 명시되지 않은(라벨만 있고 링크 없는) 참조는 추정으로 ID 를 채우지 않는다 -- facet 이 단일 진실이라 빠졌으면 그대로 비운다. 존재하지 않는 ID 를 만들면 매달린 참조가 되어 verify 가 잡는다.
 
-<PENETRATE>
-교차참조는 파일 경로가 아니라 스켈레톤의 노드 ID 로 적고, facet 에 명시된 대상만 잇는다.
-</PENETRATE>
-
-<RICOCHET>
-노드 ID 를 소스 파일명이나 facet 파일명에서 재유도하지 않는다(스켈레톤이 단일 출처).
-</RICOCHET>
-
-<RICOCHET>
+<FORBIDDEN>
 facet 에 명시되지 않은 교차참조 대상을 추정으로 채우지 않는다(빠졌으면 비운다).
-</RICOCHET>
+</FORBIDDEN>
 
 ## 데이터 보존 (요약 금지)
 facet 의 데이터를 요약하거나 빼서 옮기지 않는다 -- facet 이 단일 진실이고 data.js 는 그 충실한 이관이다. 표현(표/리스트/다이어그램 배치)은 뷰어가 정하므로, 이 에이전트는 데이터 필드를 스키마대로 채우는 데 집중한다.
 
-<RICOCHET>
+<FORBIDDEN>
 facet 데이터를 요약·삭제해 옮기지 않는다(충실 이관 -- 표현은 뷰어 몫).
-</RICOCHET>
+</FORBIDDEN>
 
 ## mermaid 소스 안전 (생성하는 다이어그램에 적용)
 `architecture.mermaid` 처럼 이 에이전트가 **생성**하는 mermaid 는 두 가지를 반드시 한다(facet 에서 복사만 하는 flow/callgraph 소스는 원본이 이미 안전하다고 보되, 아래 위반이 보이면 교정한다).
@@ -52,21 +44,9 @@ facet 데이터를 요약·삭제해 옮기지 않는다(충실 이관 -- 표현
 
 둘째, 컨테이너에 넣는 mermaid 소스 안에서 브라우저가 HTML 태그로 먹을 `<`(예: `<<interface>>`)는 `&lt;` 로, 짝 `>` 는 `&gt;` 로 이스케이프한다(`<` 뒤에 글자/`/`/`!`/`?` 가 오면 이스케이프).
 
-<PENETRATE>
-생성하는 mermaid flowchart/graph 의 노드/엣지 라벨은 특수문자 판단 없이 항상 따옴표로 감싸고, 태그로 먹을 raw `<` 는 &lt; 로 이스케이프한다.
-</PENETRATE>
-
 ## 출력
 배정 슬라이스의 조각 파일을 직접 Write 한 뒤, **쓴 파일 경로만** 짧게 본문으로 반환한다(JSON 내용은 반환하지 않는다).
 
-<PENETRATE>
-배정 슬라이스의 JSON 조각을 .dataparts/ 에 직접 Write 하고, 본문으로는 쓴 파일 경로만 반환한다.
-</PENETRATE>
-
-<RICOCHET>
-완성 조각/데이터 전체를 한 본문으로 반환하지 않는다(큰 산출은 단일 응답 토큰 한도에서 잘린다).
-</RICOCHET>
-
-<RICOCHET>
+<FORBIDDEN>
 callgraph/flow 의 다이어그램 소스를 재생성하지 않는다(facet 지속본을 그대로 복사 -- 특히 callgraph 는 툴체인 산출).
-</RICOCHET>
+</FORBIDDEN>

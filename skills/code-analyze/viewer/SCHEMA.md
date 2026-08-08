@@ -4,10 +4,6 @@ code-analyze 의 HTML 산출은 고정 뷰어 + 생성 데이터로 나뉜다. �
 
 이 스키마는 **v1** 이다. SPA 운용 경험이 쌓이면 갱신하되, facet 가 지속되는 단일 출처라 재분석 없이 갱신할 수 있다(새 스키마로 facet -> data.js 만 다시 뽑고 뷰어는 내용 해시 비교로 교체).
 
-<PENETRATE>
-뷰어와 render-data 는 window.DATA 구조를 이 파일 단일 출처로 삼아 서로 맞춘다.
-</PENETRATE>
-
 ---
 
 ## 로딩 형태
@@ -19,14 +15,6 @@ window.DATA = { ...아래 구조... };
 ```
 
 `fetch` 가 아니라 `<script src>` 로 주입하므로(`file://` 에서 fetch 는 CORS 로 막힘) 반드시 `window.DATA` 전역 대입 형태여야 한다. 뷰어의 `manifest.js` 도 같은 이유로 `window.MANIFEST = [ ... ]` 전역 대입이다.
-
-<RICOCHET>
-data.js 를 fetch 로 읽는 별도 JSON 파일로 두지 않는다(file:// 에서 막힌다).
-</RICOCHET>
-
-<PENETRATE>
-data.js 는 window.DATA 전역 대입 스크립트로 둔다.
-</PENETRATE>
 
 ---
 
@@ -49,10 +37,6 @@ window.DATA = {
 ```
 
 조건부 섹션(`conventions`, `dataContracts`, `callgraph`)은 데이터가 없으면 **키를 생략**한다. 뷰어는 키 부재/빈 배열을 보고 해당 탭을 숨긴다.
-
-<PENETRATE>
-조건부 섹션은 데이터가 없으면 키를 생략하고, 뷰어는 그 부재로 탭을 숨긴다.
-</PENETRATE>
 
 ---
 
@@ -155,10 +139,6 @@ callgraph: {
 
 SVG 는 쓰지 않는다 -- 모든 그래프는 mermaid 소스다(뷰어가 클라이언트 렌더).
 
-<RICOCHET>
-callgraph 를 렌더된 SVG 로 담지 않는다(mermaid 소스로 담는다).
-</RICOCHET>
-
 ---
 
 ## 교차참조 = 노드 ID
@@ -177,10 +157,6 @@ callgraph 를 렌더된 SVG 로 담지 않는다(mermaid 소스로 담는다).
 | `conventions.pitfalls[].relatedNodes` | `nodes[].id` |
 | `tests[].covers` | `invariants[].id` |
 | `invariants[].coveredBy` | `tests[].id` |
-
-<PENETRATE>
-교차참조는 파일 경로가 아니라 노드/불변식/테스트 ID 로 하고, 그 ID 는 실제 존재하는 대상을 가리킨다.
-</PENETRATE>
 
 ---
 
@@ -206,10 +182,3 @@ render-data 는 위 구조를 통째로 만들지 않고 **슬라이스별 조�
 - `jq` 가 없으면 python 의 json 으로 동일 병합.
 - 합침 후 `.dataparts/` 삭제. 이 디렉토리는 순수 중간물이라 삭제가 정상이다(렌더 입력이 아니라 출력 조립용 -- 다이어그램 등 렌더 입력은 facet 에 지속한다).
 
-<PENETRATE>
-render-data 는 슬라이스별 JSON 조각을 .dataparts/ 에 Write 하고, 메인이 jq 로 조각들을 하나의 window.DATA 객체로 합쳐 data.js 를 만든다(부피가 메인 컨텍스트를 거치지 않게).
-</PENETRATE>
-
-<RICOCHET>
-완성 data.js 전체를 에이전트가 한 본문으로 반환하지 않는다(큰 산출은 단일 응답 토큰 한도에서 잘린다).
-</RICOCHET>

@@ -27,18 +27,11 @@ facet 집합을 읽어 **하나의 읽기 좋은 as-built 마크다운 문서**(
 ## 출력
 완성 마크다운을 `<브랜치 디렉토리>/markdown/` 에 **직접 Write** 한다. 본문으로는 쓴 파일 경로만 짧게 반환한다(마크다운 내용은 반환하지 않는다 -- 큰 산출에서 단일 본문 반환이 잘리는 것을 피한다).
 
-<PENETRATE>
-가로지르는 7종 + 구조 개요만 엮고, 파일노드 깊은 상세는 facet/html 에 맡긴다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 다이어그램 파일을 최종 문서에서 링크로 참조하지 않는다(내용을 복사해 넣는다).
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 구조 파일노드의 전체 시그니처/멤버를 이 사람용 문서에 다 쏟지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
-완성 마크다운 전체를 한 본문으로 반환하지 않는다(큰 산출은 단일 응답 토큰 한도에서 잘린다).
-</RICOCHET>

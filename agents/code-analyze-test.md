@@ -27,18 +27,6 @@ tools: Read, Glob, Grep
 ## 출력
 완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/test.md` 에 한다.
 
-<PENETRATE>
-구조적 커버리지 공백은 골격(진입표면/인벤토리/플로우)만 기준으로 병렬 산출한다.
-</PENETRATE>
-
-<PENETRATE>
-불변식 커버리지 공백(§4)은 선행 입력 invariants.md 의 INV-id 를 기준으로 조인해 집계한다(전체 - 커버).
-</PENETRATE>
-
-<PENETRATE>
-다른 facet/노드로의 교차링크는 이 문서 파일 자신을 기준으로 한 상대경로로 적는다(facet 루트·프로젝트 루트 기준 금지) -- html 이 facet 구조를 미러해 render 가 `.md` -> `.html` 보존만으로 살린다.
-</PENETRATE>
-
-<RICOCHET>
+<FORBIDDEN>
 선행 입력으로 받은 invariants.md 를 제외하고, 같은 배치에서 병렬로 도는 다른 facet(architecture/flow/data-contract/externals/구조)을 읽거나 그 내용을 재도출하지 않는다.
-</RICOCHET>
+</FORBIDDEN>

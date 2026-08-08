@@ -24,10 +24,10 @@ tools: Read, Glob, Grep
 ## 출력
 완성 본문을 반환한다. 저장은 메인이 `<브랜치 디렉토리>/facet/data-contract.md` 에 한다.
 
-<RICOCHET>
+<FORBIDDEN>
 데이터 계약이 없으면 만들어내지 않는다.
-</RICOCHET>
+</FORBIDDEN>
 
-<RICOCHET>
+<FORBIDDEN>
 스키마를 감싸는 어댑터의 구현 상세(시그니처)를 여기 재서술하지 않는다.
-</RICOCHET>
+</FORBIDDEN>
