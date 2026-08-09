@@ -42,7 +42,7 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 ### 입력 예시
 
 ```
-save_path: /home/olbbemi/Project/Herbarium/wip
+save_path: <지식 저장소 루트>/wip
 sections_path: /home/olbbemi/.claude/plugins/cache/hortus/armarium/<버전>/references/knowledge-wip-sections.md
 topic: zmq
 triggered_by: A1, A2, A3
