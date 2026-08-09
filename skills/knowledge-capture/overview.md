@@ -2,8 +2,6 @@
 
 활성된 동안 대화를 지켜보며 개념 공백을 자동 감지하고, 사용자의 명시 저장 요청도 함께 받아 wip 로 캡처하는 스킬.
 
-활성 후 매 발화마다 자동으로 도는 상시 감시가 이 스킬의 성격이다.
-
 wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote` 가 담당한다. 본 스킬은 캡처까지만 다룬다.
 
 ---
@@ -18,8 +16,6 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 | 명시 호출 | 사용자가 `/knowledge-capture` 슬래시 명령으로 부른다 |
 | 자동 호출 | 사용자 발화가 SKILL.md 의 description 과 맞아 하네스가 이 스킬을 띄운다 |
 
-셋 다 사용자가 미리 내린 결정에서 나온다 -- 훅 설치, 슬래시 입력, description 에 맞는 발화.
-
 <FORBIDDEN>
 훅 주입이나 슬래시 명령, description 매칭 없이 이 스킬의 감시를 시작하지 않는다.
 </FORBIDDEN>
@@ -33,7 +29,8 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 | 파일 | 역할 |
 |------|------|
 | `skills/knowledge-capture/delegate/delegate.md` | 캡처 확정 후 -- 경로 확보 · 기존 정리분 대조 · writer 위임 |
-| `references/knowledge-wip-protocol.md` | 세 knowledge 스킬 공용 -- 경로 검증 · writer 호출 · 저장 규칙. delegate.md 가 로드를 지시한다 |
+| `references/herbarium-path.md` | 네 knowledge 스킬 공용 -- 경로 검증. delegate.md 가 로드를 지시한다 |
+| `references/knowledge-wip-protocol.md` | wip 를 만드는 세 스킬 공용 -- writer 호출 · 저장 규칙. delegate.md 가 로드를 지시한다 |
 
 에이전트는 `knowledge-writer` 하나를 쓴다. 정의 파일은 플러그인 루트 `agents/` 에 있다.
 
@@ -54,7 +51,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 | 자동 감지 | LLM 이 대화를 점수표로 판정해 발동 | 개념만 |
 | 명시 요청 | 사용자가 저장을 직접 지시 | 개념 + 코드/문법(지명) |
 
-코드/문법은 눈앞에 코드가 있어야 물어볼 수 있다. 그래서 코드/문법은 명시 요청으로만 들어오며, 코드베이스를 훑어 뽑는 일은 별도 스킬 `knowledge-scan` 이 담당한다.
+코드/문법은 명시 요청으로만 들어오며, 코드베이스를 훑어 뽑는 일은 별도 스킬 `knowledge-scan` 이 담당한다.
 
 ---
 
@@ -66,7 +63,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 
 ### 단계 시각화 (TaskCreate)
 
-이 스킬은 발화마다 자동으로 도는 상시 감지라 매 발화를 task 로 만들지 않는다. 임계 도달이나 명시 요청으로 writer 위임이 발생하는 시점만 표시한다 -- 백그라운드 에이전트 호출이므로 호출 즉시 completed 로 닫고, subject 는 "knowledge-writer 에이전트 호출" 형식으로 쓴다.
+매 발화를 task 로 만들지 않는다. 임계 도달이나 명시 요청으로 writer 위임이 발생하는 시점만 표시한다 -- 백그라운드 에이전트 호출이므로 호출 즉시 completed 로 닫고, subject 는 "knowledge-writer 에이전트 호출" 형식으로 쓴다.
 
 ---
 

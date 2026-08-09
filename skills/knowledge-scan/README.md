@@ -10,7 +10,7 @@ wip 누적까지만 담당하며, 확정지식 승급은 별도 스킬 [`knowled
 
 ## 형제 스킬
 
-wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. 저장 경로 검증 · writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유한다.
+wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 경로 검증은 [`references/herbarium-path.md`](../../references/herbarium-path.md) 를 `knowledge-promote` 까지 넷이 공유한다.
 
 | 스킬 | 진입 | 앵커 |
 |------|------|------|
@@ -46,11 +46,11 @@ wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. 저장
 
 카탈로그 파일은 두 가지를 정한다 -- **스캔 대상 확장자**(cpp 라면 `.cpp .cc .cxx .h .hh .hpp .hxx`)와 **등재된 비자명 문법 목록**(언어 기본 문법은 제외). 확장자는 범위 집계와 순회 양쪽의 기준이라, 빌드 산출물이나 다른 언어 소스는 애초에 세지도 읽지도 않는다.<br>
 각 항목의 신호는 그 토픽을 고유하게 대표하는 **강앵커**로 정의하며, `&&`·`|` 같이 흔하고 모호한 토큰은 오탐만 늘리므로 신호로 쓰지 않는다.<br>
-스캐너는 강앵커를 Grep 으로 찾고 Read 로 확증하며, 기존 knowledge/wip 파일명과 겹치는 topic 은 걸러낸다(dedup). 새 언어는 `languages/` 에 `<lang>.md` 를 더하면 된다.
+스캐너는 강앵커를 Grep 으로 찾고 Read 로 확증하며, 기존 knowledge/wip 파일명(`<language>-<topic>`)과 겹치는 topic 은 걸러낸다(dedup). 언어가 이름에 있어 다른 언어의 같은 topic 을 잘못 걸러내지 않는다. 새 언어는 `languages/` 에 `<lang>.md` 를 더하면 된다.
 
 ## 입력 / 출력
 
-- **저장 위치** -- 스캔 발동이 확정된 뒤 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<topic>.md`. 입력 경로는 origin remote 가 `git@github.com:Olbbemi/Herbarium.git` 인 Herbarium 저장소 하위여야 한다
+- **저장 위치** -- 스캔 발동이 확정된 뒤 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<language>-<topic>.md`. 이 스킬의 산출은 언어 문법이라 파일명에 언어가 앞에 붙는다. 입력 경로는 origin remote 가 Herbarium 인 저장소 하위여야 한다
 - **스캔 대상 경로** -- 저장 경로와 별개로, 활성 직후 물어서 받고 실재하는 디렉토리인지 확인한다
 - **제외 경로** -- 미리 정한 목록은 없다. 범위 표를 보고 사용자가 고른 것만 `exclude_globs` 로 넘어간다
 - **writer 입력 포맷** -- `triggered_by` 는 `code-scan`, `user_known` 은 "기초부터" 고정(아는 주제를 골랐어도 바꾸지 않는다), `kind` 는 항상 `code`, `snippets` 은 스캐너가 준 코드 발췌
