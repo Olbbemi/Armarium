@@ -29,7 +29,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 | 파일 | 역할 |
 |------|------|
 | `skills/knowledge-capture/delegate/delegate.md` | 캡처 확정 후 -- 경로 확보 · 기존 정리분 대조 · writer 위임 |
-| `references/herbarium-path.md` | 네 knowledge 스킬 공용 -- 경로 검증. delegate.md 가 로드를 지시한다 |
+| `references/knowledge-repos.md` | 네 knowledge 스킬 공용 -- 경로 검증. delegate.md 가 로드를 지시한다 |
 | `references/knowledge-wip-protocol.md` | wip 를 만드는 세 스킬 공용 -- writer 호출 · 저장 규칙. delegate.md 가 로드를 지시한다 |
 
 에이전트는 `knowledge-writer` 하나를 쓴다. 정의 파일은 플러그인 루트 `agents/` 에 있다.

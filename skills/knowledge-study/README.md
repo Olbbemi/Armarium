@@ -4,13 +4,13 @@ CS 로드맵 카탈로그를 기준으로 아직 정리하지 않은 주제를 �
 
 ## 무엇을 하나
 
-Herbarium 의 영역별 로드맵 카탈로그를 읽고, 이미 정리한 것과 대조해 미착수 주제를 보여준다.<br>
+지식 저장소의 영역별 로드맵 카탈로그를 읽고, 이미 정리한 것과 대조해 미착수 주제를 보여준다.<br>
 사용자가 고른 주제를 `knowledge-writer` 에이전트에 위임해 wip 본문을 만든다.<br>
 wip 누적까지만 담당하며, 확정지식 승급은 별도 스킬 [`knowledge-promote`](../knowledge-promote/README.md)가 맡는다.
 
 ## 형제 스킬
 
-wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 경로 검증은 [`references/herbarium-path.md`](../../references/herbarium-path.md) 를 `knowledge-promote` 까지 넷이 공유한다.
+wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 대상 저장소 판정은 [`references/knowledge-repos.md`](../../references/knowledge-repos.md) 를 `knowledge-promote` 까지 넷이 공유한다.
 
 | 스킬 | 진입 | 앵커 |
 |------|------|------|
@@ -34,7 +34,7 @@ wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer
 
 ## 카탈로그
 
-로드맵 카탈로그는 armarium 이 아니라 **Herbarium** 에 산다. 정리하다 보면 항목이 계속 늘어나는데, armarium 은 모든 변경이 PR 대상이라 항목 하나 추가에 브랜치를 따야 하기 때문이다.
+로드맵 카탈로그는 armarium 이 아니라 **지식 저장소**(Herbarium)에 둔다. 정리하다 보면 항목이 계속 늘어나는데, armarium 은 모든 변경이 PR 대상이라 항목 하나 추가에 브랜치를 따야 하기 때문이다.
 
 영역당 파일 하나이며 영역 목록은 디렉토리 Glob 으로 얻는다(별도 인덱스 없음).
 
@@ -60,7 +60,7 @@ wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer
 ## 동작 흐름
 
 1. 활성 (`/knowledge-study` 슬래시 명령)
-2. roadmap 경로를 입력받아 검증 (확정지식 경로는 roadmap 경로의 저장소 루트에서 찾음)
+2. roadmap 경로를 입력받아 등록 저장소인지 판정 (확정지식 경로는 roadmap 경로의 저장소 루트에서 찾음)
 3. 카탈로그 로드 -- 비었으면 부트스트랩을 돌릴지 경로를 다시 입력할지 묻는다 (오타 경로도 검증을 통과하므로 자동 진입하지 않음)
 4. wip 경로를 입력받아 검증 (부트스트랩에서 물러날 수 있는 3단계를 지난 뒤에 묻는다)
 5. 진척 대조 -- 슬러그 대조로 3상태 판정

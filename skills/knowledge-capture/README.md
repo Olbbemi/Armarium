@@ -10,7 +10,7 @@ wip 누적까지만 담당하며, 확정지식 승급은 별도 스킬 [`knowled
 
 ## 형제 스킬
 
-wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 경로 검증은 [`references/herbarium-path.md`](../../references/herbarium-path.md) 를 `knowledge-promote` 까지 넷이 공유한다.
+wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 대상 저장소 판정은 [`references/knowledge-repos.md`](../../references/knowledge-repos.md) 를 `knowledge-promote` 까지 넷이 공유한다.
 
 | 스킬 | 진입 | 앵커 |
 |------|------|------|
@@ -75,8 +75,8 @@ overview 와 delegate 를 가른 기준은 로드 시점이다. overview 는 캡
 
 ## 입력 / 출력
 
-- **저장 위치** -- 캡처 확정 시 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<topic>.md`. 입력 경로는 origin remote 가 `git@github.com:Olbbemi/Herbarium.git` 인 Herbarium 저장소 하위여야 하며, 아니면 다시 입력받는다
-- **writer 입력 포맷** -- `save_path` / `topic` / `triggered_by`(점수표 코드, `user-request`, 또는 보강이면 `user-request-reinforce`) / `trigger_summary` / `user_known` / `discussion_context` / `snippets` / `kind` / `language` (라벨+콜론 구조화 텍스트, JSON 아님)
+- **저장 위치** -- 캡처 확정 시 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<topic>.md`. 입력 경로는 `references/knowledge-repos.md` 의 등록 저장소 표에 있는 remote 를 가진 저장소 하위여야 하며, 아니면 다시 입력받는다
+- **writer 입력 포맷** -- `save_path` / `sections_path`(wip 섹션 규격 파일의 절대경로) / `topic` / `triggered_by`(점수표 코드, `user-request`, 또는 보강이면 `user-request-reinforce`) / `trigger_summary` / `user_known` / `discussion_context` / `snippets` / `kind` / `language` (라벨+콜론 구조화 텍스트, JSON 아님)
 
 ## 주의
 

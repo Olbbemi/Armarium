@@ -18,7 +18,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 
 | 파일 | 담는 것 |
 |------|--------|
-| `references/herbarium-path.md` | 받은 경로가 Herbarium 인지 판정하는 절차 |
+| `references/knowledge-repos.md` | 받은 경로가 등록된 지식 저장소인지 판정하는 절차 |
 | `references/knowledge-wip-protocol.md` | `knowledge-writer` 호출 형태 · 입력 포맷 · 반환 본문 저장 |
 
 wip 저장 경로를 확보하는 단계에서 둘 다 Read 툴로 로드해 따른다. 본 스킬이 받는 경로는 wip 저장 디렉토리 하나이며, 경로 검증 절차를 그 경로에 적용한다.
@@ -30,7 +30,7 @@ wip 저장 경로를 확보하는 단계에서 둘 다 Read 툴로 로드해 따
 | 파일 | 역할 |
 |------|------|
 | `skills/knowledge-scan/languages/<lang>.md` (예: `cpp.md`) | 언어별 스캔 대상 확장자 + "정리할 만한 비자명 문법" 목록. 범위 집계와 스캐너 대조의 기준 |
-| `references/herbarium-path.md` | 네 knowledge 스킬 공용 -- 경로 검증 |
+| `references/knowledge-repos.md` | 네 knowledge 스킬 공용 -- 경로 검증 |
 | `references/knowledge-wip-protocol.md` | wip 를 만드는 세 스킬 공용 -- writer 호출 · 저장 규칙 |
 
 에이전트 2개를 쓴다. 정의 파일은 플러그인 루트 `agents/` 에 있다.
@@ -74,7 +74,7 @@ wip 저장 경로를 확보하는 단계에서 둘 다 Read 툴로 로드해 따
 
 상대경로로 받았으면 절대경로로 바꿔 둔다.
 
-이 경로가 스캐너 입력 `codebase_path` 가 된다. 저장 경로(Herbarium wip)와는 별개다.
+이 경로가 스캐너 입력 `codebase_path` 가 된다. 저장 경로(지식 저장소의 wip)와는 별개다.
 
 ---
 
@@ -151,10 +151,10 @@ Task 도구의 prompt 파라미터에 라벨 + 콜론 구조화 텍스트로 전
 | `exclude_globs` | 순회에서 뺄 경로 목록. 사용자가 `범위와 언어 확인` 에서 고른 것뿐이며, 고른 것이 없으면 빈 값 |
 | `language` | 확정 언어 (예: `cpp`) |
 | `catalog_path` | 그 언어의 `skills/knowledge-scan/languages/<lang>.md` 절대경로 |
-| `knowledge_glob` | dedup 대조용 확정지식 Glob. 저장 경로가 속한 Herbarium 저장소의 `knowledge/**/*.md` |
-| `wip_glob` | dedup 대조용 wip Glob. 같은 Herbarium 저장소의 `wip/*.md` |
+| `knowledge_glob` | dedup 대조용 확정지식 Glob. 저장 경로가 속한 지식 저장소의 `knowledge/**/*.md` |
+| `wip_glob` | dedup 대조용 wip Glob. 같은 지식 저장소의 `wip/*.md` |
 
-`knowledge_glob` / `wip_glob` 은 확보한 wip 저장 경로가 속한 Herbarium 저장소 루트에서 구성한다.
+`knowledge_glob` / `wip_glob` 은 확보한 wip 저장 경로가 속한 지식 저장소 루트에서 구성한다.
 
 ---
 
@@ -184,6 +184,7 @@ Task 도구의 prompt 파라미터에 라벨 + 콜론 구조화 텍스트로 전
 | 필드 | 이 스킬의 값 |
 |------|-------------|
 | `save_path` | 확보한 wip 저장 경로 |
+| `sections_path` | 플러그인 루트 `references/knowledge-wip-sections.md` 의 절대경로 |
 | `topic` | 카탈로그의 정식 명칭 그대로 |
 | `triggered_by` | `code-scan` |
 | `trigger_summary` | 코드 스캔에서 발견된 문법임을 한 줄로 |

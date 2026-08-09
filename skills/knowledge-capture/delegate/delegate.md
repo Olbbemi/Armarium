@@ -10,7 +10,7 @@
 
 | 파일 | 담는 것 |
 |------|--------|
-| `references/herbarium-path.md` | 받은 경로가 Herbarium 인지 판정하는 절차 |
+| `references/knowledge-repos.md` | 받은 경로가 등록된 지식 저장소인지 판정하는 절차 |
 | `references/knowledge-wip-protocol.md` | `knowledge-writer` 호출 형태 · 입력 포맷 · 반환 본문 저장 |
 
 둘 다 Read 툴로 로드해 따른다. 본 스킬이 받는 경로는 wip 저장 디렉토리 하나이며, 경로 검증 절차를 그 경로에 적용한다.
@@ -87,7 +87,7 @@ overview `사용자 명시 지시 트리거` 로 들어온 캡처에만 적용�
 
 ## 위임 실행
 
-개념(무엇·왜)과 코드 사용법(어떻게)이 한데 섞인 주제는 concept wip 와 code wip 두 개로 나눠 캡처한다(kind 가 다르면 다른 wip -- promote `2. 형식 변환` 의 kind 결정 규칙 참조).
+개념(무엇·왜)과 코드 사용법(어떻게)이 한데 섞인 주제는 concept wip 와 code wip 두 개로 나눠 캡처한다(kind 가 다르면 다른 wip -- `skills/knowledge-promote/format/format.md` 의 `kind 결정 규칙` 참조).
 
 이 자동 위임은 wip 단계에 한정된다. wip -> 확정지식 승급 단계는 별도 사용자 확인 규약을 따른다.
 
@@ -106,6 +106,7 @@ wip 단계에서 위임 여부 · 묶음 · 분리 여부를 사용자에게 묻
 | 필드 | 이 스킬의 값 |
 |------|-------------|
 | `save_path` | `저장 경로 확보 시점` 에서 확보한 저장 경로 |
+| `sections_path` | 플러그인 루트 `references/knowledge-wip-sections.md` 의 절대경로 |
 | `topic` | 주제 식별자 (kebab-case). 메인이 정한다 |
 | `triggered_by` | 아래 `triggered_by 값` |
 | `trigger_summary` | 어떤 발화·판정으로 발동했는지 한 줄 |
