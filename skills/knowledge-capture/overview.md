@@ -21,7 +21,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 셋 다 사용자가 미리 내린 결정에서 나온다 -- 훅 설치, 슬래시 입력, description 에 맞는 발화.
 
 <FORBIDDEN>
-훅 주입도 슬래시 명령도 description 매칭 없이 이 스킬의 감시를 시작하지 않는다.
+훅 주입이나 슬래시 명령, description 매칭 없이 이 스킬의 감시를 시작하지 않는다.
 </FORBIDDEN>
 
 ---
