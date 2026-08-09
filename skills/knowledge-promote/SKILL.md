@@ -1,9 +1,8 @@
 ---
 name: knowledge-promote
 description: |
-  wip 초안을 확정지식으로 올리고 싶을 때.
-  쌓인 wip 를 정제해 지식으로 확정하려 할 때.
-  "이 wip 승급해줘", "이 wip 를 knowledge 로 올려줘", "cpp20-concepts wip 확정지식으로 만들어줘" 같은 말이 나올 때.
+  사용자가 "/knowledge-promote" 라고 입력해 명시적으로 호출한 경우.
+  자동 호출 대상이 아니며, "이 wip 승급해줘" 같은 자연어로는 발동하지 않는다.
 created: 2026-06-02 13:04
 ---
 
