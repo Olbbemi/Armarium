@@ -20,7 +20,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 
 | 파일 | 담는 것 |
 |------|--------|
-| `references/herbarium-path.md` | 받은 경로가 Herbarium 인지 판정하는 절차 |
+| `references/knowledge-repos.md` | 받은 경로가 등록된 지식 저장소인지 판정하는 절차 |
 | `references/knowledge-wip-protocol.md` | `knowledge-writer` 호출 형태 · 입력 포맷 · 반환 본문 저장 |
 
 활성 직후 둘 다 Read 툴로 로드해 따른다. 본 스킬은 경로를 둘 받으며(`경로 설정`) 받는 시점이 서로 다르다. 경로 검증 절차를 받은 경로마다 각각 적용한다.
@@ -32,7 +32,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 | 파일 | 역할 |
 |------|------|
 | `skills/knowledge-study/bootstrap/bootstrap.md` | 카탈로그가 비었을 때 사용자가 고르면 도는 1회성 채우기 절차 |
-| `references/herbarium-path.md` | 네 knowledge 스킬 공용 -- 경로 검증 |
+| `references/knowledge-repos.md` | 네 knowledge 스킬 공용 -- 경로 검증 |
 | `references/knowledge-wip-protocol.md` | wip 를 만드는 세 스킬 공용 -- writer 호출 · 저장 규칙 |
 
 에이전트 2개를 쓴다. 정의 파일은 플러그인 루트 `agents/` 에 있다.
@@ -68,7 +68,7 @@ wip 를 확정지식으로 올리는 승급은 별도 스킬 `knowledge-promote`
 
 ## 경로 설정
 
-이 스킬은 경로를 둘 받는다. 각각에 `references/herbarium-path.md` 의 검증 절차를 적용한다.
+이 스킬은 경로를 둘 받는다. 각각에 `references/knowledge-repos.md` 의 검증 절차를 적용한다.
 
 | 경로 | 용도 | 받는 시점 |
 |------|------|----------|
@@ -94,7 +94,7 @@ Glob 이 빈 사실과 확인한 경로를 알리고 두 갈래를 묻는다.
 | 갈래 | 처리 |
 |------|------|
 | 부트스트랩 | `skills/knowledge-study/bootstrap/bootstrap.md` 를 Read 툴로 로드해 따른 뒤 이 단계로 돌아온다 |
-| 경로 재입력 | `references/herbarium-path.md` 의 검증을 새 경로에 적용하고 이 단계를 다시 돈다 |
+| 경로 재입력 | `references/knowledge-repos.md` 의 검증을 새 경로에 적용하고 이 단계를 다시 돈다 |
 
 <FORBIDDEN>
 Glob 결과가 비었다는 이유만으로 부트스트랩을 시작하지 않는다.
@@ -199,6 +199,7 @@ Glob 결과가 비었다는 이유만으로 부트스트랩을 시작하지 않�
 | 필드 | 이 스킬의 값 |
 |------|-------------|
 | `save_path` | 카탈로그 로드 뒤 확보한 wip 경로 |
+| `sections_path` | 플러그인 루트 `references/knowledge-wip-sections.md` 의 절대경로 |
 | `topic` | 카탈로그 항목 슬러그 그대로 |
 | `triggered_by` | `roadmap` 또는 `roadmap-reinforce` |
 | `trigger_summary` | 어느 영역의 어떤 항목을 왜 골랐는지 한 줄 |

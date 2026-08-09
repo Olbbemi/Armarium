@@ -10,7 +10,7 @@ wip 누적까지만 담당하며, 확정지식 승급은 별도 스킬 [`knowled
 
 ## 형제 스킬
 
-wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 경로 검증은 [`references/herbarium-path.md`](../../references/herbarium-path.md) 를 `knowledge-promote` 까지 넷이 공유한다.
+wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer 호출 · 저장 규칙은 [`references/knowledge-wip-protocol.md`](../../references/knowledge-wip-protocol.md) 를 셋이 공유하고, 대상 저장소 판정은 [`references/knowledge-repos.md`](../../references/knowledge-repos.md) 를 `knowledge-promote` 까지 넷이 공유한다.
 
 | 스킬 | 진입 | 앵커 |
 |------|------|------|
@@ -50,10 +50,10 @@ wip 를 만드는 스킬은 셋이고, 진입 경로가 서로 다르다. writer
 
 ## 입력 / 출력
 
-- **저장 위치** -- 스캔 발동이 확정된 뒤 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<language>-<topic>.md`. 이 스킬의 산출은 언어 문법이라 파일명에 언어가 앞에 붙는다. 입력 경로는 origin remote 가 Herbarium 인 저장소 하위여야 한다
+- **저장 위치** -- 스캔 발동이 확정된 뒤 사용자에게 입력받는 디렉토리 하위 `<저장경로>/<language>-<topic>.md`. 이 스킬의 산출은 언어 문법이라 파일명에 언어가 앞에 붙는다. 입력 경로는 `references/knowledge-repos.md` 의 등록 저장소 표에 있는 remote 를 가진 저장소 하위여야 한다
 - **스캔 대상 경로** -- 저장 경로와 별개로, 활성 직후 물어서 받고 실재하는 디렉토리인지 확인한다
 - **제외 경로** -- 미리 정한 목록은 없다. 범위 표를 보고 사용자가 고른 것만 `exclude_globs` 로 넘어간다
-- **writer 입력 포맷** -- `triggered_by` 는 `code-scan`, `user_known` 은 "기초부터" 고정(아는 주제를 골랐어도 바꾸지 않는다), `kind` 는 항상 `code`, `snippets` 은 스캐너가 준 코드 발췌
+- **writer 입력 포맷** -- `sections_path` 로 wip 섹션 규격 파일의 절대경로를 함께 넘긴다. `triggered_by` 는 `code-scan`, `user_known` 은 "기초부터" 고정(아는 주제를 골랐어도 바꾸지 않는다), `kind` 는 항상 `code`, `snippets` 은 스캐너가 준 코드 발췌
 
 ## 주의
 

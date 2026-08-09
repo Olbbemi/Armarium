@@ -3,7 +3,7 @@
 `knowledge-capture` · `knowledge-scan` · `knowledge-study` 세 스킬이 공유하는 기반 규약.
 세 스킬은 wip 를 만드는 진입 경로가 서로 다르지만, `knowledge-writer` 를 부르고 그 결과를 저장하는 방법은 같다. 그 공통분모를 여기 한 곳에 둔다.
 
-저장할 경로가 Herbarium 인지 판정하는 방법은 여기 두지 않는다. 그 규약은 `references/herbarium-path.md` 가 단일 출처이며, wip 를 만들지 않는 `knowledge-promote` 도 그것을 함께 쓴다.
+저장할 경로가 등록된 지식 저장소인지 판정하는 방법은 여기 두지 않는다. 그 규약은 `references/knowledge-repos.md` 가 단일 출처이며, wip 를 만들지 않는 `knowledge-promote` 도 그것을 함께 쓴다.
 
 각 스킬은 자기 문서에서 이 파일을 Read 툴로 로드해 따른다. 어느 파일의 어느 시점에서 로드할지는 그 스킬이 정한다. 스킬끼리 서로를 참조하지 않는다.
 
@@ -29,19 +29,21 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 | 필드 | 의미 | 비고 |
 |------|------|------|
 | `save_path` | wip 저장 디렉토리 절대경로 | 경로 검증을 거쳐 채택한 경로. writer 가 충돌 검사·파일명 결정 기준으로 사용 |
+| `sections_path` | wip 섹션 규격 파일 절대경로 | 플러그인 루트 `references/knowledge-wip-sections.md`. writer 가 Read 로 로드해 섹션 구성을 따른다 |
 | `topic` | 주제 식별자 (kebab-case) | wip 파일명 기반 |
 | `triggered_by` | 발동 사유 코드 | 값 목록은 호출한 스킬이 자기 문서에 정의한다. 복수 가능. writer 가 깊이·정정 타깃 산정에 사용 |
 | `trigger_summary` | 한 줄 사유 | 1~2 문장 |
 | `user_known` | 사용자가 안다고 명시한 인접 지식 | writer 의 출발 지식 수준 결정 기준 |
-| `discussion_context` | 캡처가 발생한 맥락 | 왜 이 주제가 지금 필요한가. 이 값들은 writer 의 작성 참고용 입력이며 wip "캡처 맥락" 섹션에 전사하지 않는다 |
+| `discussion_context` | 캡처가 발생한 맥락 | 왜 이 주제가 지금 필요한가. 이 값들은 writer 의 작성 참고용 입력이며 `캡처 맥락` 섹션에 전사하지 않는다 |
 | `snippets` | 근거 발췌 | 무엇을 앵커로 넣을지는 스킬마다 다르다 (대화 발췌 / 코드 발췌 / 카탈로그 항목 발췌) |
-| `kind` | 지식 종류 | `concept`(기본) 또는 `code`. 노트가 답하는 질문으로 정한다(무엇·왜=concept / 어떻게 쓰나=code). 결정 규칙 상세는 promote `2. 형식 변환` 의 kind 결정 규칙 |
+| `kind` | 지식 종류 | `concept`(기본) 또는 `code`. 노트가 답하는 질문으로 정한다(무엇·왜=concept / 어떻게 쓰나=code). 결정 규칙 상세는 `skills/knowledge-promote/format/format.md` 의 `kind 결정 규칙` |
 | `language` | 대상 언어 | `kind: code` 일 때만. `python` / `rust` / `cpp` 등 |
 
 ### 입력 예시
 
 ```
 save_path: /home/olbbemi/Project/Herbarium/wip
+sections_path: /home/olbbemi/.claude/plugins/cache/hortus/armarium/<버전>/references/knowledge-wip-sections.md
 topic: zmq
 triggered_by: A1, A2, A3
 trigger_summary:

@@ -31,10 +31,6 @@ tools: Read, Glob, WebSearch, WebFetch
 2. **정리** -- `mode` 에 맞는 출력 형식으로 목록을 구성한다.
 3. **반환** -- 목록을 최종 메시지로 반환한다. 파일은 저장하지 않는다.
 
-<FORBIDDEN>
-조사 결과를 Write/Edit 으로 파일에 저장하지 않는다.
-</FORBIDDEN>
-
 ---
 
 ## 조사 원칙
