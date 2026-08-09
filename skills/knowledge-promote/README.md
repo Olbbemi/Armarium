@@ -15,7 +15,7 @@ main 에 직접 넣지 않고 브랜치에서 격리해 커밋하며, 푸시·�
 
 ## 구조
 
-- `overview.md` -- 진입점. 경로 설정 · 렌더 대상 전제 · 10단계 실행 순서
+- `overview.md` -- 진입점. 경로 설정 · 산출물 범위 · 10단계 실행 순서
 - `format/format.md` -- 확정지식 형식 규격. 프론트매터 칸 · 언어별 공식 문서 · 본문 표기 규칙 · 코드 지식 구성. 2단계에서 로드한다
 - [`references/knowledge-repos.md`](../../references/knowledge-repos.md) -- 네 knowledge 스킬 공용. 등록 저장소 표와 경로 판정 절차
 - [`references/knowledge-wip-sections.md`](../../references/knowledge-wip-sections.md) -- `knowledge-writer` 와 공용. wip 섹션의 제목·앵커·강제 여부. 2단계에서 함께 로드한다
