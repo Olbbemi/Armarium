@@ -81,8 +81,11 @@ if [ -f "$capture_overview" ]; then
 이 세션에서 \`knowledge-capture\` 는 자동 활성된 상태다. 사용자가 슬래시 명령으로 부르지
 않았어도 아래 overview 를 이미 로드한 것으로 보고 그대로 따른다. 별도로 Read 하지 않아도 된다.
 
+overview 가 Read 를 지시하는 파일 경로는 모두 아래 플러그인 루트 기준이다.
+${plugin_root}
+
 단 wip 저장 경로는 활성 시점에 묻지 않는다. 실제 캡처가 확정되는 순간에 처음 묻는다
-(overview 의 \`저장 경로 확보 시점\` 참조). 캡처가 일어나지 않는 세션은 경로를 묻지 않는다.
+(delegate.md 의 \`저장 경로 확보 시점\` 참조). 캡처가 일어나지 않는 세션은 경로를 묻지 않는다.
 
 $(cat "$capture_overview")"
 fi
