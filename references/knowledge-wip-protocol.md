@@ -3,7 +3,7 @@
 `knowledge-capture` · `knowledge-scan` · `knowledge-study` 세 스킬이 공유하는 기반 규약.
 세 스킬은 wip 를 만드는 진입 경로가 서로 다르지만, 저장할 곳을 정하는 방법과 `knowledge-writer` 를 부르고 그 결과를 저장하는 방법은 같다. 그 공통분모를 여기 한 곳에 둔다.
 
-각 스킬은 자기 overview 에서 이 파일을 Read 툴로 로드해 따른다. 스킬끼리 서로를 참조하지 않는다.
+각 스킬은 자기 문서에서 이 파일을 Read 툴로 로드해 따른다. 어느 파일의 어느 시점에서 로드할지는 그 스킬이 정한다. 스킬끼리 서로를 참조하지 않는다.
 
 ---
 
@@ -11,7 +11,7 @@
 
 wip 를 비롯한 지식 파일은 Herbarium 저장소에만 둔다. 스킬이 사용자에게 디렉토리 경로를 입력받을 때마다 아래 절차로 검증한다.
 
-경로를 코드에 고정하지 않으며, 매 활성마다 새로 입력받는다. 디렉토리명은 동명 저장소가 있을 수 있어 신뢰할 수 없으므로, 검증은 git origin remote 조회로 한다.
+경로를 코드에 고정하지 않으며, 세션마다 새로 입력받는다. 어느 시점에 입력받을지는 호출한 스킬이 정한다. 디렉토리명은 동명 저장소가 있을 수 있어 신뢰할 수 없으므로, 검증은 git origin remote 조회로 한다.
 
 ### 절차
 
@@ -38,10 +38,6 @@ git@github.com:Olbbemi/Herbarium.git
 origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하지 않는다.
 </FORBIDDEN>
 
-<FORBIDDEN>
-지식 파일 경로를 코드에 고정 리터럴로 두지 않는다.
-</FORBIDDEN>
-
 ---
 
 ## 2. knowledge-writer 호출
@@ -56,10 +52,6 @@ origin remote 가 기대 remote URL 과 일치하지 않는 경로를 채택하�
 | `subagent_type` | `knowledge-writer` |
 | `run_in_background` | `true` (백그라운드) |
 | writer 출력 | wip 파일 전체 본문을 최종 메시지로 반환 (Write 안 함) |
-
-<FORBIDDEN>
-`knowledge-writer` 를 포그라운드로 호출하지 않는다.
-</FORBIDDEN>
 
 ### 입력 포맷
 
@@ -78,10 +70,6 @@ Task 도구의 prompt 파라미터에 아래 라벨 + 콜론 구조화 텍스트
 | `language` | 대상 언어 | `kind: code` 일 때만. `python` / `rust` / `cpp` 등 |
 
 `triggered_by` 의 값 목록을 이 파일에 나열하지 않는 이유는, 그 값이 각 스킬의 발동 논리에 종속되기 때문이다. 여기 모아 두면 스킬 하나가 코드를 바꿀 때마다 공용 파일을 함께 고쳐야 한다.
-
-<FORBIDDEN>
-`triggered_by` 의 스킬별 값 목록을 이 공용 파일에 나열하지 않는다.
-</FORBIDDEN>
 
 ### 입력 예시
 
@@ -112,7 +100,3 @@ writer 는 파일을 저장하지 않는다. 메인 에이전트가 완료 통�
 
 - 저장 위치는 `<save_path>/<권장파일명>` 이다. 권장 파일명은 writer 가 충돌 검사를 거쳐 반환한다.
 - 반환 본문의 `&`/`<`/`>` HTML 엔티티는 저장 전 원래 문자로 원복한다. task-notification 이 이스케이프해 넘기기 때문이다.
-
-<FORBIDDEN>
-백그라운드 writer 에게 Write/Edit 으로 wip 파일을 직접 저장하게 하지 않는다.
-</FORBIDDEN>
