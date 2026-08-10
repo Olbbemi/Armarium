@@ -31,10 +31,14 @@
 1. 브랜치 준비: 반드시 main 에서 `skill/YYYY-MM-DD` (작업 당일 날짜) 브랜치를 딴다. 이미 있으면 그대로 체크아웃해 재사용하고, 없으면 main 에서 새로 생성한다. 이전 PR 이 이미 머지됐더라도 당일 날짜 브랜치가 존재하면 재사용한다 -- 새 브랜치를 만들지 않는다.
    - 새로 생성하기 전에 `git fetch` 로 최신 `origin/main` 을 반영한다. 로컬 main 이 origin/main 보다 뒤처져 있으면(이미 머지된 PR 이 로컬에 안 당겨진 상태) 그 옛 베이스에서 따게 되어 이미 머지된 작업이 빠진다. `git checkout -b skill/YYYY-MM-DD origin/main` 처럼 origin/main 을 기점으로 명시하는 것이 안전하다.
 2. 수정·커밋 (커밋 메시지 규칙 동일 -- 영어)
-3. 사용자가 커밋·push 를 요청할 때만 push 한다.
-4. `gh pr list --head skill/YYYY-MM-DD` 로 PR 존재 여부를 먼저 확인한다.
+3. 버전 판정: payload 가 바뀌었으면 `README.md` 의 질문 사다리로 등급을 정해 세 곳을 같은 값으로 올리고 커밋한다. 안 바뀌었으면 건너뛴다.
+   - payload = `skills/` · `agents/` · `references/` · `CLAUDE.md` · `.claude-plugin/`
+   - 비payload = `.claude/` · `.planning/` · `docs/`
+   - 이 단계를 빠뜨리면 머지해도 `/plugin marketplace update` 가 변경을 받아오지 않는다. push 훅이 차단하지만 훅에 기대지 말고 여기서 판정한다.
+4. 사용자가 커밋·push 를 요청할 때만 push 한다.
+5. `gh pr list --head skill/YYYY-MM-DD` 로 PR 존재 여부를 먼저 확인한다.
    - 없으면 `gh pr create` 로 생성한다. 본문에 변경 이유, 영향 범위, 검증 결과를 상세히 기술한다.
    - 있으면 새로 만들지 않는다 (push 로 기존 PR 에 반영). 단 push 전 열림 상태를 재확인하고, 머지·종료됐으면 새 PR 을 만든다.
-5. 머지는 사용자에게 맡긴다 -- push 후 PR URL 만 전달한다.
+6. 머지는 사용자에게 맡긴다 -- push 후 PR URL 만 전달한다.
 
 날짜는 임의로 추정하지 말고 `date '+%Y-%m-%d'` 실행 결과를 쓴다. 당일 날짜 `skill/YYYY-MM-DD` 브랜치가 이미 있으면 새 브랜치를 만들지 않고, PR 도 `gh pr list --head` 확인 없이 새로 만들지 않는다.
