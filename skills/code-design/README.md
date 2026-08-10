@@ -14,6 +14,7 @@
 
 - `overview.md` -- 파이프라인 지도(진입점). 어느 단계든 **먼저 읽고** 진입
 - `principles.md` -- 모든 단계 공통 원칙 (하위 단계는 여기 원칙을 재기술하지 않고 참조만)
+- `cross-flow.md` -- flow 를 넘어 사는 파일 넷(`roadmap.md` · `architecture.md` · `decisions.md` · `qa-checklist.md`)의 규격
 - 단계별 진입 파일
   - `00-ideation.md` -- 구상 (무엇을 왜 만들지/만들지 말지 방향 정의, go/no-go)
   - `01-requirements.md` -- 요구사항 명세
@@ -55,7 +56,7 @@
 
 ## 산출물 저장 경로
 
-모든 단계 산출물은 **프로젝트 루트(git 최상위)** 기준으로 저장된다. code-design 은 **루트에서만** 실행하고, 작업 대상은 브랜치 + 작업할 경로를 **입력으로 받는다**. within-run 산출물은 브랜치별 폴더(`code-design/<브랜치 슬러그>/`, 슬러그 = 브랜치 이름의 `/` 를 `_` 로 치환)에, flow 를 넘어 공유되는 로드맵은 `code-design/roadmap.md` 에 둔다. **착수 전 루트·브랜치·작업할 경로·진입 단계를 확인받고, 중간 진입인데 직전 핸드오프가 없으면 진행하지 않는다**(overview "프로젝트 루트 확인"). 구체적 경로 패턴은 `principles.md` 의 "단계 산출물 저장 정책" 참조.
+모든 단계 산출물은 **프로젝트 루트(git 최상위)** 기준으로 저장된다. code-design 은 **루트에서만** 실행하고, 작업 대상은 브랜치 + 작업할 경로를 **입력으로 받는다**. within-flow 산출물은 브랜치별 폴더(`code-design/<브랜치 슬러그>/`, 슬러그 = 브랜치 이름의 `/` 를 `_` 로 치환)에, flow 를 넘어 공유되는 cross-flow 층 네 파일(`roadmap.md` · `architecture.md` · `decisions.md` · `qa-checklist.md`)은 `code-design/` 루트에 flat 하게 둔다. **착수 전 루트·브랜치·작업할 경로·진입 단계를 확인받고, 중간 진입인데 직전 핸드오프가 없으면 진행하지 않는다**(overview "프로젝트 루트 확인"). 구체적 경로 패턴은 `principles.md` 의 "단계 산출물 저장 정책" 참조.
 
 ## 주의
 
