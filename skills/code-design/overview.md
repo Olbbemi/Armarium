@@ -193,7 +193,14 @@ flow 를 넘어 유지되는 파일 넷은 `code-design/` 루트에 flat 하게 
 
 | 파일 | 역할 | 진입 조건 |
 |------|------|----------|
-| `skills/code-design/03-implementation/languages/cpp.md` | C++ 고유 가드레일 | C++ 사용 시 |
+| `skills/code-design/03-implementation/languages/cpp.md` | C++ 고유 가드레일과 검증 도구 지정 | C++ 사용 시 |
+| `skills/code-design/03-implementation/languages/python.md` | Python 고유 가드레일과 검증 도구 지정 | Python 사용 시 |
+
+**05-coverage**
+
+| 파일 | 역할 | 진입 조건 |
+|------|------|----------|
+| `skills/code-design/05-coverage/lcov-to-coverage.py` | lcov 트레이스를 뷰어용 정규화 데이터로 변환 | 수집 · 변환 단계에서 항상 |
 
 ---
 

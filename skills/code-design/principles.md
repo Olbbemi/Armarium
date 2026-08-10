@@ -280,7 +280,6 @@ Claude 는 승인 · 피드백 내용을 사용자 대신 써넣지 않는다.
 - **00-ideation · 01-requirements · 02-design** -> `handoff.md` 문서 (구상 방향 / 요구사항 명세 / 설계). 다음 단계가 이 문서를 입력으로 읽는다.
 - **03-implementation** -> 별도 `handoff.md` 를 만들지 않는다.
   - 04-verification 으로 넘기는 핸드오프는 코드(소스 트리) + 검증 산출물 틀이다.
-  -
   - 설계 이탈은 G12 에 따라 02-design `handoff.md` 에 동기화하므로 별도 핸드오프 문서가 필요 없다.
 - **04-verification** -> 하류 단계가 없어 핸드오프가 필수가 아니다. 04-verification 뒤에 단계가 생기면 그 단계에 맞는 형태로 둘 수 있고, 반드시 `handoff.md` 형식일 필요는 없다.
 
