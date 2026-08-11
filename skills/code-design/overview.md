@@ -195,6 +195,7 @@ flow 를 넘어 유지되는 파일 넷은 `code-design/` 루트에 flat 하게 
 |------|------|----------|
 | `skills/code-design/03-implementation/languages/cpp.md` | C++ 고유 가드레일과 검증 도구 지정 | C++ 사용 시 |
 | `skills/code-design/03-implementation/languages/python.md` | Python 고유 가드레일과 검증 도구 지정 | Python 사용 시 |
+| `skills/code-design/03-implementation/languages/rust.md` | Rust 고유 가드레일과 검증 도구 지정 | Rust 사용 시 |
 
 **05-coverage**
 

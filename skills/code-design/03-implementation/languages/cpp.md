@@ -10,12 +10,12 @@
 | 출처 축 | 해당 항목 |
 |---------|----------|
 | 자원 · 수명 | CPP-G1 · CPP-G5 |
-| 타입 · 인터페이스 표면 | CPP-G2 · CPP-G14 |
+| 타입 · 인터페이스 표면 | CPP-G2 · CPP-G16 |
 | 빌드 · 진단 | CPP-G3 · CPP-G4 |
-| 동시성 프리미티브 | CPP-G7 ~ CPP-G12 |
+| 동시성 프리미티브 | CPP-G7 ~ CPP-G14 |
 | 테스트 조직 | CPP-G6 |
-| 12종 > 경계값 | CPP-G13 |
-| 12종 > 호환성 | CPP-G14 |
+| 12종 > 경계값 | CPP-G15 |
+| 12종 > 호환성 | CPP-G16 |
 | 12종 > 나머지 | 아래 "검증 12종 -- C++ 에서 쓰는 도구" |
 
 - **CPP-G1. 자원은 RAII/스마트포인터로 관리한다 (raw `new`/`delete` 금지).**
@@ -37,22 +37,40 @@
 - **CPP-G8. 잠금은 RAII(lock_guard/unique_lock/scoped_lock)로 잡고, 여러 뮤텍스는 scoped_lock 으로 한 번에 잡는다. 읽기와 쓰기가 공존하면 읽기-쓰기 잠금(C++17 std::shared_mutex + shared_lock)을 쓴다.**
   예외·조기 return 경로의 해제 누락과 다중 락 순서 데드락을 막고, 읽기가 잦으면 리더끼리 병렬을 허용해 불필요한 직렬화를 피한다.
 
-- **CPP-G9. 잠금 보유 구간(임계영역)은 최대한 좁게 잡는다 -- RAII 잠금은 블록 스코프로 수명을 한정하고, 락을 보유한 채 블로킹 I/O·대기·외부 콜백을 호출하지 않는다.**
-  락 구간이 넓으면 병렬성이 줄고, 락을 보유한 채 블로킹/외부 호출을 하면 데드락·긴 지연을 부른다.
+- **CPP-G9. 잠금 보유 구간(임계영역)은 최대한 좁게 잡는다 -- RAII 잠금은 블록 스코프로 수명을 한정한다.**
+  락 구간이 넓으면 그만큼 병렬성이 줄어 잠금을 도입한 이유가 사라진다.
 
-- **CPP-G10. std::thread 는 detach 하지 않는다 -- join(기본)하거나 std::jthread/스레드 풀로 수명을 관리한다.**
+- **CPP-G10. 얼마나 걸릴지 모르는 호출 -- 블로킹 I/O · 대기 · 외부 콜백 -- 은 락을 놓은 뒤에 한다.**
+  그런 호출을 임계영역 안에 넣으면 데드락과 긴 지연을 부른다. 외부 콜백은 그 안에서 무엇을 다시 잠그는지 이쪽이 알 수 없다.
+
+<FORBIDDEN>
+락을 보유한 채 블로킹 I/O · 대기 · 외부 콜백을 호출하지 않는다.
+</FORBIDDEN>
+
+- **CPP-G11. std::thread 의 수명은 join(기본) · std::jthread · 스레드 풀 중 하나로 관리한다.**
   joinable 상태로 소멸하면 std::terminate 이고, detach 스레드의 수명이 소유자보다 길면 UAF·종료 조율 곤란이 생긴다. 관리되는 스레드가 항상 안전하다.
 
-- **CPP-G11. std::atomic 은 기본 순서(seq_cst)를 그대로 쓰고, 완화는 acquire-release 선까지만 성능 근거가 있을 때 도입한다.**
+<FORBIDDEN>
+std::thread 를 detach 하지 않는다.
+</FORBIDDEN>
+
+- **CPP-G12. std::atomic 은 기본 순서(seq_cst)를 그대로 쓰고, 완화는 acquire-release 선까지만 성능 근거가 있을 때 도입한다.**
   완화된 순서는 재현 어려운 가시성 버그의 근원이고, 순서 보장이 아예 없는 relaxed 는 특히 위험하다.
 
-- **CPP-G12. 어떤 조건이 될 때까지 기다려야 하면 플래그를 바쁜 대기로 폴링하지 말고 condition_variable 로 블록하며, 술어를 받는 wait 로 기다린다.**
-  바쁜 대기는 CPU 를 낭비하고, 술어 없는 wait 는 spurious/lost wakeup 에 노출된다. (동기화 도구 선택: 상호배제는 mutex, 단순 플래그·카운터는 atomic, "조건이 될 때까지 대기"는 cv.)
+- **CPP-G13. 어떤 조건이 될 때까지 기다려야 하면 블로킹 대기로 막는다 -- 기본은 condition_variable 이다.**
+  바쁜 대기는 코어 하나를 통째로 쓰면서 아무 일도 진척시키지 않고, 대기 시간이 길수록 낭비가 그대로 커진다.
 
-- **CPP-G13. signed 정수 오버플로는 연산 전에 범위를 검사해 막는다 -- 연산한 결과값이 뒤집혔는지 보고 판정하지 않는다.**
+<FORBIDDEN>
+조건이 될 때까지 플래그를 바쁜 대기로 폴링하지 않는다.
+</FORBIDDEN>
+
+- **CPP-G14. condition_variable 은 술어를 받는 wait 로 기다린다.**
+  술어 없는 wait 는 spurious wakeup 에 그대로 깨어나고, 조건이 이미 성립한 뒤 wait 에 들어가면 lost wakeup 으로 영영 깨지 않는다. (동기화 도구 선택: 상호배제는 mutex, 단순 플래그·카운터는 atomic, "조건이 될 때까지 대기"는 블로킹 대기 -- 기본은 cv.)
+
+- **CPP-G15. signed 정수 오버플로는 연산 전에 범위를 검사해 막는다 -- 연산한 결과값이 뒤집혔는지 보고 판정하지 않는다.**
   signed overflow 는 UB 라, 컴파일러가 오버플로는 일어나지 않는다는 전제로 사후 검사 코드를 통째로 지운다.
 
-- **CPP-G14. 헤더에 드러난 클래스 레이아웃 · 가상 함수 · 인라인 함수는 ABI 표면으로 보고, 이미 배포된 라이브러리에서 이를 바꾸면 호환성 검증 대상으로 올린다.**
+- **CPP-G16. 헤더에 드러난 클래스 레이아웃 · 가상 함수 · 인라인 함수는 ABI 표면으로 보고, 이미 배포된 라이브러리에서 이를 바꾸면 호환성 검증 대상으로 올린다.**
   C++ 는 표준 ABI 가 없어 헤더만 바꿔도 재컴파일하지 않은 호출자가 링크는 되면서 실행 중에 깨진다.
 
 ---
@@ -71,9 +89,9 @@
 | e2e | 언어 무관 -- 빌드한 바이너리를 프로세스로 띄워 확인한다 | |
 | 유닛 | gtest · Catch2 · doctest | |
 | 통합 | 유닛과 같은 프레임워크 + 픽스처 | |
-| 경합 | TSan (`-fsanitize=thread`) | 계측 빌드가 따로 필요하고 ASan 과 같이 켤 수 없다 |
+| 경합 | TSan (`-fsanitize=thread`) | 계측 빌드가 따로 필요하고 ASan 과 같이 켤 수 없다. 데이터 경합과 락 순서 역전까지가 대상이라 CPP-G10 · CPP-G11 위반은 잡지 못한다 |
 | 계약 | C++ 고유 도구 없음 | 스키마 언어(protobuf 등)를 쓰면 그쪽 생성기를 따른다 |
-| 경계값 | 유닛에 흡수 + UBSan (`-fsanitize=undefined`) | CPP-G13 이 막는 오버플로를 실행 중에 잡는 수단이다 |
-| 정적 분석 | clang-tidy · cppcheck | clang-tidy 는 `compile_commands.json` 이 있어야 동작한다 |
+| 경계값 | 유닛에 흡수 + UBSan (`-fsanitize=undefined`) | CPP-G15 가 막는 오버플로를 실행 중에 잡는 수단이다 |
+| 정적 분석 | clang-tidy · cppcheck | clang-tidy 는 `compile_commands.json` 이 있어야 동작한다. CPP-G14 는 `bugprone-spuriously-wake-up-functions` 가 잡는다 |
 
 ASan(`-fsanitize=address`)은 12종에 대응하는 자리가 없지만 CPP-G1 · CPP-G5 위반을 실행 중에 잡는 수단이다. UBSan 과는 같이 켤 수 있고 TSan 과는 배타적이라, 계측 빌드를 몇 벌 만들지는 검증 산출물 틀을 짤 때 정한다.
