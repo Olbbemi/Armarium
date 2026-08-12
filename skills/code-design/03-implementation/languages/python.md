@@ -1,4 +1,4 @@
-> 역할: 03-implementation 에서 Python 사용 시, 메인 가드레일(G1~G16)에 더해 적용하는 Python 고유 가드레일과
+> 역할: 03-implementation 에서 Python 사용 시, 메인 가드레일(G1~G19)에 더해 적용하는 Python 고유 가드레일과
 >        검증 12종의 Python 도구 지정.
 >        "어떻게 쓰는지"(빌드/테스트 명령, 문법)는 일반 상식·공식 문서·프로젝트 파일에 맡긴다.
 >        라벨 규약과 형식은 `03-implementation.md` 의 "언어 파일 스켈레톤" 을 따른다.
