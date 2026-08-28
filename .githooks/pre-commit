@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# 커밋 전 검증. 통과하지 못하면 커밋을 막는다.
+#
+# 거부(exit 1)로 판정한다. 경고만 내면 그것을 읽는 쪽이 "절차에 없는 부수 경고" 로 보고
+# 넘길 수 있고, 그러면 아무것도 막지 못한다. push 훅이 같은 이유로 deny 를 쓴다.
+#
+# 검사 대상은 워킹트리다. 일부만 스테이지한 커밋에서는 스테이지 내용과 어긋날 수 있다.
+set -u
+
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+cd "$root" || exit 0
+
+[ -f engine/verify.py ] || exit 0
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "커밋 중단: python3 가 없어 검증할 수 없다." >&2
+  exit 1
+fi
+
+if ! python3 engine/selftest.py; then
+  echo "커밋 중단: 엔진 자기검사가 실패했다. 검증 결과를 믿을 수 없는 상태다." >&2
+  exit 1
+fi
+
+python3 engine/verify.py
+code=$?
+case $code in
+  0) exit 0 ;;
+  1) echo "커밋 중단: 결함이 남아 있다." >&2 ;;
+  2) echo "커밋 중단: 검증이 헛돌고 있다. 사람이 봐야 한다." >&2 ;;
+  3) echo "커밋 중단: 확정하지 않은 후보가 있다." >&2 ;;
+  *) echo "커밋 중단: 검증이 예상 밖 종료 코드 $code 를 냈다." >&2 ;;
+esac
+echo "우회는 git commit --no-verify 이지만, 그러면 이 검사가 없는 것과 같다." >&2
+exit 1
