@@ -1,0 +1,18 @@
+{
+  "target": "standards/skills",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "structure.md": "b20193e7dd10e6f408310bc5898842bb13df1b1dc9cd3800133c739cce8c4f7e",
+        "trigger.md": "fedd95fe2a6ed3afca886f0c43b0558442187146595f0b1b13bdbb5ed8d7768d",
+        "writing.md": "8b2f02f95df660d1df164d71558fa218e992e3b1507c7649174bd80ad8d23c30"
+      },
+      "items": {
+        "W4": "pass"
+      },
+      "notes": "repo-structure 6차: 규격 배치와 문서 소유 경계를 검증했다."
+    }
+  ]
+}
