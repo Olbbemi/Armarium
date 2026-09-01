@@ -1,7 +1,7 @@
 {
-  "name": "armarium",
+  "name": "scriptorium",
   "interface": {
-    "displayName": "Armarium"
+    "displayName": "Scriptorium"
   },
   "plugins": [
     {
