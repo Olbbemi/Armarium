@@ -1,0 +1,15 @@
+{
+  "target": "checks",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "fixtures/x/pass/skills/inner/SKILL.md": "534fee55a5b190259fe18dc4c07ef3df95d775f8b9a75ae5cbe38add55f3e331",
+        "run.py": "01d41071ee04eb5290d7944080703e71eb825d5380c1dc107435096525437f1a"
+      },
+      "items": {},
+      "notes": ""
+    }
+  ]
+}
