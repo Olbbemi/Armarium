@@ -1,0 +1,15 @@
+{
+  "name": "armarium",
+  "description": "아르마리움 스킬 저작 규격. 스킬을 만들고 고칠 때의 절차와 규칙, 기계 검사를 제공한다.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Olbbemi"
+  },
+  "homepage": "https://github.com/Olbbemi/Armarium",
+  "repository": "https://github.com/Olbbemi/Armarium",
+  "keywords": [
+    "skills",
+    "authoring",
+    "spec"
+  ]
+}

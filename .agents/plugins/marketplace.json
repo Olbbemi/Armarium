@@ -1,0 +1,19 @@
+{
+  "name": "armarium",
+  "interface": {
+    "displayName": "Armarium"
+  },
+  "plugins": [
+    {
+      "name": "armarium",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

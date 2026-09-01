@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: armarium-checks
+        name: 아르마리움 스킬 규격 검사
+        entry: python3 checks/run.py --full
+        language: system
+        pass_filenames: false
+        always_run: true
