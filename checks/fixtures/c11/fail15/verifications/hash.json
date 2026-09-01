@@ -1,0 +1,14 @@
+{
+  "target": "checks",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "a.py": "zz"
+      },
+      "items": {},
+      "notes": ""
+    }
+  ]
+}

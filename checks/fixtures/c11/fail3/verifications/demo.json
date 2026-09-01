@@ -1,0 +1,14 @@
+{
+  "target": "skills/demo",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "SKILL.md": "534fee55a5b190259fe18dc4c07ef3df95d775f8b9a75ae5cbe38add55f3e331"
+      },
+      "items": {},
+      "notes": ""
+    }
+  ]
+}

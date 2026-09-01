@@ -1,0 +1,23 @@
+{
+  "target": "skills/skill-authoring",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "SKILL.md": "2266dd74be019a741da3aa89ad602242c966b98c1836dd008806bd57171139ac",
+        "requests.md": "6f467734ac1bf000f42eb97726c9f7b7f09f10bed31af962d9891b36483fa5a8"
+      },
+      "items": {
+        "T2": "pass",
+        "T3": "pass",
+        "T4": "pass",
+        "W1": "pass",
+        "W2": "pass",
+        "W3": "pass",
+        "S5": "pass"
+      },
+      "notes": "repo-structure 6차: 스킬 문서의 사람 판정 항목을 검증했다."
+    }
+  ]
+}

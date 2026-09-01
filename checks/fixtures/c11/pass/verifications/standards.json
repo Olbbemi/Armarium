@@ -1,0 +1,14 @@
+{
+  "target": "standards/skills",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "spec.md": "f945979220aacadb8e5de6c45b25b4808d542dd04dbb2195c31b4c44ea237da6"
+      },
+      "items": {},
+      "notes": ""
+    }
+  ]
+}

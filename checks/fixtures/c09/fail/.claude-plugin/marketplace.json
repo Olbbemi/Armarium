@@ -1,0 +1,10 @@
+{
+  "name": "demo",
+  "plugins": [
+    {
+      "name": "demo",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}

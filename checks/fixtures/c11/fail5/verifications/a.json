@@ -1,0 +1,14 @@
+{
+  "target": "checks",
+  "verifications": [
+    {
+      "verifier": "codex",
+      "at": "2026-09-01",
+      "files": {
+        "run.py": "01d41071ee04eb5290d7944080703e71eb825d5380c1dc107435096525437f1a"
+      },
+      "items": {},
+      "notes": ""
+    }
+  ]
+}
